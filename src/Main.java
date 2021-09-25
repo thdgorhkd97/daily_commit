@@ -2,54 +2,56 @@ import java.util.ArrayList;
 
 public class Main {
 
-    //programmers level 2 - 순위 검색
-    // 효율성까지 한 번에 고려하면서 하려다 보니 상당히 오래 걸렸다...
-    // 쓰다 지우다를 반복했는데 처음부터 너무 효율성을 따지는 게 아니라
-    // 일단 구현을 하고 나서 방법에 대해서 다시 고민해봐야 할 것 같다
-    // query에 해당하는 모든 조건을 담아서 info 배열과 일일이 대조해보려 했는데
-    // 이 과정에서 3중 반복문처럼 효율성에 문제가 생길 거 같으면 다시 해보고 다시 지우고
-    // 하다 보니까 너무 시간이 오래 걸리기도 하고 너무 못한 것 같다...
+    // programmers level 2 - 삼각 달팽이
+    // 아래 -> 오른쪽 -> 왼쪽 대각선 이 방향으로 계속 하여
+    // 1부터 증가하면서 수를 쓰는 건데
+    // 이동하는 기준에 해당할 때를 판별하는 게 상당히 번거롭다.
+    // while 문 속에서 기준을 판별해야 하기 때문에 해당 조건을 만족할 때 방향 전환
+    // 이런식으로 정리해야 할 것 같다.
+    // 한화시스템 코딩테스트를 봤는 데 bfs를 코딩에 적용하여 문제를 해결하는 것에 대해서 다시 해야 할 것 같다.
+    // bfs를 활용하는 방법부터 확실히 잡아야겠다.
+
 
     public static void main(String[] args) {
+        int n = 4;
 
-        String[] info = {"java backend junior pizza 150",
-                "python frontend senior chicken 210",
-                "python frontend senior chicken 150",
-                "cpp backend senior pizza 260",
-                "java backend junior chicken 80",
-                "python backend senior chicken 50"};
+        int[][] arr = new int[n][n];
 
-        String[] query = {"java and backend and junior and pizza 100",
-                "python and frontend and senior and chicken 200",
-                "cpp and - and senior and pizza 250",
-                "- and backend and senior and - 150",
-                "- and - and - and chicken 100",
-                "- and - and - and - 150"};
+        int max = 0;
 
-        int[] answer = new int[query.length];
-        ArrayList<String> list =  new ArrayList<>();
-
-        for(int i=0;i< query.length;i++) {
-            list.clear();
-
-            String[] str = query[i].split("and");
-            for(int j=0;j<str.length;j++){
-                list.add(str[j]);
-            }
-
-            for(int j=0;j<5;j++){
-                if(list.get(j).equals(String.valueOf('-'))){
-                    continue;
-                }
-                else{
-
-                }
-            }
-
-
+        for(int i=1;i<=n;i++) {
+            max += i;
         }
 
+        int[] answer = new int[max];
+
+
+        for (int i = 0; i < n; i++) { // 모두 -1로 세팅
+            for (int j = 0; j <= i; j++) {
+                arr[i][j] = -1;
+            }
+        }
+
+        int i = 0, j = 0, k = 1;
+
+        arr[i][j] = k;
+
+        /*
+
+        while (k < max) {
+            while (i + 1 < n && k < max && arr[i + 1][j] < 0) {
+                arr[++i][j] = ++k;
+            }
+
+            while (j + 1 < n && k < max && arr[i][j + 1] < 0) {
+                arr[i][++j] = ++k;
+            }
+
+         */
 
     }
+
+
+
 
 }

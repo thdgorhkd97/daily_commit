@@ -3,45 +3,45 @@ import java.util.*;
 
 public class Main {
 
-    // 무한히 많은 회의실에서 회의한 시간이 주어질 때, 가장 많은 회의실이 사용된 시간을 모두 구하라
-    // 무한히 많은 회의실이라는 문제 조건이 있었는 데 회의실에서의 회의 시간인 info[][] 가 행이 10000이하라는
-    // 문제 조건이 있어서 회의실을 10001개라고 잡고 풀었는데 이게 문제 조건을 활용한 건지, 무시한 건지 애매하다.
-    // 문제 자체는 그리 어렵지 않았는데 무한한 회의실을 문제의 조건때문에 10000개로 한정했다는 점과
-    // 회의시간만큼 모두 더했다는 점에서 조금 석연찮은 부분이 있다.
-
+    // programmers level 2 - 점프와 순간 이동
+    // 효율성 테스트를 위해서는 jump 함수를 안 하고 그냥 main에 넣으면 된다.(호출 시간때문)
+    // 가독성을 위해서 함수로 빼두려 한다.
+    // 올라가는 경우를 생각한다면 n을 넘어가는 경우, 뛰거나 점프하는 경우 등등
+    // 수많은 경우가 존재하기 때문에 내려오는 경우를 생각하는 게 좋다.
+    // 0의 위치에서 순간이동이 안되고 반드시 1로는 이동해야 했기때문에 answer = 1로 초기화하고
+    // 1의 위치에서 생각하는 게 좋았다.
+    // 배터리 사용량을 최소로 하기 위해서는 순간 이동을 많이 해야 했으므로 짝수일 때는 나누기 2를 해서 배터리를 사용하지 않고
+    // 홀수일 때만 1을 빼서 다시 순간이동을 할 수 있게 한다.
 
     public static void main(String[] args) {
 
-        int[][] info = {{3,5},{1,8},{5,14}};
+        int N = 5;
+        int answer = 1; // 1만큼 이동하고 1의 위치에서 시작한다고 가정
 
-        int[] meeting = new int[10001];
+        // N에서 0으로 반대로 내려온다고 생각해보면
+        // N이 짝수면 N/2 위치까지 가면 순간 이동가능
 
-        for(int i=0;i<info.length;i++){
-            for(int j=info[i][0];j<=info[i][1];j++){
-                meeting[j] += 1;
-            }
-        }
-
-        int max = 0;
-        meeting[0] = max;
-
-        for(int i=1;i<10001;i++){
-            if(max < meeting[i]){
-                max = meeting[i];
-            }
-        }
-
-        ArrayList<Integer> max_meeting = new ArrayList<>();
-        for(int i=0;i<meeting.length;i++){
-            if(meeting[i] == max){
-                max_meeting.add(i);
-            }
-        }
-
-        int[] answer = new int[max_meeting.size()];
-        for(int i=0;i<answer.length;i++){
-            answer[i] = max_meeting.get(i);
-        }
-
+        answer = jump(N);
+        System.out.println(answer);
     }
+
+    public static int jump(int n){
+        int result = 1;
+        int cnt = 0;
+        while(n != 1){
+            if(n % 2 == 0){
+                n = n/2;
+            }
+            else{
+                n=n-1;
+                cnt++;
+            }
+        }
+
+        result += cnt;
+
+        return result;
+    }
+
+
 }

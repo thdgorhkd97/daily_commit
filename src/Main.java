@@ -3,45 +3,61 @@ import java.util.*;
 
 public class Main {
 
-    // programmers level 2 - 점프와 순간 이동
-    // 효율성 테스트를 위해서는 jump 함수를 안 하고 그냥 main에 넣으면 된다.(호출 시간때문)
-    // 가독성을 위해서 함수로 빼두려 한다.
-    // 올라가는 경우를 생각한다면 n을 넘어가는 경우, 뛰거나 점프하는 경우 등등
-    // 수많은 경우가 존재하기 때문에 내려오는 경우를 생각하는 게 좋다.
-    // 0의 위치에서 순간이동이 안되고 반드시 1로는 이동해야 했기때문에 answer = 1로 초기화하고
-    // 1의 위치에서 생각하는 게 좋았다.
-    // 배터리 사용량을 최소로 하기 위해서는 순간 이동을 많이 해야 했으므로 짝수일 때는 나누기 2를 해서 배터리를 사용하지 않고
-    // 홀수일 때만 1을 빼서 다시 순간이동을 할 수 있게 한다.
+    // programmers level 2 - 삼각 달팽이
+    // 아래 오른쪽 왼쪽위 이 규칙에 따라서 방향이 전환되고 그에 따라 n에서부터 숫자가 달라지는 걸 알고 나서 풀렸다
+    // n = 4이면 아래 오른쪽 왼쪽위 아래 이렇게 4번 방향이 전환되고
+    // 아래일 때 4 오른쪽일때 3 왼쪽위일때 2 아래 1 이렇게
+    // n에서부터 1씩 감소하며 숫자를 쓰기 때문이다.
+    // n X n 행렬에 규칙에 따라 채우고 채워진 걸 answer행렬로 옮긴다.
 
     public static void main(String[] args) {
 
-        int N = 5;
-        int answer = 1; // 1만큼 이동하고 1의 위치에서 시작한다고 가정
+        int n = 5;
 
-        // N에서 0으로 반대로 내려온다고 생각해보면
-        // N이 짝수면 N/2 위치까지 가면 순간 이동가능
+        int max = 0;
+        for(int i=n;i>0;i--){
+            max += i;
+        }
 
-        answer = jump(N);
-        System.out.println(answer);
-    }
+        int[] answer = new int[max];
 
-    public static int jump(int n){
-        int result = 1;
-        int cnt = 0;
-        while(n != 1){
-            if(n % 2 == 0){
-                n = n/2;
-            }
-            else{
-                n=n-1;
-                cnt++;
+        int[][] map = new int[n][n];
+
+        int x = 0, y = -1;
+        int num = 1;
+
+        for(int i=0;i<n;i++){ // 방향전환이 n번 이루어짐
+            for(int j=i;j<n;j++){ // 방향으로 n개의 숫자만큼 있다.
+                // n = 4면 방향 전환 4번, 방향 전환때마다 4 3 2 1
+                if(i % 3 == 0){ // 아래로 이동
+                    y++;
+                }
+                else if(i % 3 == 1){ // 오른쪽 이동
+                    x++;
+                }
+                else{ // 왼쪽 대각선
+                    y--;
+                    x--;
+                }
+                map[y][x] = num++;
             }
         }
 
-        result += cnt;
+        int idx = 0;
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                if(map[i][j] != 0){
+                    answer[idx++] = map[i][j];
+                }
+            }
+        }
 
-        return result;
+        for(int i=0;i<max;i++){
+            System.out.print(answer[i] + " ");
+        }
+
+
+
     }
-
 
 }

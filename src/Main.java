@@ -3,60 +3,59 @@ import java.util.*;
 
 public class Main {
 
-    // programmers level 2 - 쿼드 압축 후 개수 세기
-    // 분할 정복이라는 방법을 활용해야 했다.
-    // 배열을 4로 나누고 각 구역을 나눠가면서 1칸만 남을때까지 계속한다.
-    // 와중에 각 구역에 0이나 1로만 이뤄졌는지 확인한다.
-    // 이때, 0이나 1로만 이루어진걸 어떻게 해야 하는지 몰랐는데 그냥
-    // 정답배열에다가 1을 더하고 기본배열 자체에는 손을 대지 않는 방법이 있다.
+    // S사 코딩테스트 - 개미수열
+    // 1 11 12 1121 122111 ...
+    // 개미수열은 1 -> 11 에서의 과정은 "1이 하나" 이기 때문에 11이된다.
+    // 11 -> 12 는 11은 "1이 둘" 이기 때문에 12가 된다.
+    // 12 -> 1121 은 12는 "1이 하나 2가 하나" 이기 때문에 1121이 된다.
+    // ant_arr 에서 문자가 다를 때마다 체크를 했는데 그렇게 하다보니 다르다는 else문에 들어가지 않는
+    // 마지막까지 비교하던 문자에 대해서 추가되지 않는 문제가 있었다.
+    // 그래서 for문에서만 하는 것이 아니라 마지막으로 비교하던 문자에 대해서 추가하기 위해서
+    // for문 밖에서 마지막으로 append 해주어야 한다.
+
+
+    private static String[] ant = new String[40]; // 문제조건이 40까지 구한다
 
     public static void main(String[] args) {
 
-        int[][] arr = {{1,1,0,0},{1,0,0,0},{1,0,0,1},{1,1,1,1}};
+        String answer = "";
 
-        int[] answer = new int[2];
-        quad(arr.length, 0, 0, arr, answer);
+        ant[0] = "1";
 
-        System.out.println(answer[0] + " " + answer[1]);
-    }
-
-
-        public static void quad ( int length, int y, int x, int[][] arr, int[] answer){
-            if (length == 1) {
-                if (arr[y][x] == 1) {
-                    answer[1]++;
-                } else {
-                    answer[0]++;
-                }
-
-                return;
-            }
-
-            if (isZip(length, y, x, arr, answer)) return ;
-
-            quad(length / 2, y, x, arr, answer);
-            quad(length / 2, y + length / 2, x, arr, answer);
-            quad(length / 2, y, x + length / 2, arr, answer);
-            quad(length / 2, y + length / 2, x + length / 2, arr, answer);
+        for(int i=1;i<40;i++){
+            ant[i] = ant_arr(ant[i-1]);
         }
 
-        public static boolean isZip ( int length, int y, int x, int[][] arr, int[] answer){
-            int number = arr[y][x];
-
-            for (int i = y; i < y+length; i++) {
-                for (int j = x; j < x+length; j++) {
-                    if (number != arr[i][j]) {
-                        return false;
-                    }
-                }
-            }
-
-            if (arr[y][x] == 1) {
-                answer[1]++;
-            } else {
-                answer[0]++;
-            }
-            return true;
-
+        for(int i=0;i<40;i++){
+            System.out.println(ant[i]);
+            System.out.println();
         }
+
     }
+
+    public static String ant_arr(String str){
+
+        StringBuffer sb = new StringBuffer();
+
+        char ch = str.charAt(0);
+        int cnt = 1;
+
+        for(int i=1;i<str.length();i++){
+            if(ch == str.charAt(i)){
+                cnt++;
+            }
+            else{
+                sb.append(ch);
+                sb.append(String.valueOf(cnt));
+                ch = str.charAt(i);
+                cnt=1;
+            }
+        }
+
+        sb.append(ch);
+        sb.append(String.valueOf(cnt));
+
+        return sb.toString();
+
+    }
+}

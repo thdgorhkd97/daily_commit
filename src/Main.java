@@ -3,59 +3,56 @@ import java.util.*;
 
 public class Main {
 
-    // S사 코딩테스트 - 개미수열
-    // 1 11 12 1121 122111 ...
-    // 개미수열은 1 -> 11 에서의 과정은 "1이 하나" 이기 때문에 11이된다.
-    // 11 -> 12 는 11은 "1이 둘" 이기 때문에 12가 된다.
-    // 12 -> 1121 은 12는 "1이 하나 2가 하나" 이기 때문에 1121이 된다.
-    // ant_arr 에서 문자가 다를 때마다 체크를 했는데 그렇게 하다보니 다르다는 else문에 들어가지 않는
-    // 마지막까지 비교하던 문자에 대해서 추가되지 않는 문제가 있었다.
-    // 그래서 for문에서만 하는 것이 아니라 마지막으로 비교하던 문자에 대해서 추가하기 위해서
-    // for문 밖에서 마지막으로 append 해주어야 한다.
+    // 알고리즘 - bfs 실습
+    // bfs 실습문제가 보여서 bfs를 구현하였다.
+    // 단, 미리 행렬을 만들어놓은게 아니라 입력을 받아서 실행한다.
+    // 한 번에 구현할 수 있을 줄 알았는데 bfs 함수내에서
+    // for문의 범위를 graph의 길이만큼으로 했어야 하는데 num으로 했었다.
+    // 이 부분이 아쉬웠다.
 
-
-    private static String[] ant = new String[40]; // 문제조건이 40까지 구한다
 
     public static void main(String[] args) {
 
-        String answer = "";
 
-        ant[0] = "1";
+        Scanner sc = new Scanner(System.in);
 
-        for(int i=1;i<40;i++){
-            ant[i] = ant_arr(ant[i-1]);
+        int n = sc.nextInt();
+        int m = sc.nextInt();
+        int s = sc.nextInt();
+
+        int[][] graph = new int[n+1][n+1];
+
+        for(int i=0;i<m;i++){
+            int edge1 = sc.nextInt();
+            int edge2 = sc.nextInt();
+
+            graph[edge1][edge2] = 1;
+            graph[edge2][edge1] = 1;
         }
 
-        for(int i=0;i<40;i++){
-            System.out.println(ant[i]);
-            System.out.println();
-        }
+        boolean[] visited = new boolean[n+1];
+
+        bfs(s,visited,graph);
 
     }
 
-    public static String ant_arr(String str){
+    public static void bfs(int start,boolean[] visited,int[][] graph){
 
-        StringBuffer sb = new StringBuffer();
+        visited[start] = true;
+        Queue<Integer> q = new LinkedList<>();
+        q.add(start);
 
-        char ch = str.charAt(0);
-        int cnt = 1;
+        while(!q.isEmpty()){
+            int num = q.poll();
+            System.out.println(num);
 
-        for(int i=1;i<str.length();i++){
-            if(ch == str.charAt(i)){
-                cnt++;
-            }
-            else{
-                sb.append(ch);
-                sb.append(String.valueOf(cnt));
-                ch = str.charAt(i);
-                cnt=1;
+            for(int i=1;i< graph.length; i++){ // <- i의 범위를 <= num 으로 했었다
+                if(!visited[i] && graph[num][i] == 1){
+                    q.add(i);
+                    visited[i] = true;
+                }
             }
         }
-
-        sb.append(ch);
-        sb.append(String.valueOf(cnt));
-
-        return sb.toString();
 
     }
 }

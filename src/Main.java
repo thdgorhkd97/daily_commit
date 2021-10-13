@@ -3,11 +3,13 @@ import java.util.*;
 public class Main {
 
     // programmers level 2 - 교점에 별 만들기
-    // 좌표를 -만큼 +해서 모두 양수로 해서 계산하려고 했는데
-    // 이런식으로 하다보니 직선형으로 나오는 모습에서 에러가 발생한다.
-    // 일반적으로 가능한 방식을 다시 고려해봐야 할 것 같다.
-    // - ~ + 를 모두 포용하는 좌표에서의 계산을 일반적으로 표현할 수 있는 방식을 생각해보자
-    // 직선형으로 "*.*" 인 이중 배열에서 y쪽의 길이가 1인 경우에 에러가 발생한다,
+    // 좌표를 계산하는 방식자체는 그대로 두고 정수인 교점만을 구해서
+    // 이중배열에 해당하는 좌표를 *로 바꾸는 방식을 하려했는데
+    // 이 방식 자체가 애초에 map의 크기를 지정하는 과정에서
+    // 교점의 좌표가 해당 배열의 크기를 넘어서는 케이스가 반드시 존재해서 오류가발생하는 것 같다.
+    // 해당 방식이 맞는 것 같아서 어제에 이어 오늘까지 시도했는데
+    // 해당 방식 자체의 로직이 문제가 있는 것 같다.
+    // 새로운 접근 방식을 고려해봐야 할 것 같다.
 
     public static void main(String[] args) {
 
@@ -54,78 +56,39 @@ public class Main {
         int x_length = x_max-x_min+1;
         int y_length = y_max-y_min+1;
 
-        String[] answer = new String[x_length];
+        String[] answer = new String[y_length];
 
-        if(x_min < 0){
-            for(int i=0;i<list.size();i++){
-                list.get(i)[0] -= x_min;
-            }
-        }
-        else{
-            for(int i=0;i<list.size();i++){
-                list.get(i)[0] += x_min;
-            }
+        for(int i=0;i<list.size();i++){
+            list.get(i)[0] += Math.abs(x_min);
+            list.get(i)[1] += Math.abs(y_min);
         }
 
-        if(y_min < 0){
-            for(int i=0;i<list.size();i++){
-                list.get(i)[1] -= y_min;
-            }
+        for(int i=0;i<list.size();i++){
+            System.out.println(i + " 번째 list " + list.get(i)[0] + " " + list.get(i)[1]);
         }
-        else{
-            for(int i=0;i<list.size();i++){
-                list.get(i)[1] += y_min;
+
+        String[][] map = new String[x_length][y_length];
+        for(int i=0;i<y_length;i++){
+            for(int j=0;j<x_length;j++){
+                map[i][j] = ".";
             }
         }
 
         for(int i=0;i<list.size();i++){
-            System.out.println(list.get(i)[0] + " " + list.get(i)[1]);
+            map[list.get(i)[1]][list.get(i)[0]] = "*";
         }
 
-        String[][] map = new String[x_length][y_length];
-        System.out.println("map의 크기 : " + x_length + " " + y_length);
-
-        if(y_length != 1) {
-            for (int i = 0; i < x_length; i++) {
-                for (int j = 0; j < y_length; j++) {
-                    map[i][j] = ".";
-                }
-            }
-        }
-        else{
-            for(int i=0;i<x_length;i++){
-                map[i][1] = ".";
-            }
-        }
-
-        int idx=0;
-        for(int i=0;i<answer.length;i++){
-            for(int j=0;j<list.size();j++){
-                if(list.get(j)[1] == i){
-                    map[i][list.get(j)[0]] = "*";
-                }
-            }
-        }
-
-
-//        for(int i=0;i<x_length;i++){
-//            for(int j=0;j<y_length;j++){
-//                System.out.print(map[i][j] + " ");
-//            }
-//            System.out.println();
-//        }
-
-        idx = 0;
-        for(int i=map.length-1;i>=0;i--){
-
+        for(int i=0;i<y_length;i++){
             StringBuffer sb = new StringBuffer();
-            for(int j=0;j<map[i].length;j++){
+            for(int j=0;j<x_length;j++){
                 sb.append(map[i][j]);
             }
-            answer[idx++] = sb.toString();
+            answer[answer.length-1-i] = sb.toString();
         }
 
-
+        for(int i=0;i<answer.length;i++){
+            System.out.println(answer[i]);
+        }
 
     }
 }

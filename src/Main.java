@@ -3,10 +3,14 @@ import java.util.*;
 public class Main {
 
     // programmers level 2 - 거리두기 확인하기
+    // 해결
     // 2칸이 차이나는 경우 , 대각선으로 만나는 경우
     // 에 대해서 나눠서 생각을 해보았는데 로직은 맞는 것 같은데
-    // 어떤 경우에 틀린건지 확인해보아야 할 것 같다.
-    // 26.1 / 100
+    // 특이한 케이스에 대해서만 생각하고 일반적인 경우를 고려하지 않았다.
+    // 2칸이 차이나는 경우에 대해서만 고려했는데
+    // 생각해보면 가장 간단한 경우인 1칸이 차이나는 경우에 대해서 코드가 없었고
+    // 어떤 경우에 대해서 체크했는지 확인하는과정에서 알게 되었다..
+
 
     public static void main(String[] args) {
 
@@ -70,6 +74,19 @@ public class Main {
                         return 0;
                     }
                     if(i+1<=str.length-1 && j+1<=4 && map[i+1][j+1] =='P' && (map[i+1][j]=='O' || map[i][j+1] =='O')){
+                        return 0;
+                    }
+
+                    if(i-1 >=0 && map[i-1][j]=='P'){
+                        return 0;
+                    }
+                    if(i+1 <= str.length-1 && map[i+1][j] == 'P'){
+                        return 0;
+                    }
+                    if(j-1>=0 && map[i][j-1] =='P'){
+                        return 0;
+                    }
+                    if(j+1 <= 4 && map[i][j+1]=='P'){
                         return 0;
                     }
 

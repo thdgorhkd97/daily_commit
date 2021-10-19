@@ -2,69 +2,60 @@ import java.util.*;
 
 public class Main {
 
-    // programmers 복서 정렬하기
-    // 정렬하는 것에서 좀 시간이 걸린 문제다.
+    // programmers level 2 - 전력망을 둘로 나누기
+    // 며칠동안 될 듯 안될듯 해서 결국 풀이를 보고 나서야 해결하였다.
+    // 내가 못한 이유
+    // 1. 각 정점에 연결된 다른 노드들을 배열로 넣을 때 해쉬와 같은 방향으로 넣어야 했다
+//    1 -> 2 6
+//    2 -> 1 6
+//    3 -> 5 4 이런식으로 각 정점에 연결된 다른 정점을 표현하는 것이 훨씬 편하게 조절 가능하다
+    // 2. bfs를 표현하는 방식이 약간 다르다.
+    // check가 true 일때 안 하고 false일때 재귀로 다시 하는 식으로 해야 했다.
 
-//        Arrays.sort(rank, (a, b) -> {
-//        if(a[1] != b[1]) return b[1] - a[1];
-//        if(a[2] != b[2]) return b[2] - a[2];
-//        if(a[3] != b[3]) return b[3] - a[3];
-//        return a[0] - b[0];
-//    });
+    // 전체적인 코드는 비슷했는데 디테일적인 부분이 약간씩 달랐다.
+    // 인접배열로 표현한 방식을 해쉬와 같은 방식으로 넣는 등의 변화를 시도했으면
+    // 더 좋았을 텐데 더 많은 방식으로 접근해봐야 할 것 같다.
 
-    // 해당 방식으로 rank의 인덱스를 활용하여 정렬을 깔끔하게 할 수 있다.
-    // 그리고 rank[i][1] = (int)((double)win / cnt * 10000000);
-    // 하나만 double 형이라서 어떻게 해야하는지도 좀 고생했는데
-    // 이런 식으로 처리하여 int형으로 자료값을 넣는 것도 가능하다(double 변수를 int로 넣을 때)
-    // double 형으로 저장하면 비교할 때 또 처리해야 하니까 이런 식으로 하면 한번에 정렬이 가능
+   static ArrayList[] array;
 
     public static void main(String[] args) {
 
-        int[] weights = {50,82,75,120};
-        String[] head2head = {"NLWL","WNLL","LWNW","WWLN"};
+        int n = 9;
+        int[][] wires = {{1,3},{2,3},{3,4},{4,5},{4,6},{4,7},{7,8},{8,9}};
 
-        int[][] rank = new int[weights.length][4];
+        int answer = 101;
+        array = new ArrayList[n+1];
 
-        for(int i = 0; i < weights.length; i++) {
-            int w = weights[i];
-            int cnt = 0;
-            int win = 0;
-            int over = 0;
-
-            for(int j = 0; j < weights.length; j++) {
-                char c = head2head[i].charAt(j);
-
-                if(c != 'N') {
-                    cnt++;
-                }
-                if(c == 'W'){
-                    win++;
-                    if(weights[i] < weights[j]){
-                        over++;
-                    }
-                }
-            }
-
-            rank[i][0] = i + 1;
-            rank[i][1] = (int)((double)win / cnt * 10000000);
-            rank[i][2] = over;
-            rank[i][3] = weights[i];
-
-        }
-        Arrays.sort(rank, (a, b) -> {
-            if(a[1] != b[1]) return b[1] - a[1];
-            if(a[2] != b[2]) return b[2] - a[2];
-            if(a[3] != b[3]) return b[3] - a[3];
-            return a[0] - b[0];
-        });
-
-        int[] answer = new int[weights.length];
-
-        for(int i = 0; i < weights.length; i++) {
-            answer[i] = (int)rank[i][0];
+        for(int i=1;i<=n;i++){
+            array[i] = new ArrayList<>();
         }
 
+        for(int i = 0 ; i < wires.length; i++) {
+            array[wires[i][0]].add(wires[i][1]);
+            array[wires[i][1]].add(wires[i][0]);
+        }
 
+        for(int i = 0 ; i < wires.length; i++) {
+            boolean[] check = new boolean[n+1];
+            check[wires[i][0]] = true;
+            check[wires[i][1]] = true;
+            int a = bfs(wires[i][0],check);
+            int b = bfs(wires[i][1],check);
+            answer = Math.min(answer, Math.abs(a-b));
+        }
+
+        System.out.println(answer);
 
     }
+    private static int bfs(int index,boolean[] check) {
+        int sum = 1;
+        check[index] = true;
+        for(int i = 0 ; i < array[index].size(); i++){
+            if(check[(int)array[index].get(i)]) continue;
+            sum += bfs((int) array[index].get(i),check);
+        }
+
+        return sum;
+    }
+
 }

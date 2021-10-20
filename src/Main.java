@@ -2,60 +2,34 @@ import java.util.*;
 
 public class Main {
 
-    // programmers level 2 - 전력망을 둘로 나누기
-    // 며칠동안 될 듯 안될듯 해서 결국 풀이를 보고 나서야 해결하였다.
-    // 내가 못한 이유
-    // 1. 각 정점에 연결된 다른 노드들을 배열로 넣을 때 해쉬와 같은 방향으로 넣어야 했다
-//    1 -> 2 6
-//    2 -> 1 6
-//    3 -> 5 4 이런식으로 각 정점에 연결된 다른 정점을 표현하는 것이 훨씬 편하게 조절 가능하다
-    // 2. bfs를 표현하는 방식이 약간 다르다.
-    // check가 true 일때 안 하고 false일때 재귀로 다시 하는 식으로 해야 했다.
-
-    // 전체적인 코드는 비슷했는데 디테일적인 부분이 약간씩 달랐다.
-    // 인접배열로 표현한 방식을 해쉬와 같은 방식으로 넣는 등의 변화를 시도했으면
-    // 더 좋았을 텐데 더 많은 방식으로 접근해봐야 할 것 같다.
-
-   static ArrayList[] array;
+    // programmers level 2 - 멀쩡한 사각형
+    // 코드는 매우 간단하지만 공식을 구하는 게 어려웠다.
+    // w와 h가 주어질 때 대각선으로 관통하는 직선을 그어서 멀쩡한 사각형을 구하는 문제였다.
+    // 최대공약수를 활용해야 하는 건 알았는데 모든 상황에서 활용될 수 있는 공식을 구하기
+    // 어려워서 뭔가 조금씩 오류가 나서 풀이법을 조금 찾아보고 해결했다.
+    // (전체 크기) - (한 패턴 직사각형 당 사용하지 못하는 정사각형 크기 * 반복횟수)
+    // 패턴 직사각형은 가로로 2 세로로 3인 직사각형을 의미하는데 이렇게 반복되는
+    // 최소 크기를 고려하는 식으로 생각했어야 하는 것 같다.
 
     public static void main(String[] args) {
 
-        int n = 9;
-        int[][] wires = {{1,3},{2,3},{3,4},{4,5},{4,6},{4,7},{7,8},{8,9}};
+        int w = 8;
+        int h = 12;
 
-        int answer = 101;
-        array = new ArrayList[n+1];
+        int gcd = gcd(w,h); // 최대공약수
 
-        for(int i=1;i<=n;i++){
-            array[i] = new ArrayList<>();
-        }
-
-        for(int i = 0 ; i < wires.length; i++) {
-            array[wires[i][0]].add(wires[i][1]);
-            array[wires[i][1]].add(wires[i][0]);
-        }
-
-        for(int i = 0 ; i < wires.length; i++) {
-            boolean[] check = new boolean[n+1];
-            check[wires[i][0]] = true;
-            check[wires[i][1]] = true;
-            int a = bfs(wires[i][0],check);
-            int b = bfs(wires[i][1],check);
-            answer = Math.min(answer, Math.abs(a-b));
-        }
-
-        System.out.println(answer);
+        System.out.println(((long) w * (long) h) - ((((long) w / gcd) + ((long) h / gcd) - 1) * gcd));
 
     }
-    private static int bfs(int index,boolean[] check) {
-        int sum = 1;
-        check[index] = true;
-        for(int i = 0 ; i < array[index].size(); i++){
-            if(check[(int)array[index].get(i)]) continue;
-            sum += bfs((int) array[index].get(i),check);
-        }
 
-        return sum;
+    public static int gcd(int w, int h){
+        int small = Math.min(w,h);
+        while(true) {
+            if (w % small == 0 && h % small == 0) {
+                return small;
+            }
+            small -= 1;
+        }
     }
 
 }

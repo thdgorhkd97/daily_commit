@@ -2,91 +2,72 @@ import java.util.*;
 
 public class Main {
 
-    // programmers level 2 - 컬러링 북
-    // 어제 했던 N사 코딩테스트 예제와 비슷해서 해결해 보았다.
-    // 연결된 같은 숫자의 개수를 구하는 문제였는데 어제와 달리 로직의 실행순서를 더 확인해보았다.
-    // 0 0
-    // 1 0
-    // 2 0
-    // 3 0
-    // 4 0
-    // 3 1
-    // 0 1
-    // 0 2
-    // 이런식으로 아래로 쭉 확인한 다음 위로 올라오면서 우측을 확인하여 개수를 센다.
-    // bfs를 활용하여 하는 방식에 대해서 이제 확실해 진 것 같다.
-
-    static int cnt = 1;
+    // N사 계열사 코딩테스트 문제
+    // 1번 가지는 고정되어 있고 branch가 들어오면 가능한 최소 숫자의 가지가 추가되고
+    // merge n이 들어오면 n번 가지를 1번에 합친다.
+    // intellij 에서는 완벽하게 돌아갔는데 구름 IDE라는 온라인 코딩테스트 사이트에서는
+    // scanner 에러가 계속 떴다.
+    // Operation[] operations 로 입력이 주어졌는데 Operation[] 이라는 연산자를
+    // 사용해 보지 못해서 해당 입력을 어떻게 활용할 수 있을지 몰랐다...
+    // 근데 검색해보고 알아봐도 operation[] 이라는 연산자를 그대로 활용하는 게 없다..
 
     public static void main(String[] args) {
 
-        int m = 6;
-        int n = 4;
-        int[][] picture = {
-                {1,1,1,0},
-                {1,2,2,0},
-                {1,0,2,1},
-                {1,1,0,1},
-                {1,0,0,3},
-                {0,3,3,3}
-        };
-
-        int[] answer = new int[2];
-
-        boolean[][] check = new boolean[m][n];
-
+        Scanner sc = new Scanner(System.in);
         ArrayList<Integer> list = new ArrayList<>();
 
-        for(int i=0;i<m;i++){
-            for(int j=0;j<n;j++){
-                if(!check[i][j] && picture[i][j] !=0){
-                    list.add(bfs(check,picture,i,j));
-                    cnt=1;
+        int numOfOperation = Integer.parseInt(sc.nextLine());
+
+        int num = 2;
+
+        list.add(0,1);
+
+        while(numOfOperation != 0){
+
+            String str = sc.nextLine();
+
+            if(str.equals("branch")){
+
+                boolean flag = false;
+                while(true){
+                    for(int i=0;i<list.size();i++){
+                        if(num == list.get(i)){
+                            num += 1;
+                            flag = true;
+                            break;
+                        }
+                    }
+
+                    if(!flag){
+                        list.add(num);
+                        num = 2;
+                        break;
+                    }
+                    flag = false;
                 }
             }
+            else if(str.contains("merge")){
+                char ch = str.toCharArray()[6];
+
+                for(int i=0;i<list.size();i++){
+                    if(list.get(i) == ch - '0'){
+                        list.remove(i);
+                        break;
+                    }
+                }
+            }
+
+            numOfOperation--;
+
+
         }
+
+
+        Collections.sort(list);
 
         for(int i=0;i<list.size();i++){
-            System.out.println(list.get(i));
-        }
-        Collections.sort(list, new Comparator<Integer>() {
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                return o2-o1;
-            }
-        });
-        answer[0] = list.size();
-        answer[1] = list.get(0);
-
-        System.out.println(answer[0] + " " +  answer[1]);
-
-    }
-    public static int bfs(boolean[][] check, int[][] picture,int row,int column){
-
-        check[row][column] = true;
-        System.out.println(row + " " + column);
-
-        if(row-1 >=0 && !check[row-1][column] && picture[row][column] == picture[row-1][column]){
-            cnt++;
-            check[row-1][column] = true;
-            bfs(check,picture,row-1,column);
-        }
-        if(row+1 <= picture.length-1 && !check[row+1][column] && picture[row][column] == picture[row+1][column]){
-            cnt++;
-            check[row+1][column] = true;
-            bfs(check,picture,row+1,column);
-        }
-        if(column-1 >=0 && !check[row][column-1] && picture[row][column] == picture[row][column-1]){
-            cnt++;
-            check[row][column-1] = true;
-            bfs(check,picture,row,column-1);
-        }
-        if(column+1 <=picture[0].length-1 && !check[row][column+1] && picture[row][column] == picture[row][column+1]){
-            cnt++;
-            check[row][column+1] = true;
-            bfs(check,picture,row,column+1);
+            System.out.print(list.get(i) + " ");
         }
 
-        return cnt;
     }
 }

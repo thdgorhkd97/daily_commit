@@ -2,71 +2,89 @@ import java.util.*;
 
 public class Main {
 
-    // N사 계열사 코딩테스트 문제
-    // 1번 가지는 고정되어 있고 branch가 들어오면 가능한 최소 숫자의 가지가 추가되고
-    // merge n이 들어오면 n번 가지를 1번에 합친다.
-    // intellij 에서는 완벽하게 돌아갔는데 구름 IDE라는 온라인 코딩테스트 사이트에서는
-    // scanner 에러가 계속 떴다.
-    // Operation[] operations 로 입력이 주어졌는데 Operation[] 이라는 연산자를
-    // 사용해 보지 못해서 해당 입력을 어떻게 활용할 수 있을지 몰랐다...
-    // 근데 검색해보고 알아봐도 operation[] 이라는 연산자를 그대로 활용하는 게 없다..
+    // programmers level 2 - [3차] 파일명 정렬
+    // head, number, tail 부분을 나눠서 정렬하는 문제다
+    // 나누는 것까지도 충분히 할 수 있는데 정렬하는 부분에서 문제가 생겼다
+    // Arrays.sort(file, new Comparator<>()) 를 활용해서
+    // 정렬을 하려고 했는데 문제가 몇가지 발생한다.
+    // 1. compare의 리턴형이 int 라서 문자열을 형변환해야한다.
+    // 2. b-, .gif 등의 특수문자를 int로 자동형변환을 할때 오류가 발생한다.
+    // 즉, 나눈 부분들에 대해서 정렬하는 방식에 대해 새로 고민해 봐야 할 것 같다.
+
 
     public static void main(String[] args) {
 
-        Scanner sc = new Scanner(System.in);
-        ArrayList<Integer> list = new ArrayList<>();
+        String[] files = {"F-5 Freedom Fighter",
+                "B-50 Superfortress",
+                "A-10 Thunderbolt II", "F-14 Tomcat"};
 
-        int numOfOperation = Integer.parseInt(sc.nextLine());
+        String head = "";
+        String number = "";
+        String tail = "";
 
-        int num = 2;
+        String[][] file = new String[files.length][3];
 
-        list.add(0,1);
+        ArrayList<Integer> idxNum = new ArrayList<>();
 
-        while(numOfOperation != 0){
 
-            String str = sc.nextLine();
 
-            if(str.equals("branch")){
+        for(int j=0;j<files.length;j++) {
 
-                boolean flag = false;
-                while(true){
-                    for(int i=0;i<list.size();i++){
-                        if(num == list.get(i)){
-                            num += 1;
-                            flag = true;
-                            break;
-                        }
-                    }
+            boolean check = false;
+            int cntNum = 0;
 
-                    if(!flag){
-                        list.add(num);
-                        num = 2;
-                        break;
-                    }
-                    flag = false;
+            for (int i = 0; i < files[j].length(); i++) {
+                if (files[j].charAt(i) >= '0' && files[j].charAt(i) <= '9') {
+                    idxNum.add(i);
+                    check = true;
+                    cntNum++;
+                } else {
+                    check = false;
                 }
-            }
-            else if(str.contains("merge")){
-                char ch = str.toCharArray()[6];
 
-                for(int i=0;i<list.size();i++){
-                    if(list.get(i) == ch - '0'){
-                        list.remove(i);
-                        break;
-                    }
+
+                if (!check && cntNum > 0) {
+                    break;
                 }
             }
 
-            numOfOperation--;
+            head = files[j].substring(0,idxNum.get(0));
+            if(cntNum > 0){
+                number = files[j].substring(idxNum.get(0),idxNum.get(0) + cntNum);
+                tail = files[j].substring(idxNum.get(0) + cntNum);
+            }
+            else{
+                tail = files[j].substring(idxNum.get(0));
+            }
 
+            file[j][0] = head.toLowerCase(Locale.ROOT);
+            file[j][1] = number.toLowerCase(Locale.ROOT);
+            file[j][2] = tail.toLowerCase(Locale.ROOT);
 
         }
 
+        Arrays.sort(file, new Comparator<String[]>() {
+            @Override
+            public int compare(String[] o1, String[] o2) {
+                if(!(o1[0].charAt(0) ==(o2[0].charAt(0)))) return Integer.parseInt(o1[0]) - Integer.parseInt(o2[0]);
+                return Integer.parseInt(String.valueOf(o1[1].charAt(0))) - Integer.parseInt(String.valueOf(o2[1].charAt(0)));
 
-        Collections.sort(list);
+            }
+        });
 
-        for(int i=0;i<list.size();i++){
-            System.out.print(list.get(i) + " ");
+        String[] answer = new String[file.length];
+        for(int i=0;i< files.length;i++){
+            StringBuffer sb = new StringBuffer();
+            sb.append(file[i][0]);
+            sb.append(file[i][1]);
+            sb.append(file[i][2]);
+
+            answer[i] = sb.toString();
+        }
+
+
+        for(int i=0;i<answer.length;i++){
+            System.out.println(answer[i]);
         }
 
     }

@@ -1,91 +1,82 @@
+import java.lang.reflect.Array;
 import java.util.*;
 
 public class Main {
 
-    // programmers level 2 - [3차] 파일명 정렬
-    // head, number, tail 부분을 나눠서 정렬하는 문제다
-    // 나누는 것까지도 충분히 할 수 있는데 정렬하는 부분에서 문제가 생겼다
-    // Arrays.sort(file, new Comparator<>()) 를 활용해서
-    // 정렬을 하려고 했는데 문제가 몇가지 발생한다.
-    // 1. compare의 리턴형이 int 라서 문자열을 형변환해야한다.
-    // 2. b-, .gif 등의 특수문자를 int로 자동형변환을 할때 오류가 발생한다.
-    // 즉, 나눈 부분들에 대해서 정렬하는 방식에 대해 새로 고민해 봐야 할 것 같다.
+    // programmers level 2 - 위클리 챌린지 12주차
+    // 모든 경우를 모두 다 확인해야 해서 순열을 통해서 모든 경우의 수를 구하고
+    // 모든 경우의 수에 대해서 확인하였다.
+    // 풀이를 다 하고 나서 프로그래머스에서 제공하는 다른 사람의 풀이를 봤는데
+    // dfs를 활용해서 되게 간단하게 해결한 것을 보았다.
+    // dfs를 활용하지 못하는 게 아닌데 처음에 로직을 생각하기를 너무
+    // 단순하게만 생각한 것 같아 아쉽다.
 
+    static int[][] list;
+    static int idx = 0;
 
     public static void main(String[] args) {
 
-        String[] files = {"F-5 Freedom Fighter",
-                "B-50 Superfortress",
-                "A-10 Thunderbolt II", "F-14 Tomcat"};
+        int k = 80;
+        int[][] dungeons = {{80,20},{50,40},{30,10}};
 
-        String head = "";
-        String number = "";
-        String tail = "";
+        int n = dungeons.length;
+        int r = n;
+        int answer = -1;
 
-        String[][] file = new String[files.length][3];
+        int num = 1;
+        for(int i=1;i<=n;i++){
+            num = num * i;
+        }
+        list = new int[num][n];
 
-        ArrayList<Integer> idxNum = new ArrayList<>();
+
+        int[] arr = new int[n];
+        for(int i=0;i<n;i++){
+            arr[i] = i;
+        }
+        int depth = 0;
+
+        perm(arr,depth,n,r);
 
 
+        for(int i=0;i<list.length;i++){
+            int cnt = 0;
+            int k_copy = k;
 
-        for(int j=0;j<files.length;j++) {
+            System.out.println(list[i][0] +  " " + list[i][1] + " " + list[i][2]);
 
-            boolean check = false;
-            int cntNum = 0;
-
-            for (int i = 0; i < files[j].length(); i++) {
-                if (files[j].charAt(i) >= '0' && files[j].charAt(i) <= '9') {
-                    idxNum.add(i);
-                    check = true;
-                    cntNum++;
-                } else {
-                    check = false;
+            for(int j=0;j<dungeons.length;j++){
+                if(k_copy >= dungeons[list[i][j]][0]){
+                    k_copy = k_copy - dungeons[list[i][j]][1];
+                    cnt++;
                 }
-
-
-                if (!check && cntNum > 0) {
+                else{
                     break;
                 }
             }
-
-            head = files[j].substring(0,idxNum.get(0));
-            if(cntNum > 0){
-                number = files[j].substring(idxNum.get(0),idxNum.get(0) + cntNum);
-                tail = files[j].substring(idxNum.get(0) + cntNum);
-            }
-            else{
-                tail = files[j].substring(idxNum.get(0));
-            }
-
-            file[j][0] = head.toLowerCase(Locale.ROOT);
-            file[j][1] = number.toLowerCase(Locale.ROOT);
-            file[j][2] = tail.toLowerCase(Locale.ROOT);
-
+            System.out.println(cnt);
+            answer = Math.max(cnt,answer);
         }
 
-        Arrays.sort(file, new Comparator<String[]>() {
-            @Override
-            public int compare(String[] o1, String[] o2) {
-                if(!(o1[0].charAt(0) ==(o2[0].charAt(0)))) return Integer.parseInt(o1[0]) - Integer.parseInt(o2[0]);
-                return Integer.parseInt(String.valueOf(o1[1].charAt(0))) - Integer.parseInt(String.valueOf(o2[1].charAt(0)));
+    }
 
+    public static void perm(int[] arr, int depth, int n, int r){
+        if(depth == r){
+            for(int i=0;i<arr.length;i++){
+                list[idx][i] = arr[i];
             }
-        });
-
-        String[] answer = new String[file.length];
-        for(int i=0;i< files.length;i++){
-            StringBuffer sb = new StringBuffer();
-            sb.append(file[i][0]);
-            sb.append(file[i][1]);
-            sb.append(file[i][2]);
-
-            answer[i] = sb.toString();
+            idx++;
         }
 
-
-        for(int i=0;i<answer.length;i++){
-            System.out.println(answer[i]);
+        for(int i=depth;i<n;i++){
+            swap(arr,depth,i);
+            perm(arr,depth+1,n,r);
+            swap(arr,depth,i);
         }
-
+    }
+    public static void swap(int[] arr, int depth, int i){
+        int tmp = arr[depth];
+        arr[depth] = arr[i];
+        arr[i] = tmp;
     }
 }

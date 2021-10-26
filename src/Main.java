@@ -3,80 +3,53 @@ import java.util.*;
 
 public class Main {
 
-    // programmers level 2 - 위클리 챌린지 12주차
-    // 모든 경우를 모두 다 확인해야 해서 순열을 통해서 모든 경우의 수를 구하고
-    // 모든 경우의 수에 대해서 확인하였다.
-    // 풀이를 다 하고 나서 프로그래머스에서 제공하는 다른 사람의 풀이를 봤는데
-    // dfs를 활용해서 되게 간단하게 해결한 것을 보았다.
-    // dfs를 활용하지 못하는 게 아닌데 처음에 로직을 생각하기를 너무
-    // 단순하게만 생각한 것 같아 아쉽다.
-
-    static int[][] list;
-    static int idx = 0;
+    // programmers 커뮤러닝 1일차
+    // 그리디 알고리즘
+    // 전체 구역을 true로 바뀌면 완료했다고 생각하는 로직을 구현했는데
+    // 이런 식으로 하는 게 아니라 index를 이용해서 전체를 index가 넘어가면
+    // 완료하는 식으로 짜야 코드가 간략해지는 것으로 보인다.
 
     public static void main(String[] args) {
 
-        int k = 80;
-        int[][] dungeons = {{80,20},{50,40},{30,10}};
+        int n = 16;
+        int[] stations = {9};
+        int w = 2;
 
-        int n = dungeons.length;
-        int r = n;
-        int answer = -1;
+        boolean[] check = new boolean[n+1];
 
-        int num = 1;
-        for(int i=1;i<=n;i++){
-            num = num * i;
+        int answer = 0;
+        for(int i=0; i<stations.length;i++){
+            for(int j=stations[i]-w; j<=stations[i]+w; j++){
+                check[j] = true;
+            }
         }
-        list = new int[num][n];
 
+        while(!all_cover(check)){
 
-        int[] arr = new int[n];
-        for(int i=0;i<n;i++){
-            arr[i] = i;
-        }
-        int depth = 0;
-
-        perm(arr,depth,n,r);
-
-
-        for(int i=0;i<list.length;i++){
-            int cnt = 0;
-            int k_copy = k;
-
-            System.out.println(list[i][0] +  " " + list[i][1] + " " + list[i][2]);
-
-            for(int j=0;j<dungeons.length;j++){
-                if(k_copy >= dungeons[list[i][j]][0]){
-                    k_copy = k_copy - dungeons[list[i][j]][1];
-                    cnt++;
-                }
-                else{
-                    break;
+            for(int i=1;i<=n;i++){
+                if(!check[i]){
+                    for(int j=i;j<=i+2*w;j++){
+                        check[j] = true;
+                    }
+                    answer += 1;
                 }
             }
-            System.out.println(cnt);
-            answer = Math.max(cnt,answer);
+
         }
 
-    }
+        System.out.println(answer);
 
-    public static void perm(int[] arr, int depth, int n, int r){
-        if(depth == r){
-            for(int i=0;i<arr.length;i++){
-                list[idx][i] = arr[i];
+    }
+    public static boolean all_cover(boolean[] check){
+        int flag = 0;
+        for(int i=1;i< check.length;i++){
+            if(!check[i]){
+                flag = 1;
+                break;
             }
-            idx++;
         }
 
-        for(int i=depth;i<n;i++){
-            swap(arr,depth,i);
-            perm(arr,depth+1,n,r);
-            swap(arr,depth,i);
-        }
-    }
-    public static void swap(int[] arr, int depth, int i){
-        int tmp = arr[depth];
-        arr[depth] = arr[i];
-        arr[i] = tmp;
+        if(flag == 0) return true;
+        else return false;
     }
 }

@@ -5,67 +5,35 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers 커뮤러닝 3일차
-    // 이분탐색 -> 항상 서치하는 경우에 시간이 문제가 되었는데
-    // 이럴 경우에 사용할 수 있는 이분탐색에 대해서 확실히 인지할 수 있는 시간이었다.
-    // 정렬되있는 경우에 대해서 전체를 확인하는 것이 아니라
-    // 최소 최대의 사이값으로 변환해 가면서 값을 확인하는 개념이다.
+    // programmers - greedy 알고리즘
+    // greedy 알고리즘을 문제 풀이를 통해서 다시 확실히 개념을 잡았다.
+    // 지금 필요한 것을 당장 해결해 나가는 방식인데
+    // 개념은 알고있었지만 문제를 해결함에 있어서 어떻게 적용하는지 체계적으로 학습했다.
+    // 전체를 훑으면서 모든 인덱스에 대해 조건을 만족하면 끝낸다.
+    // 나는 for문이나 배열같은 자료구조에서 인덱스를 돌렸는데 그냥 인덱스만 돌려서
+    // 시간을 절약하거나 코드를 간결화하는 것도 가능했다.
 
     public static void main(String[] args) {
 
-        int[] budgets = {120,110,140,150};
+        int n = 11;
+        int[] stations = {4,11};
+        int w = 1;
 
-        int M = 485;
         int answer = 0;
+        int pos = 1;
+        int si = 0;
 
-        int max = 0;
-        for(int i=0;i<budgets.length;i++){
-            max = Math.max(max,budgets[i]);
-        }
-
-        int top = max;
-        int floor = 1;
-
-        while(true){
-            int mid = (top + floor) / 2;
-            int bud = 0;
-            for(int i=0;i<budgets.length;i++){
-                if(budgets[i] > mid){
-                    bud += mid;
-                }
-                else{
-                    bud += budgets[i];
-                }
-            }
-
-
-            if(bud <= M){
-                floor = mid;
+        while(pos <= n){
+            if(si < stations.length && stations[si] - w <= pos){
+                pos = stations[si] + w + 1;
+                si += 1;
             }
             else{
-                top = mid;
-            }
-
-            if(Math.abs(top-floor) == 1){
-                int bud_top = 0;
-                for(int i=0;i<budgets.length;i++){
-                    if(budgets[i] > top){
-                        bud_top += top;
-                    }
-                    else{
-                        bud_top += budgets[i];
-                    }
-                }
-
-                if(bud_top > M){
-                    answer = floor;
-                }
-                else{
-                    answer = top;
-                }
-                break;
+                answer += 1;
+                pos += w * 2 + 1;
             }
         }
+
 
         System.out.println(answer);
     }

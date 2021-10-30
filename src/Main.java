@@ -5,36 +5,42 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers - greedy 알고리즘
-    // greedy 알고리즘을 문제 풀이를 통해서 다시 확실히 개념을 잡았다.
-    // 지금 필요한 것을 당장 해결해 나가는 방식인데
-    // 개념은 알고있었지만 문제를 해결함에 있어서 어떻게 적용하는지 체계적으로 학습했다.
-    // 전체를 훑으면서 모든 인덱스에 대해 조건을 만족하면 끝낸다.
-    // 나는 for문이나 배열같은 자료구조에서 인덱스를 돌렸는데 그냥 인덱스만 돌려서
-    // 시간을 절약하거나 코드를 간결화하는 것도 가능했다.
+    // B사 코딩테스트
+    // {1,1,1,0,0} -> {1,0,1,0,1}
+    // {0,1,1,1,0,0,0,0,1} -> {0,1,0,1,0,1,0,0,1}
+    // 1과 1사이에 0을 둬야 하고 1을 앞으로 당기지 않는다.
+
+    // 금일 코딩테스트를 하면서 접했던 문제인데 확실치 않아 다시 풀어보았다.
+    // 테스트 케이스는 모두 통과하는데 내가 해본 테스트는 모두 통과하는데
+    // 수많은 테스트를 넣어본 게 아니라서 100퍼센트 완벽한지는 확실하지 않다
+    // 코드 자체는 간단하지만 ArrayList를 활용하다가 index를 고치다가 등등
+    // 시간을 상당히 많이 잡아먹었던 문제다.
+
+    // programmers 사이트에서 진행하다 보니 오류가 났을 때 어디서 오류가 난 건지 확인이
+    // 불가능했고 코드를 짤때 인덱스와 범위, loop에 대해서 유의하면서 지속해야겠다.
 
     public static void main(String[] args) {
 
-        int n = 11;
-        int[] stations = {4,11};
-        int w = 1;
+        int[] arr = {0,1,1,1,0,0,0,0,1};
 
-        int answer = 0;
-        int pos = 1;
-        int si = 0;
+        int pos=0;
+        for(int i=pos;i<arr.length-1;i++){
+            if(arr[i] == 1 && arr[i+1] == 1){
+                arr[i+1] = 0;
+                pos = i+2;
+                while(pos<arr.length && arr[pos] == 1){
+                    pos++;
+                }
+                arr[pos] = 1;
+                i = pos-2;
+            }
+            System.out.println(i);
+        }
 
-        while(pos <= n){
-            if(si < stations.length && stations[si] - w <= pos){
-                pos = stations[si] + w + 1;
-                si += 1;
-            }
-            else{
-                answer += 1;
-                pos += w * 2 + 1;
-            }
+        for(int i=0;i<arr.length;i++){
+            System.out.print(arr[i] + " ");
         }
 
 
-        System.out.println(answer);
     }
 }

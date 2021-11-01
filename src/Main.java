@@ -5,100 +5,43 @@ import java.util.stream.*;
 
 public class Main {
 
-    // 빙고문제인데
-    // 세로와 대각을 구현하지못했다.
-    // 잘못한것같다..
+    // 커뮤러닝 11월 1일
+    // hashmap을 활용할 때 아무 값이 없어서 null이 반환되는 것을
+    // if-else문으로 구현하였는데
+    // map의 map.getOrDefault()를 통해 더 간략하게 구현이 가능하다.
+    // 문제풀이를 하는 과정에서 계속 value를 1 더해서 갱신해야 하는데
+    // key값을 다루는 과정에서 에러가 계속 났다.
+    // 추가로 stream을 활용하여 하는 방법을 계속 공부해야 겠다.
 
     public static void main(String[] args) {
+        int answer = 1;
 
-        //int[][] board = [[11,13,15,16],[12,1,4,3],[10,2,7,8],[5,14,6,9]]
-        // int[] nums = [14,3,2,4,13,1,16,11,5,15]
-        // answer = 3;
-        int answer = 0;
-        final int n = board.length;
-        for(int number:nums){
-            for(int i=0;i<n;i++){
-                for(int j=0;j<n;j++){
-                    if(board[i][j] == number){
-                        board[i][j] = 0;
-                        break;
-                    }
-                }
+        String[][] clothes = {{"yellowhat","headgear"},{"bluesunglasses","eyewear"},
+                {"green_turban","headgear"}};
+
+
+        HashMap<String, Integer> map = new HashMap<String, Integer>();
+
+        for(int i=0;i<clothes.length;i++){
+            if(map.get(clothes[i][1])!=null){
+            map.put(clothes[i][1],map.get(clothes[i][1])+1);
             }
+            else{
+                map.put(clothes[i][1],1);
+            }
+        }
+
+        LinkedList<String> keyset = new LinkedList<>(map.keySet());
+
+        for(String key : keyset){
+            System.out.println(map.get(key));
+
+            answer = answer * (map.get(key)+1);
         }
 
 
 
-        answer = garo(board) + sero(board) + daegak(board);
-        return answer;
-    }
-    public static int garo(int[][] board){
-        boolean flag = false;
-        int answer=0;
-        for(int i=0;i<board.length;i++){
-            flag = false;
-            for(int j=0;j<board.length;j++){
-                if(board[i][j] != 0){
-                    flag = true;
-                    break;
-                }
-            }
-            if(!flag) answer++;
-        }
-        System.out.println(" garo : " + answer);
-        return answer;
-    }
-    public static int sero(int[][] board){
-        boolean flag = false;
-        int answer=0;
-        int column = 0;
-        for(int i=0;i<board[0].length;i++){
-            column = 0;
-            while(column < board.length){
-                if(board[column][i] != 0){
-                    flag = true;
-                    break;
-                }
-                column++;
-            }
-            if(!flag) answer++;
-        }
+        System.out.println(--answer);
 
-        System.out.println(" sero : " + answer);
-        return answer;
-    }
-
-    public static int daegak(int[][] board){
-        boolean flag = false;
-        int answer=0;
-        int i=0;
-        int j=0;
-
-        while(i < board.length && j < board[0].length){
-            if(board[i][j] != 0){
-                flag = true;
-                break;
-            }
-            i++;
-            j++;
-        }
-        if(!flag) answer++;
-
-        i=board.length-1;
-        j=0;
-        while(i >=0 && j < board[0].length){
-            if(board[i][j] != 0){
-                flag = true;
-                break;
-            }
-            i--;
-            j++;
-        }
-        if(!flag) answer++;
-
-
-
-        System.out.println(" daegak : " + answer);
-        return answer;
-    }
+   }
 }

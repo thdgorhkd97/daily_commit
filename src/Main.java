@@ -5,106 +5,88 @@ import java.util.stream.*;
 
 public class Main {
 
-    // map에서 number에 해당하는 원소들을 지워가는 빙고 게임에서 몇 줄을 지우는지를 리턴하라.
-    // 커뮤러닝에서 예시문제였는데 해결을 못해서 다시 해보기로 하였다.
-    // 구현은 잘 했는데 효율성을 확인해 볼 수 없어서 효율성은 모르겠다.
-    // 근데 코드를 리팩토링 하는 거에 대해 고민했는데
-    // 아예 로직을 바꾸지 않는 한 내가 생각한 방법에서는 더 빠르게 할 수 있는 방법은 없는 것 같다.
-    //
+    // 커뮤러닝 실전 모의 테스트
+    // 모의 테스트 이긴 하지만 빠른 시간내에 모두 풀었다 ㅠㅠㅠㅠ
+    // 1번은 전체 경우의 수를 구해서 그 중에 몬스터를 만나게 될 경우를 구했다
+    // 시간을 줄인다면 가능한 주사위 수를 구하는 3중 for문일 것으로 보이는데
+    // 근데 더해서 나오는 수만 구하는 것이 아니라 해당 수가 나오는 경우의 수를 구해야 하기 때문에
+    // 내 생각에는 모든 경우의 수를 구하는 것이 맞다고 생각한다.
 
     public static void main(String[] args) {
 
-        int[][] map = {{1,9,10,11},{2,8,16,12},{13,3,6,7},{14,4,5,15}};
-        int[] number = {4,8,5,9,11,16,14,2,3,6,13,1};
 
-        for(int n : number){
-            for(int i=0;i<map.length;i++){
-                for(int j=0;j< map.length;j++){
-                    if(map[i][j] == n){
-                        map[i][j] = 0;
-                        break;
-                    }
+        int[] monster = {4,9,5,8};
+        int S1 = 2;
+        int S2 = 3;
+        int S3 = 4;
+
+        int answer = 1;
+
+        int all = S1 * S2 * S3; // 전체 경우의 수
+        int max = S1 + S2 + S3;
+        int meet_monster = 0;
+
+        int[] number = new int[100];
+
+        for(int i=1;i<=S1;i++){
+            for(int j=1;j<=S2;j++){
+                for(int k=1;k<=S3;k++){
+                    number[i+j+k] += 1;
                 }
             }
         }
 
-        for(int i=0;i<map.length;i++){
-            for(int j=0;j< map.length;j++) {
-                System.out.print(map[i][j] + " ");
-            }
-            System.out.println();
+        for(int i=0;i<monster.length;i++){
+            meet_monster += number[monster[i]-1];
         }
 
-        System.out.println("garo : " + garo(map));
-        System.out.println("sero : " + sero(map));
-        System.out.println("daegak : " + daegak(map));
 
+        double p = ((double)(all-meet_monster) / (double)all);
 
-   }
+        answer = (int) (p * 1000);
 
-   public static int garo(int[][] map){
-        int result = 0;
-        boolean flag = false;
-        for(int i=0;i<map.length;i++){
-            flag = false;
-            for(int j=0;j<map.length;j++){
-                if(map[i][j] != 0){
-                    flag = true;
-                    break;
-                }
-            }
-            if(!flag) result++;
+        /*
+        String a = "listen";
+        String b = "silent";
+
+        a = a.toLowerCase(Locale.ROOT);
+        b = b.toLowerCase(Locale.ROOT);
+
+        HashMap<Character, Integer> map_a = new HashMap<>();
+        HashMap<Character, Integer> map_b = new HashMap<>();
+
+//        if(a.length() != b.length()) return false;
+
+        for(int i=0;i<a.length();i++){
+            map_a.put(a.charAt(i),map_a.getOrDefault(a.charAt(i),0)+1);
+            map_b.put(b.charAt(i),map_b.getOrDefault(b.charAt(i),0)+1);
         }
 
-        return result;
-   }
-
-   public static int sero(int[][] map){
-        int result = 0;
-        boolean flag = false;
-        for(int i=0;i<map.length;i++){
-            flag = false;
-            for(int j=0;j<map.length;j++){
-                if(map[j][i] != 0){
-                    flag = true;
-                    break;
-                }
+        for(Character key : map_a.keySet()){
+            if(!map_a.get(key).equals(map_b.get(key))){
+                // return false;
             }
-            if(!flag) result++;
         }
-
-        return result;
-   }
-
-   public static int daegak(int[][] map){
-        int result = 0;
-        int i=0;
-        int j=0;
-        boolean flag = false;
-        while(i <= map.length-1 && j<=map.length-1){
-            if(map[i][j] != 0){
-                flag = true;
-                break;
-            }
-            i++;
-            j++;
-        }
-        if(!flag) result++;
-
-        flag=false;
-        i=map.length-1; j=0;
-        while(i >= 0 && j<=map.length-1){
-            if(map[i][j] != 0){
-                flag = true;
-                break;
-            }
-            i--;
-            j++;
-        }
-       if(!flag) result++;
-
-       return result;
-   }
+        */
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
 }

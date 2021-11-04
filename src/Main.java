@@ -5,84 +5,45 @@ import java.util.stream.*;
 
 public class Main {
 
-    // 커뮤러닝 실전 모의 테스트
-    // 모의 테스트 이긴 하지만 빠른 시간내에 모두 풀었다 ㅠㅠㅠㅠ
-    // 1번은 전체 경우의 수를 구해서 그 중에 몬스터를 만나게 될 경우를 구했다
-    // 시간을 줄인다면 가능한 주사위 수를 구하는 3중 for문일 것으로 보이는데
-    // 근데 더해서 나오는 수만 구하는 것이 아니라 해당 수가 나오는 경우의 수를 구해야 하기 때문에
-    // 내 생각에는 모든 경우의 수를 구하는 것이 맞다고 생각한다.
+    // programmers - 정수 삼각형
+    // 위에서부터 맨 아래로 내려오면서 거치는 숫자의 최대 합을 구하는 문제다
+    // 딱 보는순간 동적 계획법이라는 게 바로 보일만한 전통적인 유형의 문제인 것 같다.
+    // 다만 각 행의 맨 앞과 맨 뒤를 if 로 빼서 조건문을 걸었는데
+    // 윗 줄의 합을 더 하는 걸 묶어서 한 번에 코드로 정리하면 더 좋을 것 같다.
 
     public static void main(String[] args) {
 
+        int[][] triangle = {{7},{3,8},{8,1,0},{2,7,4,4},{4,5,2,6,5}};
 
-        int[] monster = {4,9,5,8};
-        int S1 = 2;
-        int S2 = 3;
-        int S3 = 4;
+        // 7
+        // 3 8
+        // 8 1 0
+        // 2 7 4 4
+        // 4 5 2 6 5
 
-        int answer = 1;
+        triangle[1][0] += triangle[0][0];
+        triangle[1][1] += triangle[0][0];
 
-        int all = S1 * S2 * S3; // 전체 경우의 수
-        int max = S1 + S2 + S3;
-        int meet_monster = 0;
-
-        int[] number = new int[100];
-
-        for(int i=1;i<=S1;i++){
-            for(int j=1;j<=S2;j++){
-                for(int k=1;k<=S3;k++){
-                    number[i+j+k] += 1;
+        for(int i=2;i<triangle.length;i++){
+            for(int j=0;j<triangle[i].length;j++){
+                if(j == 0){
+                    triangle[i][j] += triangle[i-1][j];
+                }
+                else if(j == triangle[i].length-1){
+                    triangle[i][j] += triangle[i-1][j-1];
+                }
+                else{
+                    triangle[i][j] += Math.max(triangle[i-1][j-1],triangle[i-1][j]);
                 }
             }
         }
 
-        for(int i=0;i<monster.length;i++){
-            meet_monster += number[monster[i]-1];
+        int max = 0;
+        for(int i=0;i< triangle[triangle.length-1].length;i++){
+            max = Math.max(max,triangle[triangle.length-1][i]);
         }
 
-
-        double p = ((double)(all-meet_monster) / (double)all);
-
-        answer = (int) (p * 1000);
-
-        /*
-        String a = "listen";
-        String b = "silent";
-
-        a = a.toLowerCase(Locale.ROOT);
-        b = b.toLowerCase(Locale.ROOT);
-
-        HashMap<Character, Integer> map_a = new HashMap<>();
-        HashMap<Character, Integer> map_b = new HashMap<>();
-
-//        if(a.length() != b.length()) return false;
-
-        for(int i=0;i<a.length();i++){
-            map_a.put(a.charAt(i),map_a.getOrDefault(a.charAt(i),0)+1);
-            map_b.put(b.charAt(i),map_b.getOrDefault(b.charAt(i),0)+1);
-        }
-
-        for(Character key : map_a.keySet()){
-            if(!map_a.get(key).equals(map_b.get(key))){
-                // return false;
-            }
-        }
-        */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        System.out.println(max);
 
 
 

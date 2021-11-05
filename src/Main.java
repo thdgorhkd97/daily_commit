@@ -1,3 +1,4 @@
+import javax.swing.text.Position;
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -5,49 +6,66 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers - 정수 삼각형
-    // 위에서부터 맨 아래로 내려오면서 거치는 숫자의 최대 합을 구하는 문제다
-    // 딱 보는순간 동적 계획법이라는 게 바로 보일만한 전통적인 유형의 문제인 것 같다.
-    // 다만 각 행의 맨 앞과 맨 뒤를 if 로 빼서 조건문을 걸었는데
-    // 윗 줄의 합을 더 하는 걸 묶어서 한 번에 코드로 정리하면 더 좋을 것 같다.
+    // bfs 문제인데 커뮤러닝에서 풀이를 진행하는 걸 보고야 풀었다.
+    // bfs로 하긴 했는데 한 두개씩 되지 않는 경우가 있었다.
+    // 다른 bfs와 같이 방문여부, 갈 수 있는 큐에다가 카운트를 추가해서
+    // 3개를 동시에 고려해야 하는 문제여서 좀 더 신경쓰이는 게 많은 문제였다.
+    // bfs를 구현하는 걸 안다고 생각했는데 고려할 게 늘어나고 단순한 숫자 하나가 아닌
+    // 좌표 형태로 주어지니까 생각해야 할 게 많았다.
+    // 좀 더 복잡한 개념에 대한 문제를 해야 할 것 같다.
 
+    static class Position{
+
+        int x,y;
+
+        public Position(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+
+        boolean isValid(int width, int height){
+            if(x <0 || x>=width) return false;
+            if(y < 0 || y>= height) return false;
+            return true;
+        }
+    }
     public static void main(String[] args) {
 
-        int[][] triangle = {{7},{3,8},{8,1,0},{2,7,4,4},{4,5,2,6,5}};
+        int[][] maps = {{1,0,1,1,1}, {1,0,1,0,1},{1,0,1,1,1},{1,1,1,0,1},{0,0,0,0,1}};
 
-        // 7
-        // 3 8
-        // 8 1 0
-        // 2 7 4 4
-        // 4 5 2 6 5
+        int mapHeight = maps.length;
+        int mapWidth = maps[0].length;
 
-        triangle[1][0] += triangle[0][0];
-        triangle[1][1] += triangle[0][0];
+        Queue<Position> queue = new LinkedList<>();
+        int[][] count = new int[mapHeight][mapWidth];
+        boolean[][] visited = new boolean[mapHeight][mapWidth];
 
-        for(int i=2;i<triangle.length;i++){
-            for(int j=0;j<triangle[i].length;j++){
-                if(j == 0){
-                    triangle[i][j] += triangle[i-1][j];
-                }
-                else if(j == triangle[i].length-1){
-                    triangle[i][j] += triangle[i-1][j-1];
-                }
-                else{
-                    triangle[i][j] += Math.max(triangle[i-1][j-1],triangle[i-1][j]);
-                }
+        queue.offer(new Position(0,0));
+        count[0][0] = 1;
+        visited[0][0] = true;
+
+        while(!queue.isEmpty()){
+            Position current = queue.poll();
+
+            int currentCnt = count[current.y][current.x];
+
+            final int[][] moving = {{0,-1},{0,1},{-1,0},{1,0}};
+
+            for(int i=0;i<moving.length;i++){
+                Position moved = new Position(current.x + moving[i][0], current.y + moving[i][1]);
+                if(!moved.isValid(mapWidth,mapHeight)) continue;
+                if(visited[moved.y][moved.x]) continue;
+                if(maps[moved.y][moved.x] == 0) continue;
+
+                count[moved.y][moved.x] = currentCnt + 1;
+                visited[moved.y][moved.x] = true;
+                queue.offer(moved);
             }
         }
 
-        int max = 0;
-        for(int i=0;i< triangle[triangle.length-1].length;i++){
-            max = Math.max(max,triangle[triangle.length-1][i]);
-        }
-
-        System.out.println(max);
-
-
-
-
-
+        int answer = count[mapHeight-1][mapWidth-1];
+        if(answer == 0) answer = -1;
+        System.out.println(answer);
     }
+
 }

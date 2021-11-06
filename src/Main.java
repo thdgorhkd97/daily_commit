@@ -6,66 +6,77 @@ import java.util.stream.*;
 
 public class Main {
 
-    // bfs 문제인데 커뮤러닝에서 풀이를 진행하는 걸 보고야 풀었다.
-    // bfs로 하긴 했는데 한 두개씩 되지 않는 경우가 있었다.
-    // 다른 bfs와 같이 방문여부, 갈 수 있는 큐에다가 카운트를 추가해서
-    // 3개를 동시에 고려해야 하는 문제여서 좀 더 신경쓰이는 게 많은 문제였다.
-    // bfs를 구현하는 걸 안다고 생각했는데 고려할 게 늘어나고 단순한 숫자 하나가 아닌
-    // 좌표 형태로 주어지니까 생각해야 할 게 많았다.
-    // 좀 더 복잡한 개념에 대한 문제를 해야 할 것 같다.
+    // programmers 커뮤러닝
+    // 문제 : n개의 괄호쌍으로 만들어지는 순서쌍 중 올바른 괄호쌍의 개수를 구하라
+    // 처음에는 순열로 구해서 전체에 대해서 검사하면서 체크했다. (정확성 X)
+    // 두번째는 set를 넣어서 중복된 문자열을 제외하고 검사한다.(정확성 O, 시간초과)
+    // 세번째는 중간에 ) 닫히는 괄호가 열리는 괄호보다 커지면 틀린 거니까 종료(정확성 O, 시간초과)
+    // 네 번째는 처음이 열리는 괄호가 아니면 넣지 않고 set에 넣을 때 올바른지 검사(정확성 O, 시간초과)
+    // 시간 보면 꾸준히 검사 시간이 감소하기는 하는데 괄호쌍이 4개를 넘어가면 경우의 수도 많고
+    // 시간 초과가 난다.
 
-    static class Position{
+    static Set<String> set = new HashSet<>();
 
-        int x,y;
-
-        public Position(int x, int y) {
-            this.x = x;
-            this.y = y;
-        }
-
-        boolean isValid(int width, int height){
-            if(x <0 || x>=width) return false;
-            if(y < 0 || y>= height) return false;
-            return true;
-        }
-    }
     public static void main(String[] args) {
 
-        int[][] maps = {{1,0,1,1,1}, {1,0,1,0,1},{1,0,1,1,1},{1,1,1,0,1},{0,0,0,0,1}};
+        int n = 3;
+        char[] ch = new char[2 * n];
 
-        int mapHeight = maps.length;
-        int mapWidth = maps[0].length;
-
-        Queue<Position> queue = new LinkedList<>();
-        int[][] count = new int[mapHeight][mapWidth];
-        boolean[][] visited = new boolean[mapHeight][mapWidth];
-
-        queue.offer(new Position(0,0));
-        count[0][0] = 1;
-        visited[0][0] = true;
-
-        while(!queue.isEmpty()){
-            Position current = queue.poll();
-
-            int currentCnt = count[current.y][current.x];
-
-            final int[][] moving = {{0,-1},{0,1},{-1,0},{1,0}};
-
-            for(int i=0;i<moving.length;i++){
-                Position moved = new Position(current.x + moving[i][0], current.y + moving[i][1]);
-                if(!moved.isValid(mapWidth,mapHeight)) continue;
-                if(visited[moved.y][moved.x]) continue;
-                if(maps[moved.y][moved.x] == 0) continue;
-
-                count[moved.y][moved.x] = currentCnt + 1;
-                visited[moved.y][moved.x] = true;
-                queue.offer(moved);
+        for(int i=0;i<2*n;i++){
+            if(i%2 == 0){
+                ch[i] = '(';
+            }
+            else{
+                ch[i] = ')';
             }
         }
 
-        int answer = count[mapHeight-1][mapWidth-1];
-        if(answer == 0) answer = -1;
-        System.out.println(answer);
+        int depth = 0;
+        int m = ch.length;
+        int r = m;
+
+        permu(ch,depth,m,r);
+
+        System.out.println(set.size());
     }
 
+    public static void permu(char[] ch, int depth, int m, int r){
+        if(depth == r){
+            StringBuffer sb = new StringBuffer();
+            if(ch[0] == '('){
+                int cntL = 1;
+                int cntR = 0;
+                sb.append('(');
+                for(int i=1;i<ch.length;i++){
+                    if(ch[i] == '('){
+                        cntL++;
+                    }
+                    else{
+                        cntR++;
+                    }
+                    if(cntR > cntL) {
+                        break;
+                    }
+
+                    sb.append(ch[i]);
+                }
+                if( sb.toString().length() == m) {
+                    set.add(sb.toString());
+                }
+            }
+
+        }
+
+        for(int i=depth;i<m;i++){
+            swap(ch,depth,i);
+            permu(ch,depth+1,m,r);
+            swap(ch,depth,i);
+        }
+    }
+
+    public static void swap(char[] ch, int depth, int i){
+        char tmp = ch[depth];
+        ch[depth] = ch[i];
+        ch[i] = tmp;
+    }
 }

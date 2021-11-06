@@ -15,6 +15,8 @@ public class Main {
     // 시간 보면 꾸준히 검사 시간이 감소하기는 하는데 괄호쌍이 4개를 넘어가면 경우의 수도 많고
     // 시간 초과가 난다.
 
+
+
     static Set<String> set = new HashSet<>();
 
     public static void main(String[] args) {

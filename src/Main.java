@@ -6,79 +6,80 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers 커뮤러닝
-    // 문제 : n개의 괄호쌍으로 만들어지는 순서쌍 중 올바른 괄호쌍의 개수를 구하라
-    // 처음에는 순열로 구해서 전체에 대해서 검사하면서 체크했다. (정확성 X)
-    // 두번째는 set를 넣어서 중복된 문자열을 제외하고 검사한다.(정확성 O, 시간초과)
-    // 세번째는 중간에 ) 닫히는 괄호가 열리는 괄호보다 커지면 틀린 거니까 종료(정확성 O, 시간초과)
-    // 네 번째는 처음이 열리는 괄호가 아니면 넣지 않고 set에 넣을 때 올바른지 검사(정확성 O, 시간초과)
-    // 시간 보면 꾸준히 검사 시간이 감소하기는 하는데 괄호쌍이 4개를 넘어가면 경우의 수도 많고
-    // 시간 초과가 난다.
-
-
-
-    static Set<String> set = new HashSet<>();
+    // B 사 코딩테스트 문제
+    // 공부 시간이 시작, 끝, 시작, 끝... 이렇게 주어지면
+    // 105분 이상 공부한 건 105분으로 5분 미만 공부한 건 무시하는 걸 포함하여 총 공부시간을 구하는 것이다.
+    // 시간 형식이 string "hh:mm"으로 주어져서 substring을 이용해 : 위치에서 끊어서 시간과 분을 구해서 int형식으로 계산하였다.
+    // 시간과 분에 따라서 내림이나 올림이 있을 수 있기에 시간에 60을 곱해 총 분으로 계산하였다.
+    // 그렇게 하여 총 분을 더한다.(단 조건문에 의해서 if - else로 5분 미만과 105분 초과하는 경우를 고려한다.)
+    // 문제는 해결하였는데 string -> int -> string 으로 형 변환을 많이 하였다.
+    // 형 변환 과정을 최대한 줄이려고 하였는데 시간 계산이다 보니 int로 바꿔야 계산이 편해졌고 return 형이 string이라서 형 변환을 줄이기는 힘들었다.
 
     public static void main(String[] args) {
 
-        int n = 3;
-        char[] ch = new char[2 * n];
+        String[] log = {"08:30", "09:00", "14:00", "16:00", "16:01", "16:06", "16:07", "16:11"};
+        int len = log.length/2;
 
-        for(int i=0;i<2*n;i++){
-            if(i%2 == 0){
-                ch[i] = '(';
+        String[] start = new String[len]; // 시작 시간 모음
+        String[] end = new String[len]; // 끝 시간 모음
+
+        int startIdx = 0;
+        int endIdx=0;
+        for(int i=0;i<log.length;i++){ // 시작 끝 시작 끝 ... 반복되므로 i가 짝수면 시작 홀수면 끝 시간
+            if(i % 2 == 0){ // 시작 시간을 start 배열에
+                start[startIdx++] = log[i];
+            }
+            else{ // 끝 시간을 end 배열에
+                end[endIdx++] = log[i];
+            }
+        }
+
+        int[] studyTime = new int[len]; // 공부시간만 계산하기(시작시간과 끝 시간을 가지고)
+        for(int i=0;i< len; i++){
+            int startTime = 60 * Integer.parseInt((start[i].substring(0,2))) + Integer.parseInt(start[i].substring(3)); // 시작시각을 시간에 60 곱해서 분으로만 표현
+            int endTime = 60 * Integer.parseInt((end[i].substring(0,2))) + Integer.parseInt(end[i].substring(3)); // 끝시간을 시간에 60곱해서 분으로만 표현
+
+            studyTime[i] = (endTime - startTime); // 공부한 시간을 분으로 표현
+        }
+
+        int studyTimeSum = 0; // 전체 공부한 시간을 표현한 변수
+        for(int N : studyTime){
+            if(N >= 105){ // 공부시간이 1시간 45분 이상이면 1시간 45분으로 설정
+                studyTimeSum += 105;
+            }
+            else if(N < 5){ // 5분미만이면 제외
+                continue;
             }
             else{
-                ch[i] = ')';
+                studyTimeSum += N;
             }
         }
 
-        int depth = 0;
-        int m = ch.length;
-        int r = m;
+        int hour = studyTimeSum / 60; // 전체 공부 시간의 시간
+        int minute = studyTimeSum % 60; // 전체 공부시간의 분
 
-        permu(ch,depth,m,r);
-
-        System.out.println(set.size());
-    }
-
-    public static void permu(char[] ch, int depth, int m, int r){
-        if(depth == r){
-            StringBuffer sb = new StringBuffer();
-            if(ch[0] == '('){
-                int cntL = 1;
-                int cntR = 0;
-                sb.append('(');
-                for(int i=1;i<ch.length;i++){
-                    if(ch[i] == '('){
-                        cntL++;
-                    }
-                    else{
-                        cntR++;
-                    }
-                    if(cntR > cntL) {
-                        break;
-                    }
-
-                    sb.append(ch[i]);
-                }
-                if( sb.toString().length() == m) {
-                    set.add(sb.toString());
-                }
-            }
-
+        String[] answer = new String[5];
+        if(hour < 10){ // 공부시간이 한자리면 앞에 0을 추가
+            answer[0] = "0";
         }
-
-        for(int i=depth;i<m;i++){
-            swap(ch,depth,i);
-            permu(ch,depth+1,m,r);
-            swap(ch,depth,i);
+        else{ // 공부시간이 2자리이상이면 몫을 넣고
+            answer[0] = String.valueOf(hour/10);
         }
-    }
+        answer[1] = String.valueOf(hour % 10);
+        answer[2] = ":";
+        if(minute < 10){ // 공부한 시간의 분이 10미만이면 앞에 0넣고
+            answer[3] = "0";
+        }
+        else{ // 공부한 시간의 분이 10이상이면 10의자리 계산
+            answer[3] = String.valueOf(minute/10);
+        }
+        answer[4] = String.valueOf(minute % 10); // 공부한 시간의 분 1의 자리 계산
 
-    public static void swap(char[] ch, int depth, int i){
-        char tmp = ch[depth];
-        ch[depth] = ch[i];
-        ch[i] = tmp;
+        StringBuffer sb = new StringBuffer(); // answer 배열 합쳐서 반환
+        for(String str : answer){
+            sb.append(str);
+        }
+        //return sb.toString();
+        System.out.println(sb.toString());
     }
 }

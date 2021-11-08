@@ -6,80 +6,76 @@ import java.util.stream.*;
 
 public class Main {
 
-    // B 사 코딩테스트 문제
-    // 공부 시간이 시작, 끝, 시작, 끝... 이렇게 주어지면
-    // 105분 이상 공부한 건 105분으로 5분 미만 공부한 건 무시하는 걸 포함하여 총 공부시간을 구하는 것이다.
-    // 시간 형식이 string "hh:mm"으로 주어져서 substring을 이용해 : 위치에서 끊어서 시간과 분을 구해서 int형식으로 계산하였다.
-    // 시간과 분에 따라서 내림이나 올림이 있을 수 있기에 시간에 60을 곱해 총 분으로 계산하였다.
-    // 그렇게 하여 총 분을 더한다.(단 조건문에 의해서 if - else로 5분 미만과 105분 초과하는 경우를 고려한다.)
-    // 문제는 해결하였는데 string -> int -> string 으로 형 변환을 많이 하였다.
-    // 형 변환 과정을 최대한 줄이려고 하였는데 시간 계산이다 보니 int로 바꿔야 계산이 편해졌고 return 형이 string이라서 형 변환을 줄이기는 힘들었다.
+    // 커뮤러닝 특별 모의고사 2번
+    // 10분 간격으로 오는 고객들 중 booked 에 있는 고객을 먼저 대한다.
+    // 예약을 한 고객과 안 한 고객으로 hash를 만들어서 관리하고자 하였다.
+    // 이때 시간을 10분씩 더하면서 확인한건데
+    // 내 생각으로는 10분을 더한 시간까지 book 고객을 확인하고 다시 unbook 고객을 확인하면
+    // book 고객이 먼저 들어가고 그 뒤에 unbook 고객이 들어간다고 생각했는데
+    // 지금10 분내에 예약 고객과 예약 안 한 고객이 같이 있는 경우가 에러가 발생한다...
+
 
     public static void main(String[] args) {
 
-        String[] log = {"08:30", "09:00", "14:00", "16:00", "16:01", "16:06", "16:07", "16:11"};
-        int len = log.length/2;
+        String[][] booked = {{"09:55", "hae"}, {"10:05", "jee"}};
+        String[][] unbooked = {{"10:04", "hee"}, {"14:07", "eom"}};
 
-        String[] start = new String[len]; // 시작 시간 모음
-        String[] end = new String[len]; // 끝 시간 모음
+        HashMap<String, Integer> book = new HashMap<>();
+        HashMap<String, Integer> unbook = new HashMap<>();
+        int startTime = 0;
+        ArrayList<String> list = new ArrayList<>();
 
-        int startIdx = 0;
-        int endIdx=0;
-        for(int i=0;i<log.length;i++){ // 시작 끝 시작 끝 ... 반복되므로 i가 짝수면 시작 홀수면 끝 시간
-            if(i % 2 == 0){ // 시작 시간을 start 배열에
-                start[startIdx++] = log[i];
+        for(int i=0;i<booked.length;i++){
+            book.put(booked[i][1],Integer.parseInt(booked[i][0].substring(0,2)) * 60 + Integer.parseInt(booked[i][0].substring(3)));
+        }
+        for(int i=0;i< unbooked.length;i++){
+            unbook.put(unbooked[i][1],Integer.parseInt(unbooked[i][0].substring(0,2)) * 60 + Integer.parseInt(unbooked[i][0].substring(3)));
+        }
+
+        if(book.get(booked[0][1]) < unbook.get(unbooked[0][1])){ // 첫 손님이 booked의 첫 손님
+            startTime = (book.get(booked[0][1]));
+            list.add(booked[0][1]);
+            book.remove(booked[0][1]);
+        }
+        else{
+            startTime = (unbook.get(unbooked[0][1]));
+            list.add(unbooked[0][1]);
+            unbook.remove(unbooked[0][1]);
+        }
+
+        while(!book.isEmpty() && !unbook.isEmpty()){
+
+            startTime += 10;
+
+            for(String str : book.keySet()){
+                if(book.get(str) <= startTime){
+                    list.add(str);
+                    book.remove(str);
+
+                }
             }
-            else{ // 끝 시간을 end 배열에
-                end[endIdx++] = log[i];
+
+            for(String str : unbook.keySet()){
+                if(unbook.get(str) <= startTime){
+                    list.add(str);
+                    unbook.remove(str);
+                }
             }
-        }
 
-        int[] studyTime = new int[len]; // 공부시간만 계산하기(시작시간과 끝 시간을 가지고)
-        for(int i=0;i< len; i++){
-            int startTime = 60 * Integer.parseInt((start[i].substring(0,2))) + Integer.parseInt(start[i].substring(3)); // 시작시각을 시간에 60 곱해서 분으로만 표현
-            int endTime = 60 * Integer.parseInt((end[i].substring(0,2))) + Integer.parseInt(end[i].substring(3)); // 끝시간을 시간에 60곱해서 분으로만 표현
-
-            studyTime[i] = (endTime - startTime); // 공부한 시간을 분으로 표현
-        }
-
-        int studyTimeSum = 0; // 전체 공부한 시간을 표현한 변수
-        for(int N : studyTime){
-            if(N >= 105){ // 공부시간이 1시간 45분 이상이면 1시간 45분으로 설정
-                studyTimeSum += 105;
+            if(book.isEmpty()){
+                for(String str : unbook.keySet()){list.add(str);break;}
             }
-            else if(N < 5){ // 5분미만이면 제외
-                continue;
+            if(unbook.isEmpty()){
+                for(String str : book.keySet()){list.add(str);break;}
             }
-            else{
-                studyTimeSum += N;
-            }
+
         }
 
-        int hour = studyTimeSum / 60; // 전체 공부 시간의 시간
-        int minute = studyTimeSum % 60; // 전체 공부시간의 분
+        String[] answer =  new String[list.size()];
+        for(int i=0;i<list.size();i++){
+            System.out.println(list.get(i));
+            answer[i] = list.get(i);
+        }
 
-        String[] answer = new String[5];
-        if(hour < 10){ // 공부시간이 한자리면 앞에 0을 추가
-            answer[0] = "0";
-        }
-        else{ // 공부시간이 2자리이상이면 몫을 넣고
-            answer[0] = String.valueOf(hour/10);
-        }
-        answer[1] = String.valueOf(hour % 10);
-        answer[2] = ":";
-        if(minute < 10){ // 공부한 시간의 분이 10미만이면 앞에 0넣고
-            answer[3] = "0";
-        }
-        else{ // 공부한 시간의 분이 10이상이면 10의자리 계산
-            answer[3] = String.valueOf(minute/10);
-        }
-        answer[4] = String.valueOf(minute % 10); // 공부한 시간의 분 1의 자리 계산
-
-        StringBuffer sb = new StringBuffer(); // answer 배열 합쳐서 반환
-        for(String str : answer){
-            sb.append(str);
-        }
-        //return sb.toString();
-        System.out.println(sb.toString());
-    }
+   }
 }

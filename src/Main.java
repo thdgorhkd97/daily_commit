@@ -6,38 +6,82 @@ import java.util.stream.*;
 
 public class Main {
 
-    // 커뮤러닝 정수 삼각형
-    // 한번 해봤던 문제인데 가장 앞의 인덱스와 가장 뒤의 인덱스를
-    // 따로 함수로 빼는 것이 아니라 if else를 통해서 하나의 분기문으로 처리함
-    // if else 분기문도 없이 하나의 조건으로 처리하고 싶었는데
-    // for문의 범위에서 벗어나는 경우가 있기 때문에 예외 처리 조건이 없어서는
-    // 불가능할 것으로 보입니다.
+    // 커뮤러닝 특별 모의고사 1번
+    // 순열 조합으로 풀었는데 시간 초과...
+    // dfs로 하는 게 순서쌍에 대한 개수를 알 수는 있는데 맞는 경우에 대한
+    // 문자열을 알 수가 없어서 조합을 구하였는데 시간이 초과한다..
+    // dfs에서 '(' 과 ')' 의 조합을 활용하여 모든 조합을 구하면 어떨까 했는데
+    // 해당 방법에 대해서는 조금 더 공부가 필요할 것 같다.
 
+
+    static ArrayList<String> list = new ArrayList<>();
+    static Set<String> set = new HashSet<>();
 
     public static void main(String[] args) {
 
-        int[][] triangle = {{7},{3,8},{8,1,0},{2,7,4,4},{4,5,2,6,5}};
+        int N = 2;
 
-        for(int i=1;i<triangle.length;i++){
-            for(int j=0;j<triangle[i].length;j++){
-                if(j == 0){
-                    triangle[i][j] += triangle[i-1][j];
+        char[] ch = new char[N * 2];
+
+        for(int i=0;i<ch.length;i++){
+            if(i % 2 ==0) ch[i] = '(';
+            else ch[i] = ')';
+        }
+
+        int depth = 0 ;
+        int n = ch.length;
+        int r = n;
+
+        permu(ch,depth,n,r);
+
+        Collections.sort(list);
+
+        String[] answer = new String[list.size()];
+        for(int i=0;i<list.size();i++){
+            answer[i] = list.get(i);
+            System.out.println(list.get(i));
+        }
+
+    }
+    public static void permu(char[] ch, int depth, int n, int r){
+        if(depth == r){
+
+            if(ch[0]=='('){
+                StringBuffer sb = new StringBuffer();
+                int L = 0;
+                boolean flag = false;
+                int R = 0;
+                for(int i=0;i<r;i++){
+                    if(ch[i] == '('){
+                        L++;
+                    }
+                    else{
+                        R++;
+                    }
+                    if(R > L) {
+                        flag = true;
+                        break;
+                    }
+
+                    sb.append(ch[i]);
                 }
-                else if(j == triangle[i].length-1){
-                    triangle[i][j] += triangle[i-1][j-1];
-                }
-                else{
-                    triangle[i][j] += Math.max(triangle[i-1][j-1],triangle[i-1][j]);
+                if(!flag){
+                    if(set.add(sb.toString())){
+                        list.add(sb.toString());
+                    }
                 }
             }
         }
-
-
-        int answer = 0;
-        for(int i=0;i<triangle[triangle.length-1].length;i++){
-            answer = Math.max(answer, triangle[triangle.length-1][i]);
+        for(int i=depth;i<n;i++){
+            swap(ch,depth,i);
+            permu(ch,depth+1,n,r);
+            swap(ch,depth,i);
         }
-        System.out.println(answer);
+    }
+    public static void swap(char[] ch, int depth, int i){
+        char tmp = ch[depth];
+        ch[depth] = ch[i];
+        ch[i] = tmp;
 
     }
 }

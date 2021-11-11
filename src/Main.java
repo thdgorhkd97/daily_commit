@@ -6,82 +6,57 @@ import java.util.stream.*;
 
 public class Main {
 
-    // 커뮤러닝 특별 모의고사 1번
-    // 순열 조합으로 풀었는데 시간 초과...
-    // dfs로 하는 게 순서쌍에 대한 개수를 알 수는 있는데 맞는 경우에 대한
-    // 문자열을 알 수가 없어서 조합을 구하였는데 시간이 초과한다..
-    // dfs에서 '(' 과 ')' 의 조합을 활용하여 모든 조합을 구하면 어떨까 했는데
-    // 해당 방법에 대해서는 조금 더 공부가 필요할 것 같다.
-
-
-    static ArrayList<String> list = new ArrayList<>();
-    static Set<String> set = new HashSet<>();
+    // programmers level 3 - 가장 먼 노드
+    // 그래프에서 1과 가장 거리가 먼 노드의 개수를 구하는 문제
+    // bfs를 활용해서 1과의 거리 차이를 구했는 데 테스트 케이스 9개중 2개가
+    // 메모리 초과가 나왔다.
+    // bfs를 활용할 때 변수를 써서 +1을 했는데 그렇게 안하고 distance 변수를 활용하여
+    // 지금 큐에 담겨있는 변수에 +1을 해야 햇다.
 
     public static void main(String[] args) {
 
-        int N = 2;
+        int n = 6;
+        int[][] edge = {{3,6},{4,3},{3,2},{1,3},{1,2},{2,4},{5,2}};
 
-        char[] ch = new char[N * 2];
+        int[][] graph = new int[n+1][n+1];
+        int[] distance = new int[n+1];
+        boolean[] check = new boolean[n+1];
+        int num=1;
 
-        for(int i=0;i<ch.length;i++){
-            if(i % 2 ==0) ch[i] = '(';
-            else ch[i] = ')';
+        for(int i=0;i<edge.length;i++){
+            graph[edge[i][0]][edge[i][1]] = 1;
+            graph[edge[i][1]][edge[i][0]] = 1;
         }
 
-        int depth = 0 ;
-        int n = ch.length;
-        int r = n;
+        bfs(1,distance,check,num,graph);
 
-        permu(ch,depth,n,r);
-
-        Collections.sort(list);
-
-        String[] answer = new String[list.size()];
-        for(int i=0;i<list.size();i++){
-            answer[i] = list.get(i);
-            System.out.println(list.get(i));
+        int answer = 0;
+        Arrays.sort(distance);
+        for(int i=0;i< distance.length;i++){
+            if(distance[i] == distance[n]){
+                answer++;
+            }
         }
 
     }
-    public static void permu(char[] ch, int depth, int n, int r){
-        if(depth == r){
+    public static void bfs(int start, int[] distance, boolean[] check,int num,int[][] graph){
+        Queue<Integer> que = new LinkedList<>();
+        check[start] = true;
+        que.offer(start);
 
-            if(ch[0]=='('){
-                StringBuffer sb = new StringBuffer();
-                int L = 0;
-                boolean flag = false;
-                int R = 0;
-                for(int i=0;i<r;i++){
-                    if(ch[i] == '('){
-                        L++;
-                    }
-                    else{
-                        R++;
-                    }
-                    if(R > L) {
-                        flag = true;
-                        break;
-                    }
+        while(!que.isEmpty()){
+            int cur = que.poll();
 
-                    sb.append(ch[i]);
-                }
-                if(!flag){
-                    if(set.add(sb.toString())){
-                        list.add(sb.toString());
-                    }
+            System.out.println(cur + " " + distance[cur]);
+
+            for(int i=1;i<graph.length;i++){
+                if(graph[cur][i] == 1 && !check[i]){
+                    que.add(i);
+                    distance[i] = distance[cur] + 1;
+                    check[i] = true;
                 }
             }
         }
-        for(int i=depth;i<n;i++){
-            swap(ch,depth,i);
-            permu(ch,depth+1,n,r);
-            swap(ch,depth,i);
-        }
-    }
-    public static void swap(char[] ch, int depth, int i){
-        char tmp = ch[depth];
-        ch[depth] = ch[i];
-        ch[i] = tmp;
 
     }
 }

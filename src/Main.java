@@ -6,45 +6,49 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers 등굣길
-    // 동적계획법으로 위와 왼쪽을 더해가면서 채워나가는 식으로 풀이하였는데
-    // 자꾸 조금씩 어긋났다.
-    // 아마 어떤 특수한 경우가 있는 것 같은데 그걸 모두 다 커버하는
-    // 전체식을 구하기 힘들었다ㅠㅠ (내가 넣어본 테케는 모두 맞는데)
-    // 결국 해답을 찾아서 해결했다.. if 문으로 위와 왼쪽 값을 파악해 가면서 더해 나가는데
-    // 나는 1열과 1행 모두를 1로 세팅해놓고 해서 문제가 발생한 듯 싶기도 하다.
+    // programmers level 2 - 타겟 넘버
+    // dfs를 활용한 대표적인 문제라고 해서 해봤는데 아직 bfs 만큼 dfs를 이해하지 못한 것 같다.
+    // 풀이를 확인하고서 직접 변수값을 찍어보며 값을 확인하면서 보고난 후에야 어느정도
+    // 이해할 수 있었다.
+    // 각각의 인덱스에 대해서 + 와 - 를 모두 구해서 연산을 해야 하는 부분을
+    // dfs로 구현하여 모든 경우의 수를 구하는 것이 포인트였던 문제다.
+    // dfs를 통해 그래프를 순회하는 경우에 대해서는 잘 알고 있지만 이렇게 문제에
+    // 적용하는 경우에 대해서는 조금 더 공부가 필요할 것으로 보인다.
+
+    static int answer = 0;
 
     public static void main(String[] args) {
 
-        int m = 4;
-        int n = 3;
-        int[][] puddles = {{2,2}};
+        int[] numbers = {1,1,1,1,1};
+        int target = 3;
 
-        int[][] map = new int[n+1][m+1];
+        dfs(numbers,target,0,0);
 
-        for(int i=0;i< puddles.length;i++){
-            map[puddles[i][1]][puddles[i][0]] = -1;
-        }
+        System.out.println(answer);
+    }
 
-        map[1][1] = 1;
-        for(int i = 1; i < n + 1; i++) {
-            for(int j = 1; j < m + 1; j++) {
-                if(map[i][j] == -1) continue;
-                if(map[i - 1][j] > 0) map[i][j] += map[i - 1][j] % 1000000007;
-                if(map[i][j - 1] > 0) map[i][j] += map[i][j - 1] % 1000000007;
+    public static void dfs(int[] numbers,int target, int idx, int sum){
+        if(idx == numbers.length){
+            if(sum == target){
+                answer++;
             }
+            return ;
         }
 
-        for(int i=1;i<map.length;i++){
-            for(int j=1;j<map[0].length;j++){
-                System.out.print(map[i][j] + " ");
-            }
-            System.out.println();
-        }
+        sum += numbers[idx];
+//        for(int i=0;i<idx;i++){
+//            System.out.print(numbers[i] + " ");
+//        }
+//        System.out.println(" sum = " + sum);
+        dfs(numbers,target,idx+1,sum);
+        sum -= numbers[idx];
+        sum += (-1 * numbers[idx]);
 
-        System.out.println(map[n][m]);
+//        for(int i=0;i<idx;i++){
+//            System.out.print(numbers[i] + " ");
+//        }System.out.println(" sum = " + sum);
 
-
+        dfs(numbers,target,idx+1,sum);
 
     }
 }

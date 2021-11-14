@@ -6,49 +6,67 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers level 2 - 타겟 넘버
-    // dfs를 활용한 대표적인 문제라고 해서 해봤는데 아직 bfs 만큼 dfs를 이해하지 못한 것 같다.
-    // 풀이를 확인하고서 직접 변수값을 찍어보며 값을 확인하면서 보고난 후에야 어느정도
-    // 이해할 수 있었다.
-    // 각각의 인덱스에 대해서 + 와 - 를 모두 구해서 연산을 해야 하는 부분을
-    // dfs로 구현하여 모든 경우의 수를 구하는 것이 포인트였던 문제다.
-    // dfs를 통해 그래프를 순회하는 경우에 대해서는 잘 알고 있지만 이렇게 문제에
-    // 적용하는 경우에 대해서는 조금 더 공부가 필요할 것으로 보인다.
-
-    static int answer = 0;
+    // 커뮤러닝 실전 모의 코딩테스트
+    // 세균 증식
+    // max_virus 면 주변 칸을 증가시켜 나간다.
+    // 이게 max_virus와 같다면 주변 모든 칸을 퍼져나가야 하는데 이 부분을
+    // 구현하기가 매우 어려웠다..
+    // 단순히 상하좌우만 보면 되는 게 아니라
+    // max_virus와 같은 인접한 모든 칸을 확인하고 그 주변칸에 +1을 해야 하는 것이라서
+    // 이 부분을 해결할 수 있는 방법을 공부해 봐야 할 것이다.
 
     public static void main(String[] args) {
 
-        int[] numbers = {1,1,1,1,1};
-        int target = 3;
+        int rows = 3;
+        int columns = 4;
+        int max_virus = 2;
+        int[][] queries = {{3,2},{3,2},{2,2},{3,2},{1,4},{3,2},{2,3},{3,1}};
 
-        dfs(numbers,target,0,0);
+        int[][] map = new int[rows+1][columns+1];
 
-        System.out.println(answer);
-    }
-
-    public static void dfs(int[] numbers,int target, int idx, int sum){
-        if(idx == numbers.length){
-            if(sum == target){
-                answer++;
-            }
-            return ;
+        for(int i=0;i< queries.length;i++){
+            System.out.println(queries[i][0] + " " + queries[i][1]);
+            if(map[queries[i][0]][queries[i][1]] < max_virus)map[queries[i][0]][queries[i][1]]++;
+            else chain(map,queries[i][0],queries[i][1],max_virus);
         }
 
-        sum += numbers[idx];
-//        for(int i=0;i<idx;i++){
-//            System.out.print(numbers[i] + " ");
-//        }
-//        System.out.println(" sum = " + sum);
-        dfs(numbers,target,idx+1,sum);
-        sum -= numbers[idx];
-        sum += (-1 * numbers[idx]);
 
-//        for(int i=0;i<idx;i++){
-//            System.out.print(numbers[i] + " ");
-//        }System.out.println(" sum = " + sum);
 
-        dfs(numbers,target,idx+1,sum);
 
     }
+
+    public static void chain(int[][] map, int y, int x, int max_virus) {
+
+        if(y-1 > 0 && map[y-1][x] < max_virus){
+            map[y-1][x]++;
+        }
+        else if(y-2 > 0 && map[y-1][x] == max_virus){
+            chain(map,y-2,x,max_virus);
+        }
+        if(x-1 > 0 && map[y][x-1] < max_virus){
+            map[y][x-1]++;
+        }
+        else if(x-2 > 0 && map[y][x-1] == max_virus){
+            chain(map,y,x-2,max_virus);
+        }
+        if(y+1 < map.length && map[y+1][x] < max_virus){
+            map[y+1][x]++;
+        }
+        else if(y+2 < map.length && map[y+1][x] == max_virus){
+            chain(map,y+2,x,max_virus);
+        }
+        if(x+2 <map[0].length && map[y][x+1] < max_virus){
+            map[y][x+2]++;
+        }
+        else if(x+1 <map[0].length && map[y][x+1] == max_virus){
+            chain(map,y,x+1,max_virus);
+        }
+
+
+
+    }
+
+
+
+
 }

@@ -6,67 +6,63 @@ import java.util.stream.*;
 
 public class Main {
 
-    // 커뮤러닝 실전 모의 코딩테스트
-    // 세균 증식
-    // max_virus 면 주변 칸을 증가시켜 나간다.
-    // 이게 max_virus와 같다면 주변 모든 칸을 퍼져나가야 하는데 이 부분을
-    // 구현하기가 매우 어려웠다..
-    // 단순히 상하좌우만 보면 되는 게 아니라
-    // max_virus와 같은 인접한 모든 칸을 확인하고 그 주변칸에 +1을 해야 하는 것이라서
-    // 이 부분을 해결할 수 있는 방법을 공부해 봐야 할 것이다.
+    // w 사 3번 코딩테스트 문제
+    // 각 메뉴별로 들어가는 재료값과 메뉴의 가격을 비교하여 총 이익을 구하는 문제
+    // 메뉴에 들어가는 재료를 charAt 으로 구해서 각 재료값을 모두 구하고 이를 메뉴값과 비교한다.
+    // hash를 활용하여 메뉴별 이익금을 구하고
+    // 마지막에 합한다.
+    // 조금 노가다 성으로 푼 것 같은데 각 메뉴명만 보고 들어가는 재료를 구할 수 없기 때문에
+    // 괜찮은 방법이라고 생각한다.
 
     public static void main(String[] args) {
 
-        int rows = 3;
-        int columns = 4;
-        int max_virus = 2;
-        int[][] queries = {{3,2},{3,2},{2,2},{3,2},{1,4},{3,2},{2,3},{3,1}};
+        int answer = 0;
 
-        int[][] map = new int[rows+1][columns+1];
+        String[] ings = {"r 10", "a 23", "t 124", "k 9"};
+        String[] menu = {
+                "PIZZA arraak 145",
+                "HAMBURGER tkar 180",
+                "BREAD kkk 30",
+                "ICECREAM rar 50",
+                "SHAVEDICE rar 45",
+                "JUICE rra 55",
+                "WATER a 20"};
 
-        for(int i=0;i< queries.length;i++){
-            System.out.println(queries[i][0] + " " + queries[i][1]);
-            if(map[queries[i][0]][queries[i][1]] < max_virus)map[queries[i][0]][queries[i][1]]++;
-            else chain(map,queries[i][0],queries[i][1],max_virus);
+        String[] sell = {"BREAD 5", "ICECREAM 100", "PIZZA 7", "JUICE 10", "WATER 1"};
+
+        HashMap<Character, Integer> jaeryo = new HashMap<>();
+
+        String[] material = new String[2];
+        for(int i=0;i<ings.length;i++){
+            material = ings[i].split(" ");
+            jaeryo.put(material[0].charAt(0),Integer.parseInt(material[1]));
         }
 
+        HashMap<String, Integer> menuProfit = new HashMap<>();
 
+        int profit = 0;
+        String[] menuInfo = new String[3];
+        for(int i=0; i< menu.length;i++){
+            menuInfo = menu[i].split(" ");
 
+            int materialValue = 0;
+            String str = menuInfo[1];
+            for(int j=0;j<str.length();j++){
+                materialValue += jaeryo.get(str.charAt(j));
+            }
+
+            profit = Integer.parseInt(menuInfo[2]) - materialValue;
+            menuProfit.put(menuInfo[0],profit);
+        }
+
+        String[] selling = new String[2];
+        for(int i=0;i<sell.length;i++){
+            selling = sell[i].split(" ");
+
+            answer += Integer.parseInt(selling[1]) * menuProfit.get(selling[0]);
+        }
+
+        System.out.println(answer);
 
     }
-
-    public static void chain(int[][] map, int y, int x, int max_virus) {
-
-        if(y-1 > 0 && map[y-1][x] < max_virus){
-            map[y-1][x]++;
-        }
-        else if(y-2 > 0 && map[y-1][x] == max_virus){
-            chain(map,y-2,x,max_virus);
-        }
-        if(x-1 > 0 && map[y][x-1] < max_virus){
-            map[y][x-1]++;
-        }
-        else if(x-2 > 0 && map[y][x-1] == max_virus){
-            chain(map,y,x-2,max_virus);
-        }
-        if(y+1 < map.length && map[y+1][x] < max_virus){
-            map[y+1][x]++;
-        }
-        else if(y+2 < map.length && map[y+1][x] == max_virus){
-            chain(map,y+2,x,max_virus);
-        }
-        if(x+2 <map[0].length && map[y][x+1] < max_virus){
-            map[y][x+2]++;
-        }
-        else if(x+1 <map[0].length && map[y][x+1] == max_virus){
-            chain(map,y,x+1,max_virus);
-        }
-
-
-
-    }
-
-
-
-
 }

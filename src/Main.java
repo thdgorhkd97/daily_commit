@@ -6,63 +6,56 @@ import java.util.stream.*;
 
 public class Main {
 
-    // w 사 3번 코딩테스트 문제
-    // 각 메뉴별로 들어가는 재료값과 메뉴의 가격을 비교하여 총 이익을 구하는 문제
-    // 메뉴에 들어가는 재료를 charAt 으로 구해서 각 재료값을 모두 구하고 이를 메뉴값과 비교한다.
-    // hash를 활용하여 메뉴별 이익금을 구하고
-    // 마지막에 합한다.
-    // 조금 노가다 성으로 푼 것 같은데 각 메뉴명만 보고 들어가는 재료를 구할 수 없기 때문에
-    // 괜찮은 방법이라고 생각한다.
+    // programmers level 4 - 도둑질
+    // 동적계획법에는 자신 있는 것 같다.
+    // 다만 원형으로 위치한 집에서 인접한 집을 훔치지 못한다는 기준때문에
+    // 원형을 어떻게 표현할까에 대해서 조금 시간이 걸렸다.
+    // 원형으로 연결되었다는 것은 배열에서 처음과 마지막만 따로 신경쓰면 되기 때문에
+    // 첫번째를 훔치는 경우와 첫번째를 훔치지 않는 경우로 나눠서
+    // 최대값을 구하였다.
+    // 돈에 대한 동적계획법은 2번 전의 집과 현재 집을 더한 값과 하나전의 집 중에서
+    // 더 큰 값을 고르는 것으로 동적계획법을 실행하엿다.
 
     public static void main(String[] args) {
 
+        int[] money = {1,2,3,1};
         int answer = 0;
 
-        String[] ings = {"r 10", "a 23", "t 124", "k 9"};
-        String[] menu = {
-                "PIZZA arraak 145",
-                "HAMBURGER tkar 180",
-                "BREAD kkk 30",
-                "ICECREAM rar 50",
-                "SHAVEDICE rar 45",
-                "JUICE rra 55",
-                "WATER a 20"};
+        int[] steal1 = new int[money.length];
+        int[] steal2 = new int[money.length];
 
-        String[] sell = {"BREAD 5", "ICECREAM 100", "PIZZA 7", "JUICE 10", "WATER 1"};
-
-        HashMap<Character, Integer> jaeryo = new HashMap<>();
-
-        String[] material = new String[2];
-        for(int i=0;i<ings.length;i++){
-            material = ings[i].split(" ");
-            jaeryo.put(material[0].charAt(0),Integer.parseInt(material[1]));
+        // case 1 : 첫 집 훔치고 마지막 집 안 훔치는 경우
+        int case1 = 0;
+        steal1[0] = money[0];
+        steal1[1] = Math.max(money[0],money[1]);
+        for(int i=2;i<steal1.length-1;i++){
+            steal1[i] = Math.max(steal1[i-2] + money[i],steal1[i-1]);
+            case1 = Math.max(steal1[i],steal1[i+1]);
         }
 
-        HashMap<String, Integer> menuProfit = new HashMap<>();
 
-        int profit = 0;
-        String[] menuInfo = new String[3];
-        for(int i=0; i< menu.length;i++){
-            menuInfo = menu[i].split(" ");
-
-            int materialValue = 0;
-            String str = menuInfo[1];
-            for(int j=0;j<str.length();j++){
-                materialValue += jaeryo.get(str.charAt(j));
-            }
-
-            profit = Integer.parseInt(menuInfo[2]) - materialValue;
-            menuProfit.put(menuInfo[0],profit);
+        // case 2 : 첫 집 안 훔치면
+        int case2 = 0;
+        steal2[0] = 0;
+        steal2[1] = money[1];
+        for(int i = 2;i<steal2.length;i++){
+            steal2[i] = Math.max(steal2[i-2] + money[i], steal2[i-1]);
+            case2 = Math.max(steal2[i-1],steal2[i]);
         }
 
-        String[] selling = new String[2];
-        for(int i=0;i<sell.length;i++){
-            selling = sell[i].split(" ");
 
-            answer += Integer.parseInt(selling[1]) * menuProfit.get(selling[0]);
+        System.out.println("첫 집 털때 : ");
+        for(int i=0;i<steal1.length;i++){
+            System.out.print(steal1[i] + " ");
         }
+        System.out.println();
+        System.out.println("첫 집 안 털때");
+        for(int i=0;i<steal1.length;i++){
+            System.out.print(steal2[i] + " ");
+        }
+        System.out.println();
 
-        System.out.println(answer);
+        System.out.println(Math.max(case1,case2));
 
     }
 }

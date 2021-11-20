@@ -6,80 +6,78 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers level 3 - 가장 먼 노드
-    // bfs를 통해 그래프를 훑어가면서 1로부터 최대 거리인 점의 수를 찾는 문제
-    // bfs를 구현하여 거리는 모두 구했지만 메모리 초과가 났다.
-    // 처음에 graph[][] 2중 배열을 사용했을 때가 메모리 초과가 생겻는데
-    // ArrayList<ArrayList<Integer>> 이렇게 2중 리스트를 구현하니 메모리 이슈가 해결되었다.
-    // 아무래도 bfs를 위해서 이중 배열의 모든 원소를 확인하여 1인지 확인하다 보니
-    // 이중 배열로 구현하니까 큰 그래프에서 순회가 많아져 메모리 초과가 발생한 것으로 보인다.
-    // 단순히 배열과 list가 순회와 삽입 삭제 에서만 속도 차이가 있다고 알고 있는데
-    // 순회적인 측면을 강조해야 하는 bfs이다 보니 처음부터 이중 배열을 선택했는데
-    // 절대적인 게 아니라는 걸 또 깨닫게 되었다.
+    // programmers level 3 - 여행 경로
+    // 50 / 100 절반 성공 절반 시간 초과
+    // 2개 이상이 가능할 경우 알파벳 순으로 가장 빠른 도시를 방문해야 하는 조건에서
+    // 시간이 조금 오래 걸렸다.
+    // 그래서 전체를 순회하여 도착 가능한 모든 도시를 구하고 도시를 정렬한 후에
+    // 위치하고 그 도시를 다시 큐에 넣는 bfs를 활용한 방식을 구현하였는데
+    // 모두 순회하고 도시가 새로 들어올 때마다 모두 순회하다 보니
+    // 경우의 수가 많아져서 시간 초과가 발생한 것으로 보인다.
+    // 근데 도착 가능한 모든 경우의 수를 구해야 하기 때문에 모두 순회하는 것으로 구현한 것인데
+    // 시간을 줄이기 위한 방법을 더 고민해 봐야 할 것으로 보인다.
 
     public static void main(String[] args) {
 
-        int n = 6;
-        int[][] edge = {{3,6},{4,3},{3,2},{1,3},{1,2},{2,4},{5,2}};
+        String[][] tickets = {{"ICN","SFO"},{"ICN","ATL"},{"SFO","ATL"},{"ATL","ICN"},
+                {"ATL","SFO"}};
+//        String[][] tickets = {{"ICN","JFK"},{"HND","IAD"},{"JFK","HND"}};
 
-        ArrayList<ArrayList<Integer>> list=new ArrayList<ArrayList<Integer>>();
-        for(int i=0;i<edge.length;i++){
-            list.add(new ArrayList<Integer>());
-        }
-        //노드 연결
-        int a, b;
-        for(int[] node:edge){
-            a=node[0];
-            b=node[1];
-            list.get(a).add(b);
-            list.get(b).add(a);
-        }
+        Queue<String> que = new LinkedList<>();
+        ArrayList<String> result = new ArrayList<>();
+        String[] answer;
+        boolean[] check = new boolean[tickets.length];
 
-//        for(int i=1;i<graph.length;i++){
-//            for(int j=1;j<graph.length;j++){
-//                System.out.print(graph[i][j] + " ");
-//            }
-//            System.out.println();
-//        }
+        que.offer("ICN");
+        result.add("ICN");
 
-        Queue<Integer> que = new LinkedList<>();
-        boolean[] check = new boolean[n+1];
-        int[] distance = new int[n+1];
+        while(!cover(check)){
+            String str = que.poll();
+            ArrayList<String> list = new ArrayList<>();
+            int idx = 0;
 
-        distance[1] = 1;
-        que.offer(1);
-        check[1] = true;
+            for(int i=0;i< tickets.length; i++){
+                if(tickets[i][0].equals(str) && !check[i]){
+                    list.add(tickets[i][1]);
+                    idx = i;
+                }
+            }
 
-        while(!que.isEmpty()){
-            int idx = que.poll();
-            System.out.println(idx + " 에 대해서 확인해보자 ");
+            if(list.size() == 1){
+                que.offer(list.get(0));
+                result.add(list.get(0));
+                check[idx] = true;
+            }
+            else{ // 가능한 경로가 2개 이상일 때
+                Collections.sort(list);
 
-            for(int v : list.get(idx)){
-                if(!check[v]){
-                    que.offer(v);
-                    check[v] = true;
-                    distance[v] = distance[idx] + 1;
+                for(int i=0;i<tickets.length;i++){
+                    if(tickets[i][0].equals(str) &&tickets[i][1].equals(list.get(0)) && !check[i]){
+                        que.offer(list.get(0));
+                        result.add(list.get(0));
+                        check[i] = true;
+                        break;
+                    }
                 }
             }
 
         }
 
-        int answer = 0;
-        int max = 0;
-        for(int num : distance){
-            if(num > max){
-                max = num;
-                answer = 1;
-            }
-            else if(num == max){
-                answer ++;
-            }
+        answer = new String[result.size()];
+        for(int i=0;i<answer.length;i++){
+            answer[i] = result.get(i);
+        }
+        for(int i=0;i<answer.length;i++){
+            System.out.println(answer[i]);
+
         }
 
-        System.out.println(answer);
+    }
 
-
-
-
-   }
+    public static boolean cover(boolean[] check){
+        for(int i=0;i<check.length;i++){
+            if(!check[i]) return false;
+        }
+        return true;
+    }
 }

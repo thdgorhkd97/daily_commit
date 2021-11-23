@@ -6,43 +6,33 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers level 3 - 가장 긴 팰린드롭
-    // 부분 문자열 중 가장 긴 앞뒤가 똑같은 부분 문자열의 길이 찾기 문제
-    // 통과했는데 효율성을 결국 검색해서 알아보고 해결했다 ㅠㅠ
-    // for(int i=0;i + len <= s.length(); i++) 이 부분에 차이가 있었다.
-    // 나는 s.length() - len 이렇게 했는데 이런식으로 해서 사용하는 index를 편하게 활용한 것이
-    // 대부분 사람들의 풀이 방식이었다.
-    // 이를 제외하고는 코드 자체가 다르지 않은 것으로 보아 내가 한 방식으로도 해결이 가능했을 터인데
-    // 내가 for문을 깨끗하게 하려는 습관이 있어서 for문을 깨끗하게 하니 for 문 내에서
-    // 인덱스를 순회하는 과정이 번거롭게 되어 실패했던 것이 아닐까 싶다.
-
+    // programmers level 3 - 숫자 게임
+    // A 배열의 수보다 B 배열의 수가 더 크게 만드는 최대 경우의 수
+    // 처음에는 i=0 부터 A와 B의 인덱스를 동시에 비교했는데 어떻게 해도 문제가 있었다.
+    // 테스트 케이스도 너무 작게 나와서 해결방법을 몰랐는데
+    // 최대 점수를 얻기 위해서 A에서 큰 수가 있다면 B에서는 가장작은 걸 버릴수 있어야 한다는
+    // 부분에서 힌트를 얻었다.
+    // 오히려 가장 뒤에서부터 인덱스를 비교하면서 같은 인덱스만 비교하는 것이 아니라
+    // B보다 A가 크면 그에 대해서는 고려를 하지 않는 식으로 A와 B의 인덱스를 따로
+    // 관리했어야 했다.
+    // 코드는 짧지만 반대로 만들어서 인덱스를 따로 관리하는 걸 생각하는 게 힘들었다.
 
     public static void main(String[] args) {
 
-        String s = "abcdcba";
+        int[] A = {5,1,3,7};
+        int[] B = {2,2,6,8};
 
-        char[] ch = s.toCharArray();
+        Arrays.sort(A);
+        Arrays.sort(B);
 
-        for(int len = s.length(); len >= 1; len--){ // 7 6 5 4 3 2 1
-            for(int i=0;i + len <= s.length(); i++) {
-
-                boolean flag = true;
-                int mid = len / 2;
-                for(int idx=0;idx<mid;idx++){
-                    if(ch[i + idx] != ch[i + len - idx - 1]){
-                        flag = false;
-                        break;
-                    }
-                }
-                if(flag) {
-                    System.out.println(len);
-                }
-
+        int answer = 0;
+        int b_idx = B.length-1;
+        for(int i=A.length-1;i >= 0;i--){
+            if(A[i] < B[b_idx]){
+                answer++;
+                b_idx--;
             }
-
         }
-
-
 
     }
 }

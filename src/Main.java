@@ -6,33 +6,59 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers level 3 - 숫자 게임
-    // A 배열의 수보다 B 배열의 수가 더 크게 만드는 최대 경우의 수
-    // 처음에는 i=0 부터 A와 B의 인덱스를 동시에 비교했는데 어떻게 해도 문제가 있었다.
-    // 테스트 케이스도 너무 작게 나와서 해결방법을 몰랐는데
-    // 최대 점수를 얻기 위해서 A에서 큰 수가 있다면 B에서는 가장작은 걸 버릴수 있어야 한다는
-    // 부분에서 힌트를 얻었다.
-    // 오히려 가장 뒤에서부터 인덱스를 비교하면서 같은 인덱스만 비교하는 것이 아니라
-    // B보다 A가 크면 그에 대해서는 고려를 하지 않는 식으로 A와 B의 인덱스를 따로
-    // 관리했어야 했다.
-    // 코드는 짧지만 반대로 만들어서 인덱스를 따로 관리하는 걸 생각하는 게 힘들었다.
+    // programmers level 3 - 섬 연결하기
+    // greedy 방식으로 섬을 최소 비용으로 연결하기 문제
+    // 그래프에서 최소 비용으로 연결하기를 알아보니까 크루스칼 알고리즘을 사용하여
+    // MST를 구해야 한다고 알아서 구현해보려고 했는데
+    // 아무래도 개념만 읽고 바로 구현하기에는 부족한 듯 싶다.
+    // MST 개념을 비롯한 그래프 개념에 대해서 조금 부족한 것 같은데 내일은
+    // mST와 같은 그래프 관련 개념에 대해서 공부해보려한다.
 
     public static void main(String[] args) {
 
-        int[] A = {5,1,3,7};
-        int[] B = {2,2,6,8};
+        int n = 4;
+        int[][] costs = {{0,1,1},{0,2,2},{1,2,5},{1,3,1},{2,3,8}};
 
-        Arrays.sort(A);
-        Arrays.sort(B);
+        Arrays.sort(costs, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[2] - o2[2];
+            }
+        });
+//        for(int i=0;i<costs.length;i++){
+//            System.out.println(costs[i][0] + " " + costs[i][1] + " " + costs[i][2]);
+//        }
+
+        int[] parent = new int[n];
+        for(int i=0;i<n;i++){
+            parent[i] = i;
+        }
 
         int answer = 0;
-        int b_idx = B.length-1;
-        for(int i=A.length-1;i >= 0;i--){
-            if(A[i] < B[b_idx]){
-                answer++;
-                b_idx--;
+
+        for(int i=0;i<costs.length;i++){
+            if(parent[costs[i][0]] == parent[costs[i][1]]){
+                continue;
+            }
+            else{
+                answer += costs[i][2];
+                System.out.println(parent[costs[i][1]] + " 변경 " + costs[i][0] + " 로 ");
+
+                int prev = parent[costs[i][1]];
+                parent[costs[i][1]] = costs[i][0];
+
+                if(parent[costs[i][1]] == parent[costs[i][0]]){
+//                    System.out.println(answer);
+                    answer -= costs[i][2];
+                    parent[costs[i][1]] = prev;
+                }
             }
         }
+
+        System.out.println(answer);
+
+
+
 
     }
 }

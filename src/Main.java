@@ -6,57 +6,57 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers level 3 - 섬 연결하기
-    // greedy 방식으로 섬을 최소 비용으로 연결하기 문제
-    // 그래프에서 최소 비용으로 연결하기를 알아보니까 크루스칼 알고리즘을 사용하여
-    // MST를 구해야 한다고 알아서 구현해보려고 했는데
-    // 아무래도 개념만 읽고 바로 구현하기에는 부족한 듯 싶다.
-    // MST 개념을 비롯한 그래프 개념에 대해서 조금 부족한 것 같은데 내일은
-    // mST와 같은 그래프 관련 개념에 대해서 공부해보려한다.
+    // Line 코딩테스트 대비 실전 문제 풀이
+    // 주어지는 문자열을 원형으로 연결하여 생각해서 연속된 같은 문자의 개수를 문자열 배열로 반환
+    // 원래 오늘 그래프 이론 중 MST를 공부하려 했는 데 토요일날 라인 코딩테스트를 봐도 된다는 메일이 와서
+    // 실전 코딩테스트 문제를 하나 추가로 풀어보기로 하였다.
+    // 원형으로 연결되었다는 걸 표현하기 위해서 0번 인덱스와 맨 끝 인덱스를 연결하여 같은 문자가 어디까지 연결되는지
+    // 확인하고서 그 사이에 있는 문자의 개수를 파악한다.
+    // 로직자체는 그리 어렵진 않았지만 0번 인덱스에서 시작해서 끝 인덱스로 이어지는 부분을 표현하는게 어려웠다.
+    // 처음에 0번부터 while로 체크하고 s.length-1에서 -- 해가며 while 로 체크 하는 데 자꾸 인덱스 오류가 났었다.
 
     public static void main(String[] args) {
 
-        int n = 4;
-        int[][] costs = {{0,1,1},{0,2,2},{1,2,5},{1,3,1},{2,3,8}};
+        String s = "wowwow";
 
-        Arrays.sort(costs, new Comparator<int[]>() {
-            @Override
-            public int compare(int[] o1, int[] o2) {
-                return o1[2] - o2[2];
+        char ch = s.charAt(0);
+        int idx = 0;
+
+        ArrayList<Integer> list = new ArrayList<>();
+
+        int first = 0;
+        int last = 0;
+        int cnt = 0;
+        while(ch == s.charAt(idx)){
+            cnt++;
+            idx++;
+        }
+        first = idx;
+        idx = s.length()-1;
+        while(ch == s.charAt(idx)){
+            cnt++;
+            idx--;
+        }
+        last = idx;
+        list.add(cnt);
+
+        int pos = first;
+        for(int i=pos;i<=last;i++){
+            ch = s.charAt(i);
+            cnt = 0;
+            while(ch == s.charAt(pos)){
+                cnt++;
+                pos++;
             }
-        });
-//        for(int i=0;i<costs.length;i++){
-//            System.out.println(costs[i][0] + " " + costs[i][1] + " " + costs[i][2]);
-//        }
-
-        int[] parent = new int[n];
-        for(int i=0;i<n;i++){
-            parent[i] = i;
+            list.add(cnt);
+            i = pos-1;
         }
 
-        int answer = 0;
-
-        for(int i=0;i<costs.length;i++){
-            if(parent[costs[i][0]] == parent[costs[i][1]]){
-                continue;
-            }
-            else{
-                answer += costs[i][2];
-                System.out.println(parent[costs[i][1]] + " 변경 " + costs[i][0] + " 로 ");
-
-                int prev = parent[costs[i][1]];
-                parent[costs[i][1]] = costs[i][0];
-
-                if(parent[costs[i][1]] == parent[costs[i][0]]){
-//                    System.out.println(answer);
-                    answer -= costs[i][2];
-                    parent[costs[i][1]] = prev;
-                }
-            }
+        int[] answer = new int[list.size()];
+        Collections.sort(list);
+        for(int i=0;i<answer.length;i++){
+            answer[i] = list.get(i);
         }
-
-        System.out.println(answer);
-
 
 
 

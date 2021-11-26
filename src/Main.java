@@ -6,59 +6,66 @@ import java.util.stream.*;
 
 public class Main {
 
-    // Line 코딩테스트 대비 실전 문제 풀이
-    // 주어지는 문자열을 원형으로 연결하여 생각해서 연속된 같은 문자의 개수를 문자열 배열로 반환
-    // 원래 오늘 그래프 이론 중 MST를 공부하려 했는 데 토요일날 라인 코딩테스트를 봐도 된다는 메일이 와서
-    // 실전 코딩테스트 문제를 하나 추가로 풀어보기로 하였다.
-    // 원형으로 연결되었다는 걸 표현하기 위해서 0번 인덱스와 맨 끝 인덱스를 연결하여 같은 문자가 어디까지 연결되는지
-    // 확인하고서 그 사이에 있는 문자의 개수를 파악한다.
-    // 로직자체는 그리 어렵진 않았지만 0번 인덱스에서 시작해서 끝 인덱스로 이어지는 부분을 표현하는게 어려웠다.
-    // 처음에 0번부터 while로 체크하고 s.length-1에서 -- 해가며 while 로 체크 하는 데 자꾸 인덱스 오류가 났었다.
+    // 크루스칼 알고리즘 ( MST )
+    // MST 개념을 익히기 위해서 크루스칼 알고리즘을 공부하였다.
+    // 최소의 가중치를 가진 간선을 더해가면서 양쪽 정점의 부모 정점을 파고 들어가면서
+    // 사이클이 발생하는지를 파악하고 ( find를 통해서)
+    // 사이클이 발생하면 해당 간선을 더하지 않고 사이클이 아니면 더해 나가면서
+    // union을 통해서 더하는 간선의 양 정점의 부모 정점을 변경해 나간다.
 
-    public static void main(String[] args) {
+    static int[] parent;
 
-        String s = "wowwow";
+    public static void main(String[] args){
 
-        char ch = s.charAt(0);
-        int idx = 0;
+        int n = 4;
 
-        ArrayList<Integer> list = new ArrayList<>();
+        int[][] costs = {{0,1,1},{0,2,2},{1,2,5},{1,3,1},{2,3,8}};
 
-        int first = 0;
-        int last = 0;
-        int cnt = 0;
-        while(ch == s.charAt(idx)){
-            cnt++;
-            idx++;
-        }
-        first = idx;
-        idx = s.length()-1;
-        while(ch == s.charAt(idx)){
-            cnt++;
-            idx--;
-        }
-        last = idx;
-        list.add(cnt);
-
-        int pos = first;
-        for(int i=pos;i<=last;i++){
-            ch = s.charAt(i);
-            cnt = 0;
-            while(ch == s.charAt(pos)){
-                cnt++;
-                pos++;
+        Arrays.sort(costs, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                return o1[2] - o2[2];
             }
-            list.add(cnt);
-            i = pos-1;
+        });
+
+        parent = new int[n];
+
+        for(int i=0;i<n;i++) {
+            parent[i] = i;
         }
 
-        int[] answer = new int[list.size()];
-        Collections.sort(list);
-        for(int i=0;i<answer.length;i++){
-            answer[i] = list.get(i);
+        int answer = 0;
+
+        for(int i=0;i<costs.length;i++){
+
+            if(find(costs[i][0]) == find(costs[i][1])){ // 사이클 발생 경우
+                continue;
+            }
+
+            answer += costs[i][2];
+
+            union(costs[i][0],costs[i][1]);
+        }
+
+        for(int i=0;i<n;i++){
+            System.out.print(parent[i] + " ");
         }
 
 
 
+    }
+    public static int find(int x){
+        if(parent[x] == x) return x;
+        return parent[x] = find(parent[x]);
+    }
+    public static void union(int a, int b){
+        int pa = parent[a];
+        int pb = parent[b];
+        if (pa == pb) {
+            System.out.println(pa + " = " + pb);
+            return;
+        }
+        System.out.println(parent[pa] + " 를 " + pb + " 로 바꿉니다.");
+        parent[pa] = pb;
     }
 }

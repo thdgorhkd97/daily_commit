@@ -6,66 +6,57 @@ import java.util.stream.*;
 
 public class Main {
 
-    // 크루스칼 알고리즘 ( MST )
-    // MST 개념을 익히기 위해서 크루스칼 알고리즘을 공부하였다.
-    // 최소의 가중치를 가진 간선을 더해가면서 양쪽 정점의 부모 정점을 파고 들어가면서
-    // 사이클이 발생하는지를 파악하고 ( find를 통해서)
-    // 사이클이 발생하면 해당 간선을 더하지 않고 사이클이 아니면 더해 나가면서
-    // union을 통해서 더하는 간선의 양 정점의 부모 정점을 변경해 나간다.
+    // L 사 코딩테스트 1번 문제
+    // source 문자열에서 겹치지않게 하나씩 문자를 빼고 사전순으로 정렬한 다음 문자열을 이어나간다.
+    // 처음에는 source 문자열에서 꺼내고 source 문자열 내에서 제외해나가면서 처리하려 했는데
+    // String 형을 제외해 나가면서 하기가 쉽지 않았다( 사용했으면 아예 다른 문자로 바꾸는 식으로 치환하려 함)
+    // 근데 그렇게 하면 source의 길이만큼 계속 순회를 했어야 해서 그런 방식은 포기했다.
+    // 그래서 source 문자열을 arraylist로 복사해서 거기서 제외해 나가며 새로운 문자열을 만들었다.
+    // 처음에 source 문자열을 처리해서 해결해야 겠다는 생각에 시간을 조금 소요했었는데
+    // 진작 arraylist로 했으면 훨씬 빠르게 처리할 수 있었을 것 같다.
 
-    static int[] parent;
 
     public static void main(String[] args){
 
-        int n = 4;
+        String source = "execute";
 
-        int[][] costs = {{0,1,1},{0,2,2},{1,2,5},{1,3,1},{2,3,8}};
+        String dest = "";
 
-        Arrays.sort(costs, new Comparator<int[]>() {
-            @Override
-            public int compare(int[] o1, int[] o2) {
-                return o1[2] - o2[2];
+        Set<Character> set = new HashSet<>();
+        ArrayList<Character> list = new ArrayList<>();
+        ArrayList<Character> s = new ArrayList<>();
+
+        for(int i=0;i<source.length();i++){
+            s.add(source.charAt(i));
+        }
+
+        while(true){
+//if(source.equals("")) return dest;
+
+            if(s.isEmpty()) break;
+
+            for(int i=0;i<s.size();i++){
+                if(set.add(s.get(i))){ // 겹치지 않으면
+                    list.add(s.get(i));
+                    s.remove(s.get(i));
+                    i--;
+                }
             }
-        });
 
-        parent = new int[n];
+            Collections.sort(list);
 
-        for(int i=0;i<n;i++) {
-            parent[i] = i;
-        }
-
-        int answer = 0;
-
-        for(int i=0;i<costs.length;i++){
-
-            if(find(costs[i][0]) == find(costs[i][1])){ // 사이클 발생 경우
-                continue;
+            StringBuffer sb = new StringBuffer();
+            for(int i=0;i<list.size();i++){
+                sb.append(list.get(i));
             }
+            dest += sb.toString();
 
-            answer += costs[i][2];
+            set.clear();
+            list.clear();
 
-            union(costs[i][0],costs[i][1]);
         }
 
-        for(int i=0;i<n;i++){
-            System.out.print(parent[i] + " ");
-        }
+        System.out.println(dest);
 
-
-
-    }
-    public static int find(int x){
-        if(parent[x] == x) return x;
-        return parent[x] = find(parent[x]);
-    }
-    public static void union(int a, int b){
-        int pa = parent[a];
-        int pb = parent[b];
-        if (pa == pb) {
-            System.out.println(pa + " = " + pb);
-            return;
-        }
-        System.out.println(parent[pa] + " 를 " + pb + " 로 바꿉니다.");
-        parent[pa] = pb;
     }
 }

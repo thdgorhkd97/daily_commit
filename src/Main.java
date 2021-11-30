@@ -6,52 +6,55 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers level 3 - 보석 쇼핑
-    // 효율성에서 문제가 생겨서 인터넷에서 검색 후 해결하였다.
-    // 원래는 이중배열을 이용해서 풀어서 n^2의 시간을 소모해야 했는데 투 포인터를
-    // 활용해야 하는 문제였다.
-    // 모든 보석을 포함하되 큐에 가장 먼저 넣은 보석이 1개보다 많아지면 1개가 될 때까지
-    // 앞의 시작 포인트를 당기는 식으로 해야 했다.
-    // 정확성은 좋지만 효율성에서 문제가 생기는 경우가 꽤 많다.
-    // 알고 있지만 이를 해결하기가 쉽지 않은 것 같다....
-    // 이번 문제도 이중 배열이 아니라 애초에 투포인터를 이용해서 인덱스를 바꿔가며 확인하는 등
-    // 시간을 좀 더 신경쓰면서 해결해보자
+    // programmers level 3 - 불량 사용자
+    // banned_id에 있는 유저 목록 중 *로 표시된 부분은 상관없이 맞는 아이디 목록을 구하는 문제
+    // *로 표시된 id 마다 가능한 경우의 수를 구해서 곱하는 로직을 생각했었다.
+    // 동시에 가능한 경우의 수를 구하는 것이기 때문에 2 2 2 개면 총 8개가 되기 때문이다.
+    // 하지만 이렇게 하면 banned_id에 똑같은 조건이 있을 때 문제가 생긴다.
+    // 예를 들어 *rodo 가 2개이고 user 중에 crodo 와 frodo 만 있다면
+    // baanned_id 에 *rodo는 2개이더라도 2 * 2 = 4 개가 아니라
+    // 2개만 존재해야 하는 것이다.
+    // 이런 조건을 고려해서 로직을 다시 구현해야 하는데 그걸 포함하는 조건이나
+    // 예외 처리를 어떻게 해야 할 지 조금 더 생각해 봐야할 것 같다..
 
     public static void main(String[] args){
 
-        String[] gems = {"DIA", "RUBY", "RUBY", "DIA", "DIA", "EMERALD", "SAPPHIRE", "DIA"};
-        int[] answer = new int[2];
+        String[] user_id = {"frodo", "fradi", "crodo", "abc123", "frodoc"};
+        String[] banned_id = {"*rodo", "*rodo", "******"};
+        Set<String> set = new HashSet<>();
 
-        HashSet<String> set = new HashSet<>();
 
-        for (String s : gems) {
-            set.add(s);
+        for(String str : banned_id){
+            set.add(str);
         }
 
-        HashMap<String, Integer> map = new HashMap<>();
-        Queue<String> q = new LinkedList<>();
-        int start = 0;
+        int[] many = new int[set.size()];
+
         int idx = 0;
-        int len = Integer.MAX_VALUE;
-
-        for(int i=0;i<gems.length;i++){
-            map.put(gems[i],map.getOrDefault(gems[i],0) + 1);
-            q.add(gems[i]);
-
-            while(map.get(q.peek()) > 1){
-                map.put(q.peek(),map.get(q.poll())-1);
-                idx++;
+        for(String str : set){
+            int cnt = 0;
+            for(String user : user_id){
+                if(str.length() == user.length()){
+                    boolean flag = true;
+                    for(int i=0;i<user.length();i++){
+                        if(str.charAt(i)!='*' && user.charAt(i) != str.charAt(i)){
+                            flag = false;
+                            break;
+                        }
+                    }
+                    if(flag){
+                       cnt++;
+                    }
+                }
             }
-
-            if(map.size() == set.size() && len > (i-idx)){
-                len = i - idx;
-                start = idx + 1;
-            }
+            many[idx++] = cnt;
         }
 
-        answer[0] = start;
-        answer[1] = len+start;
-        System.out.println(answer[0] + " " + answer[1]);
+        for(int i=0;i<many.length;i++){
+            System.out.println(many[i]);
+        }
+
+
 
     }
 }

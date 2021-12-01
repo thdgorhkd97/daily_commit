@@ -7,54 +7,71 @@ import java.util.stream.*;
 public class Main {
 
     // programmers level 3 - 불량 사용자
-    // banned_id에 있는 유저 목록 중 *로 표시된 부분은 상관없이 맞는 아이디 목록을 구하는 문제
-    // *로 표시된 id 마다 가능한 경우의 수를 구해서 곱하는 로직을 생각했었다.
-    // 동시에 가능한 경우의 수를 구하는 것이기 때문에 2 2 2 개면 총 8개가 되기 때문이다.
-    // 하지만 이렇게 하면 banned_id에 똑같은 조건이 있을 때 문제가 생긴다.
-    // 예를 들어 *rodo 가 2개이고 user 중에 crodo 와 frodo 만 있다면
-    // baanned_id 에 *rodo는 2개이더라도 2 * 2 = 4 개가 아니라
-    // 2개만 존재해야 하는 것이다.
-    // 이런 조건을 고려해서 로직을 다시 구현해야 하는데 그걸 포함하는 조건이나
-    // 예외 처리를 어떻게 해야 할 지 조금 더 생각해 봐야할 것 같다..
+    // 하나하나 비교하는 것이 아니라 아예 banned_id의 길이만큼 유저를 뽑아서
+    // 가능한 유저 목록 중 가능한 케이스가 있는지 확인해보고자 하였다.(유저의 총 길이가 8이므로 완전탐색이 가능할 것이라 판단하엿다.)
+    // banned_id의 길이만큼 유저를 구해서 set을 통해 중복되지 않는 유저 목록을 구하고자 하였다.
+    // 근데 처음에 Set<String[]> 이렇게 받았다가 배열의 순서가 달라서 set에 적용되지 않앗다.
+    // 그래서 Arrays.sort()를 활용하여 배열의 순서를 맞게 맞추면 set에서 동일한 배열을 구별할 줄 알았는데
+    // 배열의 원소 순서가 같아도 set에서 구별을 하지 못하였다.
+    // 아래처럼 아예 배열의 주소 자체를 같게 만들어야 구별을 할 수 있었다.
+    // str2 = str; -> set.add() = false;
+    // 그래서 중복되지 않는 유저목록을 구하기 위해서 배열의 원소들을 하나의 String으로 모아서
+    // 비교하는 방식을 활용하였다.
+    // ArrayList에는 중복되지 않는 String의 배열값만 넣어서 arraylist는 결과적으로
+    // banned_id의 길이에 해당하는 중복되지 않는 배열이 원소로 들어간다.
+    // arraylist의 원소들을 가지고 비교하면 되는데 오늘은 여기까지 하려한다.
+
+    static Set<String> set = new HashSet<>();
+    static ArrayList<String[]> list = new ArrayList<>();
+    static int len = 0;
 
     public static void main(String[] args){
 
         String[] user_id = {"frodo", "fradi", "crodo", "abc123", "frodoc"};
         String[] banned_id = {"*rodo", "*rodo", "******"};
-        Set<String> set = new HashSet<>();
+
+        int n = user_id.length;
+        int r = banned_id.length;
+        int depth = 0;
+        len = banned_id.length;
+
+        permu(user_id,depth,n,r);
 
 
-        for(String str : banned_id){
-            set.add(str);
-        }
-
-        int[] many = new int[set.size()];
-
-        int idx = 0;
-        for(String str : set){
-            int cnt = 0;
-            for(String user : user_id){
-                if(str.length() == user.length()){
-                    boolean flag = true;
-                    for(int i=0;i<user.length();i++){
-                        if(str.charAt(i)!='*' && user.charAt(i) != str.charAt(i)){
-                            flag = false;
-                            break;
-                        }
-                    }
-                    if(flag){
-                       cnt++;
-                    }
-                }
+        for(int i=0;i<list.size();i++){
+            for(int j=0;j<len;j++){
+                System.out.print(list.get(i)[j] + " ");
             }
-            many[idx++] = cnt;
+            System.out.println();
         }
 
-        for(int i=0;i<many.length;i++){
-            System.out.println(many[i]);
+    }
+
+    static void permu(String[] user_id,int depth, int n, int r){
+        if(depth == r){
+            String[] str = new String[len];
+            for(int i=0;i<r;i++){
+                str[i] = user_id[i];
+            }
+            Arrays.sort(str);
+            StringBuffer sb = new StringBuffer();
+            for(int i=0;i<r;i++){
+                sb.append(str[i]);
+            }
+
+            if(set.add(sb.toString())) list.add(str);
         }
 
+        for(int i=depth;i<n;i++){
+            swap(user_id,depth,i);
+            permu(user_id,depth+1,n,r);
+            swap(user_id,depth,i);
+        }
+    }
 
-
+    static void swap(String[] user_id,int depth, int i){
+        String tmp = user_id[i];
+        user_id[i] = user_id[depth];
+        user_id[depth] = tmp;
     }
 }

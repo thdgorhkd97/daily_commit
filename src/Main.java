@@ -6,72 +6,47 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers level 3 - 불량 사용자
-    // 하나하나 비교하는 것이 아니라 아예 banned_id의 길이만큼 유저를 뽑아서
-    // 가능한 유저 목록 중 가능한 케이스가 있는지 확인해보고자 하였다.(유저의 총 길이가 8이므로 완전탐색이 가능할 것이라 판단하엿다.)
-    // banned_id의 길이만큼 유저를 구해서 set을 통해 중복되지 않는 유저 목록을 구하고자 하였다.
-    // 근데 처음에 Set<String[]> 이렇게 받았다가 배열의 순서가 달라서 set에 적용되지 않앗다.
-    // 그래서 Arrays.sort()를 활용하여 배열의 순서를 맞게 맞추면 set에서 동일한 배열을 구별할 줄 알았는데
-    // 배열의 원소 순서가 같아도 set에서 구별을 하지 못하였다.
-    // 아래처럼 아예 배열의 주소 자체를 같게 만들어야 구별을 할 수 있었다.
-    // str2 = str; -> set.add() = false;
-    // 그래서 중복되지 않는 유저목록을 구하기 위해서 배열의 원소들을 하나의 String으로 모아서
-    // 비교하는 방식을 활용하였다.
-    // ArrayList에는 중복되지 않는 String의 배열값만 넣어서 arraylist는 결과적으로
-    // banned_id의 길이에 해당하는 중복되지 않는 배열이 원소로 들어간다.
-    // arraylist의 원소들을 가지고 비교하면 되는데 오늘은 여기까지 하려한다.
+    // programmers level 3 - 최고의 집합
+    // 오늘도 처음에는 불량 사용자 문제를 어제에 이어서 해결하고자 하였는데
+    // 문제 해결방식중에 4중 for문이 나와서 결국 해답을 확인하였다..ㅠㅠ 그래서 기억에 모드가 남아있어서
+    // 나중에 다시 해결해야 할 것으로 보인다.
+    // 최고의 집합이라는 문제는 n개의 자연수로 합이 s인 순서쌍 중에서 곱이 최대인 순서쌍을 구하는 문제이다.
+    // 처음에는 합이 s인 n개의 자연수 모음을 모두 만들어서 하려 했는데 그렇게 하면 반드시 시간 초과가 날 게 분명하기 때문에
+    // 어떻게 해야 할까 생각해보다가 산술평균에서 영감을 얻어서 같을 때 곱이 최대가 되므로 가장 차이가 나지 않는
+    // 자연수 모음을 찾으려 하였다.
+    // 그런데 그 경우에는 s가 n으로 나누어 떨어져서 같은 숫자로 구성되는 경우에만 해당하므로 다른 경우에는 어떻게 할까 생각하다가
+    // 질문 중에 어차피 나머지가 n을 넘을 수 없기 때문에 1을 더해나가면서 s를 맞추면 된다는 걸 보고나서
+    // 해결할 수 있었다.
 
-    static Set<String> set = new HashSet<>();
-    static ArrayList<String[]> list = new ArrayList<>();
-    static int len = 0;
+    public static void main(String[] args) {
 
-    public static void main(String[] args){
+        int n = 2;
+        int s = 9;
 
-        String[] user_id = {"frodo", "fradi", "crodo", "abc123", "frodoc"};
-        String[] banned_id = {"*rodo", "*rodo", "******"};
+        int[] answer = new int[n];
 
-        int n = user_id.length;
-        int r = banned_id.length;
-        int depth = 0;
-        len = banned_id.length;
+        // if(n > s) return new int[] {-1};
 
-        permu(user_id,depth,n,r);
-
-
-        for(int i=0;i<list.size();i++){
-            for(int j=0;j<len;j++){
-                System.out.print(list.get(i)[j] + " ");
+        if(s % n == 0){ // 나누어 떨어질 때
+            for(int i=0;i<n;i++){
+                answer[i] = s / n;
             }
-            System.out.println();
         }
-
-    }
-
-    static void permu(String[] user_id,int depth, int n, int r){
-        if(depth == r){
-            String[] str = new String[len];
-            for(int i=0;i<r;i++){
-                str[i] = user_id[i];
-            }
-            Arrays.sort(str);
-            StringBuffer sb = new StringBuffer();
-            for(int i=0;i<r;i++){
-                sb.append(str[i]);
+        else{ // 나누어 떨어지지 않을 때
+            for(int i=0;i<n;i++){
+                answer[i] = s / n;
             }
 
-            if(set.add(sb.toString())) list.add(str);
+            int num = s % n;
+
+            for(int i=n-num;i<n;i++){
+                answer[i] += 1;
+            }
         }
 
-        for(int i=depth;i<n;i++){
-            swap(user_id,depth,i);
-            permu(user_id,depth+1,n,r);
-            swap(user_id,depth,i);
-        }
-    }
 
-    static void swap(String[] user_id,int depth, int i){
-        String tmp = user_id[i];
-        user_id[i] = user_id[depth];
-        user_id[depth] = tmp;
+
+
+
     }
 }

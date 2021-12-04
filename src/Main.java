@@ -6,69 +6,144 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers level 3 - 배달
-    // 처음에는 한 마을에서 다른 마을까지의 최소거리를 구하는 과정을 어떻게 해야 할까 고민했는데
-    // 그래프 알고리즘 중에서 플로이드 와샬 알고리즘(모든 정점 사이의 최단거리를 구하는 알고리즘)으로 구했다.
-//    for (int k = 0; k < N; k++) { // 거쳐가는 정점
-//        for (int i = 0; i < N; i++) { // 시작 정점
-//            for (int j = 0; j < N; j++) { // 도착 정점
-//                if(i == j) continue;
-//                if (map[i][j] > map[i][k] + map[k][j]) {
-//                    map[i][j] = map[i][k] + map[k][j];
-//                }
-//            }
-//        }
-//    }
-    // 그 후에는 첫번째 마을에서의 거리가 K 이하인 것을 구하면 되는 문제였다.
-    // 플로이드 와샬 알고리즘을 사용해야 한다는 것을 인지하지 못했고
-    // 문제의 조건 중에서 마을 사이를 잇는 간선이 여러개 있다는 것을 인지하지 못해서
-    // 마을을 잇는 간선 중 가장 가중치가 작은 간선만을 취하는 조건을 뒤늦게 추가하였다.
+    // programmers dev matching 1번문제
+    // 첫번째 행에서 #이면 아래로 > 면 오른쪽으로 < 면 왼쪽으로 이동하는데 *을 2번 만나면 그곳에서 멈춘다.
+    // 첫번째 행을 모두 이동하면서 맵을 나가게 되는 케이스를 구하여라
+    // 처음에는 for문 내에서 첫번째 행부터 이동하는 모든 케이스를 처리하려고 했는데
+    // for문을 알아보기 힘들어서 시작위치를 인자로 받는 함수를 구현하였다.
+    // 이동하게 되는 위치를 변수로 갱신해가면서 case를 활용해 위치를 이동해 나가며 맵을 나가면 answer + 1
+    // *를 2번 만나게 되면 그곳에서 멈추며 다음으로 넘어가도록 하였다.
+    // map을 이동하는 좌표를 구현하는 생각으로 접근한 게 주요했던 것 같다.
 
     public static void main(String[] args) {
 
-        int N = 5;
-        int[][] road = {{1,2,1},{2,3,3},{5,2,2},{1,4,2},{5,3,1},{5,4,2}};
-
-        int K = 3;
-
-        int[][] map = new int[N][N];
-
-        for (int i = 0; i < map.length; i++) {
-            for (int j = 0; j < map[0].length; j++) {
-                if (i == j) {  //i==j일땐 0;
-                    map[i][j] = 0;
-                    continue;
-                }
-                map[i][j] = 500001;      //K가 500000이하 자연수이므로
-            }
-        }
-
-
-        for(int i=0;i<road.length;i++){ //직접적으로 연결된 간선에 대한 표현
-            if(map[road[i][0] - 1][road[i][1] - 1] < road[i][2])  continue; // 연결된 간선이 2개 이상이면 작은 거리값만 취할 수 있도록
-            map[road[i][0]-1][road[i][1]-1] = road[i][2]; // 마을간의 가중치 연결
-            map[road[i][1]-1][road[i][0]-1] = road[i][2]; // 마을간의 가중치 연결
-        }
-
-        for (int k = 0; k < N; k++) { // 거쳐가는 정점
-            for (int i = 0; i < N; i++) { // 시작 정점
-                for (int j = 0; j < N; j++) { // 도착 정점
-                    if(i == j) continue;
-                    if (map[i][j] > map[i][k] + map[k][j]) {
-                        map[i][j] = map[i][k] + map[k][j];
-                    }
-                }
-            }
-        }
+        String[] drum = {"######",">#*###","####*#","#<#>>#",">#*#*<","######"};
 
         int answer = 0;
 
-        for(int i=0; i<N;i++){ // 첫번째 마을에서의 거리가 K이하인 마을의 수 구하기
-            if(map[0][i] <= K) answer++;
+        String[][] map = new String[drum.length][drum.length];
+
+        for(int i=0;i<drum.length;i++){
+            if(isOut(drum,0,i)) {
+                answer++;
+            }
         }
+    }
+    static boolean isOut(String[] drum,int y, int x){
 
+        int cnt = 0;
+        while(true){
+            char ch = drum[y].charAt(x);
+            System.out.println(ch + " " + y + " " + x);
+            switch (ch){
+                case '#' : y++; break;
+                case '>' : x++; break;
+                case '<' : x--; break;
+                case '*' : if(cnt== 0) {
+                    cnt++;
+                    y++;
+                    break;
+                } else{
+                    return false;
+                }
+            }
 
-
+            if(y >= drum.length) return true;
+        }
 
     }
 }
+
+
+
+
+
+
+
+
+
+/*char[][] keyboard = {
+                {'q','w','e','r','t','y','u','i','o'},
+                {'p','a','s','d','f','g','h','j','k'},
+                {'l','z','x','c','v','b','n','m','.'}};
+
+        String s = "tooth";
+        int answer = 0;
+
+        ArrayList<String> list = new ArrayList<>();
+
+            int end = s.length()-2;
+            int pos = 0;
+
+            while(pos <= end) {
+                StringBuffer sb = new StringBuffer();
+                for (int j = pos; j < pos+2; j++) {
+                    sb.append(s.charAt(j));
+                }
+                list.add(sb.toString());
+                pos++;
+
+            }
+
+
+
+        HashMap<String,Integer> map = new HashMap<>(); // 길이가 2인 부분문자열의 복잡도를 넣는다.
+
+        for(String str : list){
+                char left = str.charAt(0);
+                char right = str.charAt(1);
+
+                int[] whereL = new int[2];
+                int[] whereR = new int[2];
+
+                for(int i=0;i< keyboard.length;i++){
+                    for(int j=0;j< keyboard[0].length;j++){
+                        if(keyboard[i][j] == left){
+                            whereL[0] = i;
+                            whereL[1] = j;
+                        }
+                        if(keyboard[i][j] == right){
+                            whereR[0] = i;
+                            whereR[1] = j;
+                        }
+                    }
+                }
+
+                int complex = Math.abs(whereL[0] - whereR[0]) + Math.abs(whereL[1] - whereR[1]);
+                answer += complex;
+            System.out.println(str + " " + complex);
+                map.put(str,complex);
+
+
+        }
+
+        for(int i=3;i<=s.length();i++) {
+            end = s.length() - i;
+            pos = 0;
+
+            while(pos <= end) {
+                StringBuffer sb = new StringBuffer();
+                for (int j = pos; j < pos+i; j++) {
+                    sb.append(s.charAt(j));
+                }
+
+
+                int position = 0;
+                int last = sb.toString().length() - 1;
+                int complex = 0;
+
+                while (position <= last - 1) {
+                    String subString = sb.toString().substring(position, position + 2);
+                    complex += map.get(subString);
+                    position++;
+                }
+                System.out.println(sb.toString() + " " + complex);
+                answer += complex;
+
+                pos++;
+
+            }
+
+        }
+
+        System.out.println(answer);*/

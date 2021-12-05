@@ -6,51 +6,66 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers dev matching 1번문제
-    // 첫번째 행에서 #이면 아래로 > 면 오른쪽으로 < 면 왼쪽으로 이동하는데 *을 2번 만나면 그곳에서 멈춘다.
-    // 첫번째 행을 모두 이동하면서 맵을 나가게 되는 케이스를 구하여라
-    // 처음에는 for문 내에서 첫번째 행부터 이동하는 모든 케이스를 처리하려고 했는데
-    // for문을 알아보기 힘들어서 시작위치를 인자로 받는 함수를 구현하였다.
-    // 이동하게 되는 위치를 변수로 갱신해가면서 case를 활용해 위치를 이동해 나가며 맵을 나가면 answer + 1
-    // *를 2번 만나게 되면 그곳에서 멈추며 다음으로 넘어가도록 하였다.
-    // map을 이동하는 좌표를 구현하는 생각으로 접근한 게 주요했던 것 같다.
+    // programmers level 3 - 단어 변환
+    // begin 에서 target 으로 변환시키는 데 words에 있는 단어들을 거쳐서 얼마만에 가는가
+    // 단 한번에 하나의 알파벳만을 바꾸는 게 가능하다.
+    // 그래서 begin에서 words에 있는 단어들 중에 하나의 알파벳만 다르면 그 단어로 바꿔가면서
+    // 최종으로 target으로 바뀌었을 때 바꾼 횟수를 구하는 식으로 구현했는데
+    // 그렇게 하니까 이게 최소 횟수가 아니라 words를 다 돌아서라도 target이 되면
+    // 문제가 해결되기 때문에 문제가 발생하였다.
+    // 그래서 변환을 했을 때 바뀐 단어가 target 단어와 하나의 알파벳만 차이가 나면
+    // 끝내는 식의 if문을 걸어야 하는지 싶다.
+    // (근데 그렇게 하면 words에 있는 모든 단어를 계속 확인해야 하는 데...)
+
+    static int answer = 0;
 
     public static void main(String[] args) {
 
-        String[] drum = {"######",">#*###","####*#","#<#>>#",">#*#*<","######"};
+        String begin = "hit";
+        String target = "cog";
 
-        int answer = 0;
+        String[] words = {"hot","dot","dog","lot","log","cog"};
 
-        String[][] map = new String[drum.length][drum.length];
-
-        for(int i=0;i<drum.length;i++){
-            if(isOut(drum,0,i)) {
-                answer++;
+        boolean make = false;
+        for(String str : words){
+            if(str.equals(target)){
+                make = true;
             }
         }
-    }
-    static boolean isOut(String[] drum,int y, int x){
 
-        int cnt = 0;
-        while(true){
-            char ch = drum[y].charAt(x);
-            System.out.println(ch + " " + y + " " + x);
-            switch (ch){
-                case '#' : y++; break;
-                case '>' : x++; break;
-                case '<' : x--; break;
-                case '*' : if(cnt== 0) {
+//        if(!make) return 0;
+
+        boolean[] check = new boolean[words.length];
+
+        change(begin,target,check,words);
+
+        System.out.println(answer);
+
+    }
+    static void change(String begin, String target, boolean[] check, String[] words){
+        if(begin.equals(target)){
+            return ;
+        }
+
+        for (int i = 0; i < words.length; i++) {
+            if (check[i]) {
+                continue;
+            }
+
+            int cnt = 0;    // 같은 스펠링 몇개인지 세기
+            for (int j = 0; j < begin.length(); j++) {
+                if (begin.charAt(j) == words[i].charAt(j)) {
                     cnt++;
-                    y++;
-                    break;
-                } else{
-                    return false;
                 }
             }
 
-            if(y >= drum.length) return true;
+            if (cnt == begin.length() - 1) {  // 한글자 빼고 모두 같은 경우
+                check[i] = true;
+                answer++;
+                System.out.println(words[i]);
+                change(words[i],target,check,words);
+            }
         }
-
     }
 }
 

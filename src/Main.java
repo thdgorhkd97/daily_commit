@@ -6,66 +6,83 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers level 3 - 단어 변환
-    // 한글자만 다른 단어를 words에서 찾아서 dfs로 재귀 호출하며
-    // 모든 경우의 수를 찾아가다가 begin과 target이 같아지면 종료한다.
-    // 다만, 내가 놓쳤던 부분은 다시 false로 재설정해야 하는 부분이다.
-    // 이게 어제 내가 놓쳤던 부분처럼 하나만 다른게 여러개인 경우가 있기 때문에
-    // 모든 경우의 수를 구해야 해서 다시 false로 재설정하고 begin과 target이 같게 되는 경우를
-    // 기다려야 하는 거였다.
-    // 나는 하나가 다른 경우의 수 중에서 변환하는 케이스가 많을 때를 어떻게 해야 할지 고민했는데
-    // check를 false로 재설정하여 다시 찾아가도록 해야 한다는 게 정답이었던 듯 싶다.
-
-    static int answer = 0;
+    // programmers level 3 - 베스트 앨범
+    // 각 장르에 맞는 전체 횟수를 정렬하고 for문을 돌면서 각 장르에 맞는 횟수를 더해서
+    // 정렬한 후 상위 2개를 자르는 식으로 했는데
+    // 정렬단계가 상당히 오래 걸리고 정확성은 맞다고 생각했는데
+    // 정확성에서 생각보다 낮은 결과를 보였다...
+    // hashmap을 정렬하는 데 있어서 keyset이나 keyvalues를 활용해서 키나 밸류를 보는 건
+    // 알았는데 소트를 하면서 키나 밸류를 한번에 확인하는 방식에 대해서 새로 알았다.
+//    List<Map.Entry<Integer,Integer>> entryList = new ArrayList<>(many.entrySet());
+//            Collections.sort(entryList, new Comparator<Map.Entry<Integer, Integer>>() {
+//        @Override
+//        public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
+//            return o2.getValue().compareTo(o1.getValue());
+//        }
+//    });
 
     public static void main(String[] args) {
 
-        String begin = "hit";
-        String target = "cog";
+        String[] genres = {"classic", "pop", "classic", "classic", "pop"};
 
-        String[] words = {"hot","dot","dog","lot","log","cog"};
+        int[] plays = {500,600,150,800,2500};
 
-        boolean make = false;
-        for(String str : words){
-            if(str.equals(target)){
-                make = true;
-            }
+        HashMap<String,Integer> map = new HashMap<>();
+
+        for(int i=0;i< genres.length;i++){
+            map.put(genres[i], map.getOrDefault(genres[i],0)+plays[i]);
         }
 
-//        if(!make) return 0;
+        List<String> key = new LinkedList<>(map.keySet());
 
-        boolean[] check = new boolean[words.length];
+        key.sort((s1,s2)->s2.compareTo(s1));
 
-        change(begin,target,check,words,0);
-
-        System.out.println(answer);
-
-    }
-    static void change(String begin, String target, boolean[] check, String[] words,int cnt){
-
-        if(begin.equals(target)){
-            answer = cnt;
-            return ;
+        ArrayList<String> grade = new ArrayList<>();
+        int idx = 0;
+        for(String keyset : key){
+            grade.add(keyset);
+            idx++;
+            if(keyset.isEmpty()||idx == 2) break;
         }
 
-        for (int i = 0; i < words.length; i++) {
-            if (check[i]) {
-                continue;
-            }
+        ArrayList<Integer> result = new ArrayList<>();
 
-            int count = 0;    // 같은 스펠링 몇개인지 세기
-            for (int j = 0; j < begin.length(); j++) {
-                if (begin.charAt(j) == words[i].charAt(j)) {
-                    count++;
+        for(int i=0;i<grade.size();i++){
+            String str = grade.get(i);
+
+            HashMap<Integer,Integer> many = new HashMap<>();
+            for(int j=0;j<plays.length;j++){
+                if(genres[j].equals(str)){
+                    many.put(j,plays[j]);
                 }
             }
 
-            if (count == begin.length() - 1) {  // 한글자 빼고 모두 같은 경우
-                check[i] = true;
-//                System.out.println(words[i] + " " + cnt);
-                change(words[i],target,check,words,cnt+1);
-                check[i] = false; // 모든 경우의 수를 보기 위해 false로 변환
+
+            List<Map.Entry<Integer,Integer>> entryList = new ArrayList<>(many.entrySet());
+            Collections.sort(entryList, new Comparator<Map.Entry<Integer, Integer>>() {
+                @Override
+                public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
+                    return o2.getValue().compareTo(o1.getValue());
+                }
+            });
+
+            int index = 0;
+            for(Map.Entry<Integer,Integer> entry : entryList){
+                result.add(entry.getKey());
+                index++;
+                if(index == 2) break;
             }
+
         }
+
+        int[] answer = new int[result.size()];
+
+        for(int i=0;i<result.size();i++){
+            answer[i] = result.get(i);
+//            System.out.println(answer[i]);
+        }
+
+
+
     }
 }

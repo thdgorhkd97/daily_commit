@@ -6,83 +6,80 @@ import java.util.stream.*;
 
 public class Main {
 
-    // programmers level 3 - 베스트 앨범
-    // 각 장르에 맞는 전체 횟수를 정렬하고 for문을 돌면서 각 장르에 맞는 횟수를 더해서
-    // 정렬한 후 상위 2개를 자르는 식으로 했는데
-    // 정렬단계가 상당히 오래 걸리고 정확성은 맞다고 생각했는데
-    // 정확성에서 생각보다 낮은 결과를 보였다...
-    // hashmap을 정렬하는 데 있어서 keyset이나 keyvalues를 활용해서 키나 밸류를 보는 건
-    // 알았는데 소트를 하면서 키나 밸류를 한번에 확인하는 방식에 대해서 새로 알았다.
-//    List<Map.Entry<Integer,Integer>> entryList = new ArrayList<>(many.entrySet());
-//            Collections.sort(entryList, new Comparator<Map.Entry<Integer, Integer>>() {
-//        @Override
-//        public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
-//            return o2.getValue().compareTo(o1.getValue());
-//        }
-//    });
+    // B사 코딩테스트 5번 문제
+    // 전체 map 배열에 0이 없다면 이 조건을 !fullCover로 해서
+    // map 배열을 전체를 돌면서 0이 없는지 있는지를 확인하는 식으로 while문을 돌았는데
+    // 이게 만약 rows와 columns가 커지면 시간 이슈가 생길 수도 있지 않나 싶다..
+    // 해결하는 데는 조금 시간이 걸리긴 했지만 문제 없었다고 생각하는데
+    // while문을 돌면서 fullCover를 도는 부분이 조금 걱정이다.git
 
     public static void main(String[] args) {
 
-        String[] genres = {"classic", "pop", "classic", "classic", "pop"};
+        int rows = 3;
+        int columns = 4;
 
-        int[] plays = {500,600,150,800,2500};
+        int[][] map = new int[rows+1][columns+1];
 
-        HashMap<String,Integer> map = new HashMap<>();
+        int r = 1;
+        int c = 1;
+        int num = 1;
+        map[r][c] = num;
+        while(!fullCover(map) ){
 
-        for(int i=0;i< genres.length;i++){
-            map.put(genres[i], map.getOrDefault(genres[i],0)+plays[i]);
-        }
-
-        List<String> key = new LinkedList<>(map.keySet());
-
-        key.sort((s1,s2)->s2.compareTo(s1));
-
-        ArrayList<String> grade = new ArrayList<>();
-        int idx = 0;
-        for(String keyset : key){
-            grade.add(keyset);
-            idx++;
-            if(keyset.isEmpty()||idx == 2) break;
-        }
-
-        ArrayList<Integer> result = new ArrayList<>();
-
-        for(int i=0;i<grade.size();i++){
-            String str = grade.get(i);
-
-            HashMap<Integer,Integer> many = new HashMap<>();
-            for(int j=0;j<plays.length;j++){
-                if(genres[j].equals(str)){
-                    many.put(j,plays[j]);
+            System.out.println(r+"행 " + c+ "열 " + " 에 " + num);
+            if(!fullCover(map) && r==1 && c== 1){
+                if(num % 2 == 0){
+                    if(map[r+1][c] != 0){
+                        break;
+                    }
+                }
+                else{
+                    if(map[r][c+1] != 0){
+                        break;
+                    }
                 }
             }
 
+            map[r][c] = num;
 
-            List<Map.Entry<Integer,Integer>> entryList = new ArrayList<>(many.entrySet());
-            Collections.sort(entryList, new Comparator<Map.Entry<Integer, Integer>>() {
-                @Override
-                public int compare(Map.Entry<Integer, Integer> o1, Map.Entry<Integer, Integer> o2) {
-                    return o2.getValue().compareTo(o1.getValue());
+            if(num % 2 == 0){
+                if(r < rows){
+                    r= r+1;
                 }
-            });
-
-            int index = 0;
-            for(Map.Entry<Integer,Integer> entry : entryList){
-                result.add(entry.getKey());
-                index++;
-                if(index == 2) break;
+                else{
+                    r = 1;
+                }
+            }
+            else{
+                if(c < columns){
+                    c = c+1;
+                }
+                else{
+                    c = 1;
+                }
             }
 
+            num++;
         }
 
-        int[] answer = new int[result.size()];
-
-        for(int i=0;i<result.size();i++){
-            answer[i] = result.get(i);
-//            System.out.println(answer[i]);
+        int[][] answer = new int[rows][columns];
+        for(int i=1;i<=rows;i++){
+            for(int j=1;j<=columns;j++){
+                answer[i-1][j-1] = map[i][j];
+            }
         }
 
 
+    }
 
+    public static boolean fullCover(int[][] map){
+        for(int i=1;i<map.length;i++){
+            for(int j=1;j<map[0].length;j++) {
+                if(map[i][j] == 0){
+                    return false; // 0이 있을 때
+                }
+            }
+        }
+        return true; // 0이 없을 때
     }
 }

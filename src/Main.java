@@ -2,51 +2,58 @@ import java.util.*;
 
 public class Main {
 
-    // programmers level 3 - 야근 지수
-    // n만큼 works배열에서 뺐을 때 2의 거듭제곱의 합이 가장 최소가 되도록 해야 한다.
-    // 남은 works배열의 원소값이 거듭제곱의 지수가 되기 때문에 평균적으로 가장 작게 만들어야 한다,
-    // 큰 수에서 계속 빼나가면 될 것으로 보인다.
-
-    // 효율성에서 문제가 생겨서 loop를 수정하고 정렬을 줄이고 해도 해결이 안 되서 결국
-    // 해결법을 알아보았더니 우선순위 큐를 이용하여 for문 내에서 정렬을 안 하도록 하는 것이었다.
-    // 우선순위 큐 -> 일반적인 큐의 FIFO 구조가 아니라 우선순위를 결정하고 그 우선순위에 따라
-    // 나가는 원소가 결정되는 구조를 가진다.(힙을 이용하여 구현함)
-    // 내부 요소는 이진 트리로 구성, 높은 우선순위의 요소를 먼저 꺼내서 처리
-    // 우선순위 큐는 값이 추가되면 즉시 정렬 되는 것이 가장 큰 특징이다!!
-    // 즉 먼저 정한 우선순위에 따라 값을 넣을 때마다 즉시 정렬
-    // 우선순위 큐를 적극적으로 활용하는 방법이 괜찮을 것 같다.
-    // 값을 넣을 때마다 정렬이 필요한 경우에
-
+    // programmers level 3 - 이중 우선순위 큐
+    // 어제 사용했던 우선순위 큐를 다시 사용하는 문제를 골라서 해결해보았다.
+    // 최소 힙과 최대 힙을 구현한 우선순위 큐를 따로 구현함으로써 최대값과 최소값에 대한
+    // 함수를 빠르게 구현할 수 있었다.
+    // 다만 처음에는 하나의 우선순위 큐를 사용했기 때문에 최소로 하면 최대값을 제외할 때
+    // 최대로 하면 최소값을 제외할 때 큐의 마지막 원소를 어떻게 찾아야 하지 라는 고민을 했는데
+    // 이걸 최소와 최대로 나눠서 보면 어떻게 해야 할 까 싶었다.
+    // 우선순위 큐에서 원소를 remove로 제외하면 자동적으로 정렬이 되기 때문에
+    // 최대값을 제외할 때는 최대힙을 구현한 우선순위 큐에서 poll로 꺼내서 remove를 사용해
+    // 빠르게 정렬과 remove를 동시에 작업하는 게 가능했다.
 
     public static void main(String[] args) {
 
-        int n = 4;
-        int[] works = {3,4,3};
+        String[] operations = {"I 16", "I -5643", "D -1", "D 1", "D 1", "I 123", "D -1"};
 
-        PriorityQueue<Integer> que = new PriorityQueue<>(Collections.reverseOrder());
+        int[] answer = new int[2];
 
-//        Arrays.sort(works);
+        PriorityQueue<Integer> queMin = new PriorityQueue<>();
+        PriorityQueue<Integer> queMax = new PriorityQueue<>(Comparator.reverseOrder());
 
-        for(int number : works){
-            que.offer(number);
+        for(String str : operations){
+            if(str.contains("I")){ // 뒤에 오는 숫자 삽입
+                String sub = str.substring(2);
+                queMin.offer(Integer.parseInt(sub));
+                queMax.offer(Integer.parseInt(sub));
+            }
+            else if(str.contains("D") && str.contains("-")){ // 큐에서 최솟값 삭제
+                if(!queMin.isEmpty()){
+                    int min = queMin.poll();
+                    queMin.remove(min);
+                    queMax.remove(min);
+                }
+            }
+            else{ // 큐에서 최대값 삭제
+                if(!queMax.isEmpty()){
+                    int max = queMax.poll();
+                    queMin.remove(max);
+                    queMax.remove(max);
+                }
+            }
+
         }
 
-        for(int i=0; i<n;i++){
 
-            int max = (int)que.poll();
-//            if(max <= 0) return 0;
-            que.offer(max-1);
+
+        if(!queMin.isEmpty() && !queMax.isEmpty()) {
+            answer[0] = queMax.poll();
+            answer[1] = queMin.poll();
 
         }
 
-        long sum = 0;
-        while(!que.isEmpty()){
-            sum += Math.pow(que.poll(),2);
-        }
-
-        System.out.println(sum);
-
-
+        System.out.println(answer[0] + " " + answer[1]);
 
 
 

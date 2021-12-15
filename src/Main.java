@@ -2,60 +2,37 @@ import java.util.*;
 
 public class Main {
 
-    // programmers level 3 - 이중 우선순위 큐
-    // 어제 사용했던 우선순위 큐를 다시 사용하는 문제를 골라서 해결해보았다.
-    // 최소 힙과 최대 힙을 구현한 우선순위 큐를 따로 구현함으로써 최대값과 최소값에 대한
-    // 함수를 빠르게 구현할 수 있었다.
-    // 다만 처음에는 하나의 우선순위 큐를 사용했기 때문에 최소로 하면 최대값을 제외할 때
-    // 최대로 하면 최소값을 제외할 때 큐의 마지막 원소를 어떻게 찾아야 하지 라는 고민을 했는데
-    // 이걸 최소와 최대로 나눠서 보면 어떻게 해야 할 까 싶었다.
-    // 우선순위 큐에서 원소를 remove로 제외하면 자동적으로 정렬이 되기 때문에
-    // 최대값을 제외할 때는 최대힙을 구현한 우선순위 큐에서 poll로 꺼내서 remove를 사용해
-    // 빠르게 정렬과 remove를 동시에 작업하는 게 가능했다.
+    // programmers level 3 - 멀리 뛰기
+    // 1 - 1
+    // 2 - 2
+    // 3 - 3
+    // 4 - 5
+    // 5 - 8?
+    // 이라는 규칙이 보여서 ( 전전 + 전 = 현재 ) 라는 공식에 맞춰질 것 같았다.
+    // n = 5 까지일때까지밖에 못 구해서 사실 확신을 가지기는 힘들었다.
+    // 그 후 동적계획법을 실행하는 것은 어렵지 않았다.
+    // 다만 한 가지 케이스에서 계속 실패 혹은 런타임에러가 났는데 코드가 간결하다 보니
+    // 오히려 어디서 오류가 나는지 알아내는 게 상당히 어려웠다.
+    // 근데 계속 보다보니 n개 만큼 dp 배열의 크기를 구했는데 규칙에 맞추기 위해서
+    // dp[0]와 dp[1]의 값을 미리 넣었기 때문에 오류가 났다...
+    // dp 자체의 크기가 1인 경우도 있는데 dp[1]의 값을 넣으려 하니 문제가 발생하였다.
 
     public static void main(String[] args) {
 
-        String[] operations = {"I 16", "I -5643", "D -1", "D 1", "D 1", "I 123", "D -1"};
+        int n = 2; // n은 2000이하 정수
 
-        int[] answer = new int[2];
+        int[] dp = new int[n];
+//        if(n==1) return 1;
 
-        PriorityQueue<Integer> queMin = new PriorityQueue<>();
-        PriorityQueue<Integer> queMax = new PriorityQueue<>(Comparator.reverseOrder());
+        dp[0] = 1;
+        dp[1] = 2;
 
-        for(String str : operations){
-            if(str.contains("I")){ // 뒤에 오는 숫자 삽입
-                String sub = str.substring(2);
-                queMin.offer(Integer.parseInt(sub));
-                queMax.offer(Integer.parseInt(sub));
-            }
-            else if(str.contains("D") && str.contains("-")){ // 큐에서 최솟값 삭제
-                if(!queMin.isEmpty()){
-                    int min = queMin.poll();
-                    queMin.remove(min);
-                    queMax.remove(min);
-                }
-            }
-            else{ // 큐에서 최대값 삭제
-                if(!queMax.isEmpty()){
-                    int max = queMax.poll();
-                    queMin.remove(max);
-                    queMax.remove(max);
-                }
-            }
 
+        for(int i=2;i<n;i++){
+            dp[i] = (dp[i-1] + dp[i-2]) % 1234567;
         }
 
-
-
-        if(!queMin.isEmpty() && !queMax.isEmpty()) {
-            answer[0] = queMax.poll();
-            answer[1] = queMin.poll();
-
-        }
-
-        System.out.println(answer[0] + " " + answer[1]);
-
-
+//        return dp[n-1];
 
     }
 }

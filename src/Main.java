@@ -2,37 +2,41 @@ import java.util.*;
 
 public class Main {
 
-    // programmers level 3 - 멀리 뛰기
-    // 1 - 1
-    // 2 - 2
-    // 3 - 3
-    // 4 - 5
-    // 5 - 8?
-    // 이라는 규칙이 보여서 ( 전전 + 전 = 현재 ) 라는 공식에 맞춰질 것 같았다.
-    // n = 5 까지일때까지밖에 못 구해서 사실 확신을 가지기는 힘들었다.
-    // 그 후 동적계획법을 실행하는 것은 어렵지 않았다.
-    // 다만 한 가지 케이스에서 계속 실패 혹은 런타임에러가 났는데 코드가 간결하다 보니
-    // 오히려 어디서 오류가 나는지 알아내는 게 상당히 어려웠다.
-    // 근데 계속 보다보니 n개 만큼 dp 배열의 크기를 구했는데 규칙에 맞추기 위해서
-    // dp[0]와 dp[1]의 값을 미리 넣었기 때문에 오류가 났다...
-    // dp 자체의 크기가 1인 경우도 있는데 dp[1]의 값을 넣으려 하니 문제가 발생하였다.
+    // programmers level 3 - 스티커 모으기 (2)
+    // 원형으로 연결된 스티커에서 인접한 스티커들은 뜯지 못하기 때문에 맨 처음을 뜯는 경우와 안 뜯는 경우로 나눴다.
+    // 처음에는 단순히 맨 처음을 뜯고(맨 뒤는 뜯지 않아야 한다) 그 이후로 한 칸씩 뛰면서 뜯는 것과
+    // 맨 처음을 뜯지 않고(맨 뒤를 뜯어야 한다) 그 이후로 한칸씩 뛰어가며 뜯는 것을 비교했는데
+    // 이렇게 하니 특수한 케이스를 포함할 수 없었다.(홀수번째만 뜯어가야 하는 케이스 ex 1 5 2 9 3
+    // 그래서 동적 계획법을 구상했다.
+    // 직전을 뜯으면 현재를 뜯을 수 없으므로 dp[i-1] 이고 전전을 뜯으면 현재를 뜯을 수 있으므로 dp[i-2] + sticker[i] 가 된다.
+    // 즉 동적 계획법을 구상하고 맨 앞을 뜯는 것과 안 뜯는 것 중에서 max 값을 구한다.
 
     public static void main(String[] args) {
 
-        int n = 2; // n은 2000이하 정수
+        int[] sticker = {14,6,5,11,3,9,2,10};
 
-        int[] dp = new int[n];
-//        if(n==1) return 1;
+        int[] dp1 = new int[sticker.length];
+        int[] dp2 = new int[sticker.length];
 
-        dp[0] = 1;
-        dp[1] = 2;
-
-
-        for(int i=2;i<n;i++){
-            dp[i] = (dp[i-1] + dp[i-2]) % 1234567;
+        // 첫 번째 스티커를 뜯었을 때
+        // 첫번째거 뜯으니까 맨 뒤는 넣지 않는다.
+        dp1[0] = sticker[0];
+        dp1[1] = sticker[0];
+        for(int i=2;i< sticker.length-1;i++){
+            dp1[i] = Math.max(dp1[i-1],dp1[i-2]+ sticker[i]);
         }
 
-//        return dp[n-1];
+        // 첫 번째 스티커를 뜯지 않았을 때
+        // 첫번째를 뜯지 않았으니까 맨 뒤를 뜯는다.
+        dp2[0] = 0;
+        dp2[1] = sticker[1];
+        for(int i=2; i<sticker.length; i++){
+            dp2[i] = Math.max(dp2[i-1],dp2[i-2] + sticker[i]);
+        }
+
+        int answer = Math.max(dp1[sticker.length-2],dp2[sticker.length-1]);
+
+        System.out.println(answer);
 
     }
 }

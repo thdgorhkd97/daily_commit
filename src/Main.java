@@ -2,41 +2,74 @@ import java.util.*;
 
 public class Main {
 
-    // programmers level 3 - 스티커 모으기 (2)
-    // 원형으로 연결된 스티커에서 인접한 스티커들은 뜯지 못하기 때문에 맨 처음을 뜯는 경우와 안 뜯는 경우로 나눴다.
-    // 처음에는 단순히 맨 처음을 뜯고(맨 뒤는 뜯지 않아야 한다) 그 이후로 한 칸씩 뛰면서 뜯는 것과
-    // 맨 처음을 뜯지 않고(맨 뒤를 뜯어야 한다) 그 이후로 한칸씩 뛰어가며 뜯는 것을 비교했는데
-    // 이렇게 하니 특수한 케이스를 포함할 수 없었다.(홀수번째만 뜯어가야 하는 케이스 ex 1 5 2 9 3
-    // 그래서 동적 계획법을 구상했다.
-    // 직전을 뜯으면 현재를 뜯을 수 없으므로 dp[i-1] 이고 전전을 뜯으면 현재를 뜯을 수 있으므로 dp[i-2] + sticker[i] 가 된다.
-    // 즉 동적 계획법을 구상하고 맨 앞을 뜯는 것과 안 뜯는 것 중에서 max 값을 구한다.
+    // L 사 코딩테스트 2번문제
+    // String[] pixels 배열이 주어지면 3열씩 잘라서 만들어지는 글자를 리턴한다.
+    // 111
+    // 100
+    // 111
+    // 001
+    // 111      -> 5
+    // 0 1 2 3 4 5 6 7 8 9 중에서 맨 위부터 이루어지는 1과 0중에서 하나만 특정할 수 있는 경우가 존재한다.
+    // ex) 맨 위줄이 110인 건 1만 존재한다. 즉 맨 위줄이 110이라면 아래는 상관없이 1이 되는 것이다.
+    // 맨 위줄이 111인 건 4만 존재한다.
+    // 이런 식으로 맨 윗줄부터 숫자를 특정할 수 있는 조건을 if-else로 나누어 가며 숫자를 특정할 수 있는 순간까지
+    // 문자열을 확인해보았다.
+    // 정확성은 잘 맞는데 아마도 if - else를 통한 노가다 성이 있어서 조금 마이너스가 있었을 수 있는 것 같다.
+    // 근데 이게 string을 잘라서 하나의 문자를 만든 것처럼 만들어서 숫자를 판별해야 하는데 if-else가 아니라면
+    // 어떻게 해결해야 할지 잘 모르겠다..
 
     public static void main(String[] args) {
 
-        int[] sticker = {14,6,5,11,3,9,2,10};
+        String[] pixels = {
+                "111110111101111101111101",
+                "100010101101001101100101",
+                "111010111111111111111111",
+                "001010101001100001001001",
+                "111111111001111001111001"};
 
-        int[] dp1 = new int[sticker.length];
-        int[] dp2 = new int[sticker.length];
+        String answer = "";
 
-        // 첫 번째 스티커를 뜯었을 때
-        // 첫번째거 뜯으니까 맨 뒤는 넣지 않는다.
-        dp1[0] = sticker[0];
-        dp1[1] = sticker[0];
-        for(int i=2;i< sticker.length-1;i++){
-            dp1[i] = Math.max(dp1[i-1],dp1[i-2]+ sticker[i]);
+        StringBuffer sb = new StringBuffer();
+        for(int i=0;i< pixels[0].length();i=i+3){
+
+            String[] str = new String[pixels.length];
+            for(int j=0;j< pixels.length;j++){
+                str[j] = pixels[j].substring(i,i+3);
+                System.out.println(str[j]);
+            }
+
+            System.out.println(whatnumber(str));
+
+            System.out.println("----------------------");
+            sb.append(whatnumber(str));
         }
 
-        // 첫 번째 스티커를 뜯지 않았을 때
-        // 첫번째를 뜯지 않았으니까 맨 뒤를 뜯는다.
-        dp2[0] = 0;
-        dp2[1] = sticker[1];
-        for(int i=2; i<sticker.length; i++){
-            dp2[i] = Math.max(dp2[i-1],dp2[i-2] + sticker[i]);
-        }
-
-        int answer = Math.max(dp1[sticker.length-2],dp2[sticker.length-1]);
-
+        answer = sb.toString();
         System.out.println(answer);
 
     }
+
+    static String whatnumber(String[] str){
+        if(str[0].equals("110")) return "1";
+        else if(str[0].equals("101")) return "4";
+        else{
+            if(str[2].equals("101")) return "0";
+            else if(str[2].equals("001")) return "7";
+            else{
+                if(str[3].equals("100")) return "2";
+                else { // 3 5 6 8 9를 분류
+                    if(str[1].equals("001")) return "3";
+                    else if(str[1].equals("100")){ // 5 6
+                        if(str[3].equals("001"))return "5";
+                        else return "6";
+                    }
+                    else{ // 8 9
+                        if(str[3].equals("001"))return "9";
+                        else return "8";
+                    }
+                }
+            }
+        }
+    }
+
 }

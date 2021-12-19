@@ -2,41 +2,53 @@ import java.util.*;
 
 public class Main {
 
-    // programmers level 3 - 네트워크
-    // 문제 : 컴퓨터의 개수 n, 연결에 대한 정보가 담긴 2차원 배열 computers가 매개변수로 주어질 때, 네트워크의 개수를 return
-    // computer[i][i]는 무조건 1이고 i번 컴퓨터와 j번 컴퓨터가 연결되어 있으면 computer[i][j]가 1 이다.
-    // for문을 돌면서 연결여부를 파악하는 check 배열을 보며 check가 false이고 computers 배열이 1이면 연결되었다는 걸 표현하기 위해
-    // check를 true로 바꾸고 answer에 1을 더한다.
-    // 즉, for문을 돌면서 check가 false면 연결된 네트워크를 아직 보지 않았다는 것이므로 연결된 네트워크를 확인하면서 해당 네트워크의
-    // 인덱스를 가지는 check를 true로 바꾼다.
-    // 연결된 네트워크의 check는 true로 만들고 연결된 네트워크를 모두 돌면 answer+1
+    // programmers 징검다리 건너기
+    // 징검다리는 일렬로 놓여 있고 각 징검다리의 디딤돌에는 모두 숫자가 적혀 있으며 디딤돌의 숫자는 한 번 밟을 때마다 1씩 줄어듭니다.
+    // 디딤돌의 숫자가 0이 되면 더 이상 밟을 수 없으며 이때는 그 다음 디딤돌로 한번에 여러 칸을 건너 뛸 수 있습니다.
+    // 단, 다음으로 밟을 수 있는 디딤돌이 여러 개인 경우 무조건 가장 가까운 디딤돌로만 건너뛸 수 있습니다.
+    // 이때 k 이상의 칸을 뛰어넘는 것은 불가능합니다.
+    // while문에서 stones 배열에 모두 1을 빼고 만약 0일 경우에 연속된 0을 cnt로 해서 숫자를 세어
+    // 연속된 0의 수가 k가 되면 건너뛸 수 없는 경우이기 때문에 break로 빠져나온다.
+    // 정확성은 모두 맞지만 효율성 테스트를 통과하지 못했다.
+    // 아마 stones 배열의 길이가 매우 길거나 원소가 커서 1씩 빼면서 for문을 도는 경우가 많을 때가 있는 것 같다.
+    // 효율성을 생각해보면 아마도 k개의 연속된 수가 가장 작은 부분을 찾아야 할 것으로 보인다.
+    // 연속된 0을 가장 빨리 만들 수 있는 범위를 찾아야 하는 것 같은데 그 부분을 생각해봐야 겠다.
 
     public static void main(String[] args) {
 
-        int n = 3;
-        int[][] computers = {{1,1,0},{1,1,0},{0,0,1}};
+        int[] stones = {2, 4, 5, 3, 2, 1, 4, 2, 5, 1};
 
-        boolean[] check = new boolean[n];
+        int k = 3;
+
         int answer = 0;
 
-        for(int i=0;i<n;i++){
-            if(!check[i]){
-                dfs(computers,i,check);
-                answer++;
+        while(true){
+            boolean flag = true;
+            int cnt = 0;
+            for(int i=0;i<stones.length;i++){
+                if(stones[i] > 0) {
+                    cnt=0;
+                    stones[i]--;
+                }
+                else if(stones[i] == 0) cnt++;
+
+                if(cnt >= k){
+                    flag =false;
+                    break;
+                }
             }
+
+            if(flag) answer++;
+            else break;
+
+//            for(int i=0;i<stones.length;i++){
+//                System.out.print(stones[i] + " ");
+//            }
+//            System.out.println();
         }
 
         System.out.println(answer);
 
-    }
 
-    static void dfs(int[][] computers, int start,boolean[] check){
-        check[start] = true;
-
-        for(int i=0;i< computers.length;i++){
-            if(start != i && !check[i] && computers[start][i] == 1){
-                dfs(computers,i,check);
-            }
-        }
     }
 }

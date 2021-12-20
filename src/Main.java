@@ -2,17 +2,17 @@ import java.util.*;
 
 public class Main {
 
-    // programmers 징검다리 건너기
-    // 징검다리는 일렬로 놓여 있고 각 징검다리의 디딤돌에는 모두 숫자가 적혀 있으며 디딤돌의 숫자는 한 번 밟을 때마다 1씩 줄어듭니다.
-    // 디딤돌의 숫자가 0이 되면 더 이상 밟을 수 없으며 이때는 그 다음 디딤돌로 한번에 여러 칸을 건너 뛸 수 있습니다.
-    // 단, 다음으로 밟을 수 있는 디딤돌이 여러 개인 경우 무조건 가장 가까운 디딤돌로만 건너뛸 수 있습니다.
-    // 이때 k 이상의 칸을 뛰어넘는 것은 불가능합니다.
-    // while문에서 stones 배열에 모두 1을 빼고 만약 0일 경우에 연속된 0을 cnt로 해서 숫자를 세어
-    // 연속된 0의 수가 k가 되면 건너뛸 수 없는 경우이기 때문에 break로 빠져나온다.
-    // 정확성은 모두 맞지만 효율성 테스트를 통과하지 못했다.
-    // 아마 stones 배열의 길이가 매우 길거나 원소가 커서 1씩 빼면서 for문을 도는 경우가 많을 때가 있는 것 같다.
-    // 효율성을 생각해보면 아마도 k개의 연속된 수가 가장 작은 부분을 찾아야 할 것으로 보인다.
-    // 연속된 0을 가장 빨리 만들 수 있는 범위를 찾아야 하는 것 같은데 그 부분을 생각해봐야 겠다.
+    // programmers level 3 - 징검다리 건너기 ( 효율성 해결을 위한 노력 )
+    // 효율성을 해결하는 방법을 도저히 모르겠어서 결국 찾아보고 말았다 ㅠㅠ
+    // 이진 탐색을 활용하여 문제를 해결하고자 하였다.
+    // 최소와 최대값의 중간값부터 확인해가면서 그 값이 stones 배열에서 뺐을 때
+    // k값을 넘는지 확인한다. ( 중간값이 지나간 인원이라고 한다면 이때 그 인원들이 징검다리를
+    // 건널 수 없다면 더 적은 인원이 지나가야만 하는 것이기 때문에 max를 mid-1로 바꾼다.
+    // 이진 탐색법을 활용해야 한다는 것을 알고서 구현하는 데 성공했는데
+    // 어제는 효율성 테스트에서 시간초과가 발생했는데 이번에는 실패라고 뜨면서
+    // 시간이 표시되기는 했다.
+    // 뭔가 어제보다는 시간적인 측면에서 발전한 것 같긴 한데 이 방법으로도 해결하는 데는
+    // 실패했다는 것이다...
 
     public static void main(String[] args) {
 
@@ -22,32 +22,44 @@ public class Main {
 
         int answer = 0;
 
-        while(true){
-            boolean flag = true;
-            int cnt = 0;
-            for(int i=0;i<stones.length;i++){
-                if(stones[i] > 0) {
-                    cnt=0;
-                    stones[i]--;
-                }
-                else if(stones[i] == 0) cnt++;
+        // 이진 탐색을 활용해보자
 
-                if(cnt >= k){
-                    flag =false;
+        int min = 1;
+        int max = 200000;
+        int mid = 0;
+
+        while(min <= max){
+            mid = (min + max) / 2;
+
+            int cnt = 0;
+            boolean flag = true;
+
+            for(int i=0;i< stones.length; i++){
+                if(stones[i] < mid){
+                    cnt++;
+                }
+                else cnt = 0;
+
+                if(cnt == k){
+                    flag = false;
                     break;
                 }
             }
 
-            if(flag) answer++;
-            else break;
+            if(!flag){
+                max = mid - 1;
+            }
+            else{
+                min = mid + 1;
+                answer =  Math.max(answer,mid);
+            }
 
-//            for(int i=0;i<stones.length;i++){
-//                System.out.print(stones[i] + " ");
-//            }
-//            System.out.println();
         }
 
         System.out.println(answer);
+
+
+
 
 
     }

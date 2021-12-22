@@ -2,69 +2,55 @@ import java.util.*;
 
 public class Main {
 
-    // programmers level 3 - 징검다리 건너기 ( 효율성 해결을 위한 노력 )
-    // 효율성을 해결하는 방법을 도저히 모르겠어서 결국 찾아보고 말았다 ㅠㅠ
-    // 이진 탐색을 활용하여 문제를 해결하고자 하였다.
-    // 이진 탐색 방법을 확인해보고도 해결이 불가능해서 결국 풀이 코드를 확인하였는데
-    // 내가 while문 내에서 돌리면서 확인한 for문을 함수로 따로 빼내서 해결한 부분만
-    // 다르다고 판단하였다.
-    // 근데 알고보니 이분탐색을 하는 max 값 설정이 잘못된 것이었다.
-    // 나는 stones 배열의 전체 크기를 max로 잡았는데 stones 배열의 원소값의 최대 크기를 max로 잡았어야 했다
-    // 되게 간단한 건데 이걸 어제 왜 못봤을까 ㅠㅠㅠ
-    // 하여튼 함수로 따로 빼내는 거랑 비교해서 시간을 확인해 보았다.
-
-    //        for(long i=0;i<2000000000;i++){
-    //            cnt++;
-    //        }
-    // 이 함수를 그냥 했을 때는 1138 System.currentTimeMillis() 로 1138이 나왔고
-    // 함수로 빼서 실행 했을 때는 1188이 나왔다. 함수를 호출하고 리턴받는 시간이 더해진 듯하다.
-    // 당연히 함수를 호출하는 게 더 시간이 오래 걸릴거라 생각했고 나중에 알고보니 설정값 오류였다.
-
+    // programmers level 2 - 3차 파일명 정렬
+    // 처음에는 처음 숫자가 나오는 부분의 앞을 head
+    // 처음 나오는 숫자부터 이어지는 숫자 number
+    // 그 뒷 부분을 tail 로 문제에서 주어지는 그대로 구현하였다. indexOf로 위치를 찾아서 substring으로 잘랐다.
+    // 근데 그렇게 하니 코드도 복잡하고 예외상황이 많이 발생하였다.
+    // 그래서 정렬에 대한 부분만 참고해서 어떻게 구현해야 빠르고 정확하게 할 수 있을지 확인했다.
+    // 일단 "[0-9]" 라는 정규표현식을 활용하여 처음 나오는 숫자를 더 간결하게 표현하고
+    // Character.isDigit(c) 으로 표현하는 방법으로 하면 훨씬 더 간단해졌다.
+    // 나는 모든 걸 정리해서 String[][] 배열에 넣고 하나하나 비교했는데
+    // 이걸 정렬을 통해서 한번에 나오는 걸 정리하고 그 내부에서 다시 정리해야 하는 걸
+    // 따로 함수로 정리해서 표현하니까 코드도 간결하고 보기 좋게 표현할 수 있었다.
+    // 이쁘게 정렬하는 방법을 좀 더 연구해 보면 좋을 것 같다.
 
     public static void main(String[] args) {
 
-        int[] stones = {2, 4, 5, 3, 2, 1, 4, 2, 5, 1};
+        String[] files = {"img12.png", "img10.png", "img02.png", "img1.png", "IMG01.GIF", "img2.JPG"};
 
-        int k = 3;
+        Arrays.sort(files, new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                // 숫자 앞부분을 잘라서 head로 만든다.(처음 나오는 숫자의 앞부분)
+                String head1 = o1.split("[0-9]")[0];
+                String head2 = o2.split("[0-9]")[0];
 
-        int answer = 0;int min = 1;
-        int max = 200000000;
-        int mid = 0;
+                // compareTo로 비교하기 위해서 소문자로 변경 후에 비교
+                int result = head1.toLowerCase(Locale.ROOT).compareTo(head2.toLowerCase(Locale.ROOT));
 
-        while(min <= max){
-            mid = (min + max) / 2;
-
-            int cnt = 0;
-            boolean flag = true;
-
-            for(int i=0;i< stones.length; i++){
-                if(stones[i] < mid){
-                    cnt++;
+                // 같은 문자일 경우 뒤에 오는 숫자로 비교한다.
+                if(result == 0){
+                    result = convertNum(o1,head1) - convertNum(o2,head2);
                 }
-                else cnt = 0;
-
-                if(cnt == k){
-                    flag = false;
-                    break;
-                }
+                return result;
             }
+        });
 
-            if(!flag){
-                max = mid - 1;
-            }
-            else{
-                min = mid + 1;
-                answer =  Math.max(answer,mid);
-            }
+//        return files;
 
+    }
+
+    public static int convertNum(String str, String head){
+        str = str.substring(head.length()); // head 길이만큼 잘라서 숫자부터 오는 중간 부분을 확인
+        String result = "";
+        for(char c : str.toCharArray()){
+            if(Character.isDigit(c) && result.length() < 5){
+                // 숫자이면서 result 길이가 5이하일때만 확인한다.
+                result += c;
+            }
+            else break;
         }
-
-
-
-//        long beforeTime = System.currentTimeMillis();
-//        ( 시간 측정할 코드)
-//        long afterTime = System.currentTimeMillis();
-//        long Time = (afterTime - beforeTime);
-
+        return Integer.valueOf(result);
     }
 }

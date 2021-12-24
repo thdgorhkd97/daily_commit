@@ -2,65 +2,57 @@ import java.util.*;
 
 public class Main {
 
-    // programmers level 2 - 문자열 압축
-    // 유튜브에 있는 문제 해결 풀이 영상을 보았다.
-    // 설명도 있어서 코드는 이해했는데 나 혼자서는 못했을 것 같다.
-    // 특정한 알고리즘이 쓰이지 않는 시뮬레이션 문제인데
-    // 3중 for문이 활용된 데다가 for 문 내에서
-    // 시작 조건이나 i++ 에 해당하는 부분을 없이 구현하고
-    // pos += i 등으로 문자열의 특정 위치로 이동하거나 부분문자열을 확인하는등
-    // 생각해야 할게 상당히 많은 문제였다.
-    // 특정 알고리즘에 대한 공부가 아니라 기본적으로 문제를 푸는 사고력에 대해서
-    // 훈련을 해야 한다고 느끼는 시간이다.
+    // programmers level 3 - 여행 경로
+    // 정확성은 맞는데 또 효율성에서 문제가 생긴다 ㅠㅠㅠ
+    // 출발지를 두고 for문을 돌리면서 가능한 도착 루트를 정렬하여 다음 도착지를 정했는데
+    // 이런 방식이 너무 시간이 오래 걸린다.
+    // 효율성을 맞추기 위해서 서치해본 결과 dfs 방식을 활용해야 했다.
+    // 도착하지 않았고 출발지가 일치한다면 그 다음 도착지를 넣고
+    // 다시 visited[i]를 false로 바꿔서 모든 경로를 다시 볼 수 있도록 한다.
+    // programmers를 돌려보면서 공부 한 뒤라서 이제 남은 문제들이 거의 다 내가 어디가 막혔느지
+    // 알거나 해결하기 어려운 문제들만 남아있다.
+    // 계속 찾아보면서 이해하고 공부하는 게 과연 공부가 되는 건지 싶지만 이해하고 습득하면서
+    // 비슷한 문제가 나온다면 해결할 수 있도록 하는 게 좋지 않을까 싶다.
+
+    static boolean[] visited;
+    static ArrayList<String> answers;
 
     public static void main(String[] args) {
 
-        String s = "aabbaccc";
+        String[][] tickets = {
+                {"ICN","SFO"},
+                {"ICN","ATL"},
+                {"SFO","ATL"},
+                {"ATL","ICN"},
+                {"ATL","SFO"}};
 
-        int answer = s.length();
+        visited = new boolean[tickets.length];
+        answers = new ArrayList<>();
 
-        for(int i=1; i < s.length()/2 ;i++){ // 절반이후로는 압축이 안 되므로
-            int pos = 0;
+        int cnt = 0;
+        dfs(cnt,"ICN","ICN",tickets);
 
-            int len = s.length();
+        Collections.sort(answers);
 
-            for(; pos + i <= s.length() ;){
-                String unit = s.substring(pos,pos + i);
-                pos += i;
+        String[] answer = answers.get(0).split(" ");
+//        return answer;
+    }
 
-                int cnt = 0;
-                for(; pos + i <= s.length();){
-                    if(unit.equals(s.substring(pos,pos+i))){ // 그다음문자와 같은지
-                        cnt++;
-                        pos += i;
-                    }else{ // 다음 문자가 다르다면
-                        break;
-                    }
-                }
-
-                if(cnt > 0){
-                    len -= i * cnt; // i가 반복되는 문자의 개수
-
-                    if( cnt < 9){ // 한자리숫자만큼 반복되면
-                        len += 1;
-                    }
-                    else if(cnt < 99){ // 두자리숫자만큼 반복되면
-                        len += 2;
-                    }
-                    else if(cnt < 999){ // 세자리숫자만큼 반복되면
-                        len += 3;
-                    }
-                    else{ // 최대는 1000
-                        len += 4;
-                    }
-                }
-
-            }
-
-            answer = Math.min(answer, len);
+    public static void dfs(int cnt, String present, String answer, String[][] tickets){
+        if(cnt == tickets.length){
+            answers.add(answer);
+            return ;
         }
 
-//        return answer;
+        for(int i=0;i< tickets.length;i++){
+            if(!visited[i] && tickets[i][0].equals(present)){
+                visited[i] = true;
 
+                dfs(cnt + 1, tickets[i][1], answer + " " + tickets[i][1], tickets);
+                visited[i] = false;
+            }
+        }
+
+        return;
     }
 }

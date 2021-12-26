@@ -1,76 +1,100 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.util.*;
 
 public class Main {
 
-    // B 사 코딩테스트 6번 문제
-    // 월요일과 금요일의 정해진 출퇴근 시간이 주어지면 여행지와 해당 여행지를 갈때 소모되는 휴가시간을
-    // 최대로 사용할 수 있는 경로를 구하라.
-    // 여행지별로 사용되는 휴가 시간을 map으로 넣어서 비교했다.
-    // 그 후에 사용되는 휴가 시간을 정렬하여 가장 휴가 시간을 잘 활용할 수 있는 여행지를 골라서
-    // 정답으로 선정한다.
-    // 이때 am과 pm으로 시간이 나누어지기 때문에 각각 am과 pm일 때를 구분하고
-    // string으로 주어지는 시간을 계산하여 int로 비교했다.
-    // 문제 자체를 해결하는 데는 큰 어려움은 없었다고 생각한다.
-    // 근데 문제에서의 조건을 조금 놓친 건 아닐까 싶은 생각도 있다.
-    // 휴가 시간을 잘 활용하는 마지막 경로를 찾아야 하고 월요일 오전과 금요일 오후를 따로
-    // 계산해서 시간을 계산하는 방식이 조금 번거로웠다.
+    // baekjoon 1939번 - 중량 제한
+//    문제
+//    N(2 ≤ N ≤ 10,000)개의 섬으로 이루어진 나라가 있다.
+//    이들 중 몇 개의 섬 사이에는 다리가 설치되어 있어서 차들이 다닐 수 있다.
+//    영식 중공업에서는 두 개의 섬에 공장을 세워 두고 물품을 생산하는 일을 하고 있다.
+//    물품을 생산하다 보면 공장에서 다른 공장으로 생산 중이던 물품을 수송해야 할 일이 생기곤 한다. 그런데 각각의 다리마다 중량제한이 있기 때문에 무턱대고 물품을 옮길 순 없다.
+//    만약 중량제한을 초과하는 양의 물품이 다리를 지나게 되면 다리가 무너지게 된다.
+//    한 번의 이동에서 옮길 수 있는 물품들의 중량의 최댓값을 구하는 프로그램을 작성하시오.
+//
+//    입력
+//    첫째 줄에 N, M(1 ≤ M ≤ 100,000)이 주어진다.
+//    다음 M개의 줄에는 다리에 대한 정보를 나타내는 세 정수 A, B(1 ≤ A, B ≤ N), C(1 ≤ C ≤ 1,000,000,000)가 주어진다.
+//    이는 A번 섬과 B번 섬 사이에 중량제한이 C인 다리가 존재한다는 의미이다.
+//    서로 같은 두 섬 사이에 여러 개의 다리가 있을 수도 있으며, 모든 다리는 양방향이다.
+//    마지막 줄에는 공장이 위치해 있는 섬의 번호를 나타내는 서로 다른 두 정수가 주어진다.
+//    공장이 있는 두 섬을 연결하는 경로는 항상 존재하는 데이터만 입력으로 주어진다.
 
-    public static void main(String[] args) {
+    // 백준 사이트에서 문제를 해결해보려 해서 입력값을 받는 것부터 다시 확인하고 공부했다.
+    // BufferedReader와 StringTokenizer를 활용했다.
+    // 이분탐색을 활용한 문제라는 것을 알고 있어서 이분탐색을 활용해 보았는데 코드를 만들고 보니
+    // 문제에 대해 잘못 이해한 부분이 있어서 수정해야 할 것으로 보인다.
+    // 먼저 나는 공장사이를 다이렉트로 잇는 경로가 반드시 존재하는 줄 알았는데 경로가 존재하는 것이지
+    // 다이렉트로 잇는 경로에 대한 언급은 없다.
+    // 이 부분 때문에 공장이 있는 섬 사이의 경로에 대한 값을 확인하는 코드가 추가되어야 한다.
 
-        String[][] plans = {{"홍콩","06:45 am"},{"일본","10:10 pm"}};
-        int time = 75;
+    public static void main(String[] args) throws IOException {
 
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        HashMap<String, Double> map = new HashMap<>(); // 도시=키 / 도시로 출발할 때 사용하는 휴가시간을 value
+        String s = br.readLine();
 
-        for(int i=0;i<plans.length;i++){
-            int startTime = 0; // 출발 시간에 관한 변수
-            map.put(plans[i][0],0.0); // 해시에 도시명을 키로 해서 저장
-            if(plans[i][1].contains("P")) { // 출발 시간이 PM이면
-                startTime = Integer.parseInt(plans[i][1].substring(0, plans[i][1].indexOf("P")));
-                // P 이전의 숫자(시간) 을 startTime 변수에 지정
-                if(startTime < 6){ // 만약 6시 이전에 출발하면 휴가 시간을 사용하는 것이니까 map 갱신
-                    map.put(plans[i][0],map.get(plans[i][0])+(double)6-startTime);
-                }
+        StringTokenizer stk = new StringTokenizer(s);
+
+        int N = Integer.parseInt(stk.nextToken());
+        int M = Integer.parseInt(stk.nextToken());
+
+        int[][] island = new int[N+1][N+1];
+
+        for(int i=0;i<M;i++){
+            String str = br.readLine();
+
+            StringTokenizer st = new StringTokenizer(str);
+
+            int left = Integer.parseInt(st.nextToken());
+            int right = Integer.parseInt(st.nextToken());
+            int weight = Integer.parseInt(st.nextToken());
+
+            island[left][right] = Math.max(island[left][right],weight);
+            island[right][left] = Math.max(island[right][left],weight);
+
+        }
+        s = br.readLine();
+
+        stk = new StringTokenizer(s);
+
+        int factory1 = Integer.parseInt(stk.nextToken());
+        int factory2 = Integer.parseInt(stk.nextToken());
+
+//        for(int i=1;i<=3;i++){
+//            for(int j=1;j<=3;j++){
+//                System.out.print(island[i][j] + " ");
+//            }
+//            System.out.println();
+//        }
+//
+//        System.out.println(" 공장 위치 : " + factory1 + " " + factory2);
+
+        int min = 1;
+        int max = 1000000000;
+
+        while(min <= max){
+            int mid = (min + max) / 2;
+
+            if(canMove(mid,island,factory1,factory2)){
+                max = mid - 1;
             }
-            else{ // 출발 시간이 AM이면
-                startTime = Integer.parseInt(plans[i][1].substring(0, plans[i][1].indexOf("A")));
-                if(startTime > 9.5){ // 9시 반 넘어서 출발하면 12 ~ 6시까지의 6시간과 (12-startTime) 오전 빼는 시간을 더해야 한다.
-                    map.put(plans[i][0],map.get(plans[i][0])+(double)6+12-startTime);
-                }
-                else{ // 9시 이전에 출발하는 거면 금요일을 통째로 안 가니까 8.5시간을 더한다.
-                    map.put(plans[i][0],map.get(plans[i][0])+(double)8.5);
-                }
+            else{
+                min = mid + 1;
             }
-
-            int arriveTime = 0; // 도착시간에 대한 변수
-            if(plans[i][2].contains("P")) { // 월요일 오후에 도착하면
-                arriveTime = Integer.parseInt(plans[i][2].substring(0, plans[i][2].indexOf("P")));
-                if( arriveTime < 6 && arriveTime > 1){ // 월요일은 1시 출근이므로 1시에서 넘은 만큼 휴가 시간 사용
-                    map.put(plans[i][0],map.get(plans[i][0])+(double)arriveTime-1);
-                }
-                else if(arriveTime >= 6){ // 만약 퇴근 시간을 지나서 왔다면 월요일 근무시간인 5시간 제외
-                    map.put(plans[i][0],map.get(plans[i][0])+(double)arriveTime-5);
-                }
-            }
-            // 월요일 오전에 도착하면 휴가 시간을 제외하지 않으니까 else문은 필요 없다.
         }
 
-        String answer = "";
-        ArrayList<Double> list = new ArrayList<>();
-        for(String str : map.keySet()){
-            if(map.get(str) <= time) { // 휴가 시간 내의 휴가지를 모두 선택
-                list.add(map.get(str));
-            }
-        }
-        Collections.sort(list,Collections.reverseOrder()); // 정렬
-        for(String str : map.keySet()){
-            if(map.get(str) == list.get(0)){ // 휴가 시간을 가장 잘 활용하는 여행지 선택(올해의 마지막 여행이므로)
-                answer = str;
-            }
-        }
-//        return answer;
+        System.out.println(min);
 
+    }
 
+    public static boolean canMove(int mid,int[][] island,int factory1,int factory2){
+        if(island[factory1][factory2] <= mid){
+            return true;
+        }
+        else return false;
     }
 }

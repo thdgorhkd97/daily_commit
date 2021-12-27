@@ -23,13 +23,25 @@ public class Main {
 //    마지막 줄에는 공장이 위치해 있는 섬의 번호를 나타내는 서로 다른 두 정수가 주어진다.
 //    공장이 있는 두 섬을 연결하는 경로는 항상 존재하는 데이터만 입력으로 주어진다.
 
-    // 백준 사이트에서 문제를 해결해보려 해서 입력값을 받는 것부터 다시 확인하고 공부했다.
-    // BufferedReader와 StringTokenizer를 활용했다.
-    // 이분탐색을 활용한 문제라는 것을 알고 있어서 이분탐색을 활용해 보았는데 코드를 만들고 보니
-    // 문제에 대해 잘못 이해한 부분이 있어서 수정해야 할 것으로 보인다.
-    // 먼저 나는 공장사이를 다이렉트로 잇는 경로가 반드시 존재하는 줄 알았는데 경로가 존재하는 것이지
-    // 다이렉트로 잇는 경로에 대한 언급은 없다.
-    // 이 부분 때문에 공장이 있는 섬 사이의 경로에 대한 값을 확인하는 코드가 추가되어야 한다.
+    // 백준에서 메모리 초과가 나서 인접행렬로 구현한 부분을 cost와 연결된 다음 섬을 인자로 가지는
+    // 인접리스트로 바꿔서 다시 구현했다. 항상 인접행렬로 구현하던 습관이 있어서 이번 기회에 찾아보고
+    // 하느라 시간은 좀 걸렸지만 인접리스트로 구현해서 메모리 초과는 해결할 수 있었다.
+    // 다만 ArrayList로 선언하고서 각 배열의 인자에 대해 새롭게 선언하는 부분을 놓쳐서
+    // 처음에는 널포인트에 수를 넣으려는 오류가 발생하였다.
+    // 그 후에는 bfs를 활용하여 factory1에서 factory2까지 이동하는 경로를 구현하기 위해
+    // 코드를 짜서 방문여부와 가중치를 표현하여 이동하였을 때 무게를 이분탐색하는 코드를 구현했느데
+    // 문제를 해결하지는 못했다 ㅎㅎ;;
+    // 백준 사이트가 테스트 케이스도 적고 얼마나 틀렸는지 나오지 않아서 정확히는 모르겠지만
+    // 수정이 필요하다는 것은 확실하다ㅠㅠ
+
+    public static class Node{
+        int n;
+        int cost;
+        public Node(int n,int cost){
+            this.n = n;
+            this.cost = cost;
+        }
+    }
 
     public static void main(String[] args) throws IOException {
 
@@ -42,7 +54,11 @@ public class Main {
         int N = Integer.parseInt(stk.nextToken());
         int M = Integer.parseInt(stk.nextToken());
 
-        int[][] island = new int[N+1][N+1];
+        ArrayList<Node> island[] = new ArrayList[N + 1];
+        for(int i=0;i<N+1;i++){
+            island[i] = new ArrayList<>();
+        }
+        boolean[] visited = new boolean[N + 1];
 
         for(int i=0;i<M;i++){
             String str = br.readLine();
@@ -53,8 +69,8 @@ public class Main {
             int right = Integer.parseInt(st.nextToken());
             int weight = Integer.parseInt(st.nextToken());
 
-            island[left][right] = Math.max(island[left][right],weight);
-            island[right][left] = Math.max(island[right][left],weight);
+            island[left].add(new Node(right,weight));
+            island[right].add(new Node(left,weight));
 
         }
         s = br.readLine();
@@ -64,37 +80,46 @@ public class Main {
         int factory1 = Integer.parseInt(stk.nextToken());
         int factory2 = Integer.parseInt(stk.nextToken());
 
-//        for(int i=1;i<=3;i++){
-//            for(int j=1;j<=3;j++){
-//                System.out.print(island[i][j] + " ");
-//            }
-//            System.out.println();
-//        }
-//
-//        System.out.println(" 공장 위치 : " + factory1 + " " + factory2);
-
         int min = 1;
         int max = 1000000000;
+
+        int answer = 0;
 
         while(min <= max){
             int mid = (min + max) / 2;
 
-            if(canMove(mid,island,factory1,factory2)){
-                max = mid - 1;
+            if(canMove(mid,island,factory1,factory2,visited)){
+
+                min = mid + 1;
+                answer = mid;
             }
             else{
-                min = mid + 1;
+                max = mid - 1;
             }
         }
 
-        System.out.println(min);
+        System.out.println(answer);
 
     }
 
-    public static boolean canMove(int mid,int[][] island,int factory1,int factory2){
-        if(island[factory1][factory2] <= mid){
-            return true;
+    public static boolean canMove(int mid,ArrayList<Node>[] island,int factory1,int factory2,boolean[] visited){
+
+        Queue<Integer> que = new LinkedList<>();
+        que.offer(factory1);
+        visited[factory1] = true;
+
+        while(!que.isEmpty()){
+            int tmp = que.poll();
+            if(tmp == factory2) return true;
+
+            for(int i=0;i<island[tmp].size();i++){
+                if(island[tmp].get(i).cost >= mid && !visited[island[tmp].get(i).n]){
+                    visited[island[tmp].get(i).n] = true;
+                    que.offer(island[tmp].get(i).n);
+                }
+            }
         }
-        else return false;
+
+        return false;
     }
 }

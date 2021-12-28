@@ -23,16 +23,18 @@ public class Main {
 //    마지막 줄에는 공장이 위치해 있는 섬의 번호를 나타내는 서로 다른 두 정수가 주어진다.
 //    공장이 있는 두 섬을 연결하는 경로는 항상 존재하는 데이터만 입력으로 주어진다.
 
-    // 백준에서 메모리 초과가 나서 인접행렬로 구현한 부분을 cost와 연결된 다음 섬을 인자로 가지는
-    // 인접리스트로 바꿔서 다시 구현했다. 항상 인접행렬로 구현하던 습관이 있어서 이번 기회에 찾아보고
-    // 하느라 시간은 좀 걸렸지만 인접리스트로 구현해서 메모리 초과는 해결할 수 있었다.
-    // 다만 ArrayList로 선언하고서 각 배열의 인자에 대해 새롭게 선언하는 부분을 놓쳐서
-    // 처음에는 널포인트에 수를 넣으려는 오류가 발생하였다.
-    // 그 후에는 bfs를 활용하여 factory1에서 factory2까지 이동하는 경로를 구현하기 위해
-    // 코드를 짜서 방문여부와 가중치를 표현하여 이동하였을 때 무게를 이분탐색하는 코드를 구현했느데
-    // 문제를 해결하지는 못했다 ㅎㅎ;;
-    // 백준 사이트가 테스트 케이스도 적고 얼마나 틀렸는지 나오지 않아서 정확히는 모르겠지만
-    // 수정이 필요하다는 것은 확실하다ㅠㅠ
+    // 친구와 함께 고민해보면서 2군데를 수정하였다.
+    // 먼저 처음에 설정하는 min과 max를 그냥 범위의 최소와 최대로 넣는 것이 아니라
+    // 입력되는 코스트와 비교하면서 min과 max로 넣어 입력 되는 코스트의 최소와 최대로 맞춰
+    // 조금이나마 코드의 속도를 빠르게 하였다. 근데 이 부분은 약간의 코드 성능 문제인것같고
+    // 내가 애초에 했던 방식(최소 최대로 설정)도 문제가 있을 것 같지는 않다.
+    // 코드가 옳게 바뀐 건 boolean[] visited = new boolean[N + 1]; 이 코드를
+    // while문 내부로 옮긴 게 주요한 것 같다.
+    // 내가 잘못 생각했던 게 visited를 한 번만 선언해서 사이클을 돌면 되는 것이 아니라
+    // mid 값이 설정된 상태에서 visited를 돌면서 mid값이 바뀔 때마다 visited의 값을 변경하면서
+    // 진행해야 하는 건데 외부에서 선언하니 visited를 계속 활용하지 못해서 mid값이 변하는 상황을
+    // 제대로 반영하지 못한 것으로 보인다.
+
 
     public static class Node{
         int n;
@@ -58,7 +60,10 @@ public class Main {
         for(int i=0;i<N+1;i++){
             island[i] = new ArrayList<>();
         }
-        boolean[] visited = new boolean[N + 1];
+
+
+        int max = 1;
+        int min = 1000000000;
 
         for(int i=0;i<M;i++){
             String str = br.readLine();
@@ -68,6 +73,9 @@ public class Main {
             int left = Integer.parseInt(st.nextToken());
             int right = Integer.parseInt(st.nextToken());
             int weight = Integer.parseInt(st.nextToken());
+
+            min = Math.min(weight,min);
+            max = Math.max(weight,max);
 
             island[left].add(new Node(right,weight));
             island[right].add(new Node(left,weight));
@@ -80,13 +88,11 @@ public class Main {
         int factory1 = Integer.parseInt(stk.nextToken());
         int factory2 = Integer.parseInt(stk.nextToken());
 
-        int min = 1;
-        int max = 1000000000;
-
         int answer = 0;
 
         while(min <= max){
             int mid = (min + max) / 2;
+            boolean[] visited = new boolean[N + 1];
 
             if(canMove(mid,island,factory1,factory2,visited)){
 

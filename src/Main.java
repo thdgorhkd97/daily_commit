@@ -3,95 +3,73 @@ import java.util.*;
 
 public class Main {
 
-    // programmers level 2 - 순위 검색
-    // info라는 지원자 정보를 담은 배열중에서 query배열에 해당하는 정보를 만족하는
-    // 지원자의 수를 골라내는 문제
-    // query에 해당하는 정보를 위해서 info 배열의 지원자 점수를 제외한 나머지 정보를
-    // key로 하고 점수를 value로 하여 map에 집어넣었다.
-    // 그 후에 key를 보면서 query의 조건에 맞는지 확인하고 조건에 맞다면 value값과
-    // 요구하는 점수 조건을 비교하는 식으로 코드를 짜보앗다.
-    // 근데 query의 조건을 만족하는지 확인하는 과정에서 문제가 발생한 것으로 보인다.
-    // 조건을 정리한 list와 그를 확인하기 위한 조건을 split으로 나눈 배열을 for문으로
-    // 하나하나 확인하다보니 코드가 너무 번거로워졌고 split하는 과정에서
-    // " and " 로 나눠서 " " 을 포함한다던지 하는 실수도 했었다.
-    //
+    // programmers level 2 - 괄호 변환
+    // 따로 어떤 자료구조나 알고리즘 개념이 쓰인 문제는 아니지만 문제에서 주어지는
+    // 조건을 그대로 구현해야 하는 문제였다.
+    // 처음에는 그저 main 함수에 코드를 구현하다 문제 조건에서 처음부터 구현해야 하는 경우가 있기에
+    // 따로 함수로 구현하여 표현하였다.
+    // replaceAll에서 '(' 라는 문자와 ')' 라는 문자 자체를 표현하는 방법에 대해 고민했는데
+    // \\를 앞에 붙혀서 괄호의 문자 자체를 표현하는 방법에 대해 숙지 하였다.
+    // 단순히 문제를 따라가면서 조건에 맞춰 코드를 구현하는 것 뿐 아니라
+    // 조건을 일치하는 환경 내에서 일정 부분 코드를 리팩토링하여 사용하는 게 더 효율적이라는 걸
+    // 다시 한 번 느꼈다. 조건을 파괴하지 않는 선에서 내가 조건을 수정할 수 있어야 한다.
+
 
     public static void main(String[] args) throws IOException {
 
-        String[] info = {
-                "java backend junior pizza 150",
-                "python frontend senior chicken 210",
-                "python frontend senior chicken 150",
-                "cpp backend senior pizza 260",
-                "java backend junior chicken 80",
-                "python backend senior chicken 50"};
+        String p = "(()())()";
 
-        String[] query = {
-                "java and backend and junior and pizza 100",
-                "python and frontend and senior and chicken 200",
-                "cpp and - and senior and pizza 250",
-                "- and backend and senior and - 150",
-                "- and - and - and chicken 100",
-                "- and - and - and - 150"};
+        String answer = "";
 
-        int[] answer = new int[query.length];
+        answer = change(p); // 문제에서 다시 변환해야 하는 조건이 있기에 함수로 따로 표현
 
-        Map<String,Integer> map = new HashMap<>();
+//        return answer;
+    }
 
-        for(String strings : info){
+    static String change(String p){
+        if(p.equals("")) return ""; // 입력이 빈 문자열이면 빈 문자열을 반환 (조건 1)
 
-            int numberIdx = 0;
-            for(int i=0;i<strings.length();i++){
-                if(strings.charAt(i) >= '0' && strings.charAt(i)<='9'){
-                    numberIdx = i; // 처음으로 숫자가 나오는 부분
-                    break;
-                }
+        int open = 0; // ( 의 개수
+        int close = 0; // ) 의 개수
+
+        int idx = 0; // '(' 의 개수와 ')' 의 개수가 같은 곳의 idx를 저장
+        for(int i=0;i<p.length();i++){
+            if(p.charAt(i)=='('){
+                open++;
             }
-
-            String str = strings.substring(0,numberIdx).trim(); // 숫자가 나오기 전까지
-            int grade = Integer.parseInt(strings.substring(numberIdx)); // 숫자인 부분
-            map.put(str,grade); // map에 숫자 전까지를 key로 숫자 부분을 value로
-        }
-
-        ArrayList<String> list = new ArrayList<>(map.keySet());
-
-        int idx = 0;
-        for(String strings : query){
-            String[] str = strings.split(" "); // str은 query정보
-
-            int cnt = 0;
-
-            for(int i=0;i<list.size();i++){
-                String goal = list.get(i); // 지원자의 정보
-                boolean flag = true;
-
-                for(int j=0;j<str.length-1;j++){ // 맨 마지막은 점수이므로 앞의 조건만 확인
-                    if(!str[j].equals("-") && !str[j].equals("and")){ // -과 and가 아니면 확인해야할 정보
-                        if(!goal.contains(str[j])){ // 포함하고 있지않다면 더 확인할 필요 없음
-                            System.out.println(goal + " 에는 " + str[j] + " 가 없습니다");
-                            flag = false;
-                            break;
-                        }
-                    }
-                }
-
-                if(flag){ // 모든 정보를 포함하고 있다면
-                    if(map.get(goal) >= Integer.parseInt(str[str.length-1])){
-                        cnt++;
-                    }
-                }
+            else{
+                close++;
             }
-
-            answer[idx++] = cnt;
-
+            if(open == close) {
+                idx = i;
+                break;
+            }
         }
 
-        for(int i=0;i<answer.length;i++){
-            System.out.println(answer[i]);
+        String u = p.substring(0,idx+1); // 균형잡힌 문자열로 더 이상 분리 불가능하게
+        String v = p.substring(idx+1); // 빈 문자열이 가능
+
+        if(isCorrect(u)){ // u가 올바른 괄호 문자열이면
+            u += change(v); // v에 대해 처음부터 다시 수행 후 u에 이어 붙여 반환
         }
+        else{
+            String emp = "(" + change(v) + ")"; // '(' 에 v를 처음부터 수행한 결과에 ')' 더하기
+            u = u.substring(1, u.length()-1);// u의 첫번째와 마지막 문자 제거하기
+            u = u.replaceAll("\\(","\\/").replaceAll("\\)","\\(").replaceAll("\\/","\\)");
+            // 나머지 문자열의 괄호 방향을 뒤집기
+            emp += u; // 뒤에 이어 붙히기
+            return emp;
+        }
+        return u;
+    }
 
-
-
-
+    static boolean isCorrect(String u){ // 올바른 괄호 문자열인지 확인
+        while(!u.equals("")){ // 비어있지 않다면
+            if(u.charAt(0)==')'){
+                return false;
+            }
+            u = u.replaceAll("\\(\\)",""); //( 과 ) 를 빈칸으로 변환
+        }
+        return true;
     }
 }

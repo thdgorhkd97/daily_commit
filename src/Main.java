@@ -3,73 +3,50 @@ import java.util.*;
 
 public class Main {
 
-    // programmers level 2 - 괄호 변환
-    // 따로 어떤 자료구조나 알고리즘 개념이 쓰인 문제는 아니지만 문제에서 주어지는
-    // 조건을 그대로 구현해야 하는 문제였다.
-    // 처음에는 그저 main 함수에 코드를 구현하다 문제 조건에서 처음부터 구현해야 하는 경우가 있기에
-    // 따로 함수로 구현하여 표현하였다.
-    // replaceAll에서 '(' 라는 문자와 ')' 라는 문자 자체를 표현하는 방법에 대해 고민했는데
-    // \\를 앞에 붙혀서 괄호의 문자 자체를 표현하는 방법에 대해 숙지 하였다.
-    // 단순히 문제를 따라가면서 조건에 맞춰 코드를 구현하는 것 뿐 아니라
-    // 조건을 일치하는 환경 내에서 일정 부분 코드를 리팩토링하여 사용하는 게 더 효율적이라는 걸
-    // 다시 한 번 느꼈다. 조건을 파괴하지 않는 선에서 내가 조건을 수정할 수 있어야 한다.
-
+    // programmers level 3 - 디스크 컨트롤러
+    // 우선순위 큐를 활용하는 과정에서 int[] 배열이 들어오는 데 이 중 [1] 원소에 대해서 지속적으로
+    // 정렬하는 기준에 대해서 알지 못했는데 우선순위 큐를 선언하는 과정에서
+    // 우선순위 큐에서 확인할 정렬 기준에 대해 집어넣어 주면 된다는 걸 알았다.(람다식으로 표현하였다)
+    // 그 이후의 로직은 생각보다 단순하다고 생각된다. 큐에 들어간 작업이 끝나는 시점에서 요청이 들어왔는가에 따라
+    // 큐에 집어넣을지 넣지 않을지 판단하고 실행하는 작업에 대해서 작업 종료시간을 수정해나간다.
+    // 느낀 점 : 우선순위 큐를 활용하지 못했던 것은 아니라고 생각한다. 이전에도 우선순위 큐를 활용한 적이 있었고 개념도 알고 있다.
+    //          다만 우선순위 큐에 int[]가 들어갈 때 int[] 배열 중 특정 순서의 원소의 내림차순 혹은 오름차순 기준으로 정렬하도록
+    //          기준 자체를 설정할 수 있다는 부분은 어떻게 표현하는지 잘 몰랐는데 이번 기회에 확실히 할 수 있었다.
 
     public static void main(String[] args) throws IOException {
 
-        String p = "(()())()";
+        int[][] jobs = {{0,3},{1,9},{2,6}};
 
-        String answer = "";
+        Arrays.sort(jobs,(o1, o2) -> o1[0]-o2[0]);
 
-        answer = change(p); // 문제에서 다시 변환해야 하는 조건이 있기에 함수로 따로 표현
+        PriorityQueue<int[]> que = new PriorityQueue<>((o1, o2) -> o1[1] - o2[1]);
 
-//        return answer;
-    }
+        int answer = 0;
+        int end = 0; // 수행되고난 직후의 시간
+        int jobsIdx = 0; // jobs 배열의 인덱스
+        int count = 0; // 수행된 요청 갯수
 
-    static String change(String p){
-        if(p.equals("")) return ""; // 입력이 빈 문자열이면 빈 문자열을 반환 (조건 1)
+        while(count < jobs.length){ // 모든 요청을 모두 수행할 때까지
 
-        int open = 0; // ( 의 개수
-        int close = 0; // ) 의 개수
-
-        int idx = 0; // '(' 의 개수와 ')' 의 개수가 같은 곳의 idx를 저장
-        for(int i=0;i<p.length();i++){
-            if(p.charAt(i)=='('){
-                open++;
+            while (jobsIdx < jobs.length && jobs[jobsIdx][0] <= end) {
+                // 작업이 완료되는 시간이 end 니까 그 시점까지 들어온 모든 요청을 큐에 삽입
+                que.add(jobs[jobsIdx]);
+                jobsIdx += 1;
             }
-            else{
-                close++;
+
+            if(que.isEmpty()){ // 큐가 비어있다면
+                // 작업이 완료되는 end 이후로 작업 요청이 들어오는 것이므로 end를 다음 요청의 작업 시간으로 초기화
+                end = jobs[jobsIdx][0];
             }
-            if(open == close) {
-                idx = i;
-                break;
+            else{ // 큐가 비어있지 않다면(작업이 진행 중일 때 요청이 들어오면)
+                int[] tmp = que.poll(); // 현재 큐에 있는 것 중 수행시간이 가장 짧은 것
+                answer += tmp[1] + end - tmp[0];
+                end += tmp[1];
+                count++;
             }
         }
 
-        String u = p.substring(0,idx+1); // 균형잡힌 문자열로 더 이상 분리 불가능하게
-        String v = p.substring(idx+1); // 빈 문자열이 가능
 
-        if(isCorrect(u)){ // u가 올바른 괄호 문자열이면
-            u += change(v); // v에 대해 처음부터 다시 수행 후 u에 이어 붙여 반환
-        }
-        else{
-            String emp = "(" + change(v) + ")"; // '(' 에 v를 처음부터 수행한 결과에 ')' 더하기
-            u = u.substring(1, u.length()-1);// u의 첫번째와 마지막 문자 제거하기
-            u = u.replaceAll("\\(","\\/").replaceAll("\\)","\\(").replaceAll("\\/","\\)");
-            // 나머지 문자열의 괄호 방향을 뒤집기
-            emp += u; // 뒤에 이어 붙히기
-            return emp;
-        }
-        return u;
-    }
-
-    static boolean isCorrect(String u){ // 올바른 괄호 문자열인지 확인
-        while(!u.equals("")){ // 비어있지 않다면
-            if(u.charAt(0)==')'){
-                return false;
-            }
-            u = u.replaceAll("\\(\\)",""); //( 과 ) 를 빈칸으로 변환
-        }
-        return true;
+//        return (int) Math.floor(answer / jobs.length);
     }
 }

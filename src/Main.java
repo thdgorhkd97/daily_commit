@@ -1,53 +1,91 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 public class Main {
 
-    // programmers level 4 - 호텔 방 배정
-//    1. 한 번에 한 명씩 신청한 순서대로 방을 배정합니다.
-//    2. 고객은 투숙하기 원하는 방 번호를 제출합니다.
-//    3. 고객이 원하는 방이 비어 있다면 즉시 배정합니다.
-//    4. 고객이 원하는 방이 이미 배정되어 있으면 원하는 방보다 번호가 크면서 비어있는 방 중 가장 번호가 작은 방을 배정합니다.
-    // 효율성을 위해서 map을 활용해야 한다는 힌트를 얻었고 map에서 키값으로는 현재 방을
-    // value값으로는 키에 해당하는 다음 비어있는 방을 넣어야 한다는 생각까지는 할 수 잇었다.
-    // 그래서 구현을 하다 보니 처음으로 할당되는 경우 즉 키에 값이 존재하지 않는 경우에 대해서는
-    // 구현할 수 있었다.( !map.containskey())를 활용하여
-    // 근데 이미 있는 경우에 대해서 다음으로 비어있는 방의 번호를 map의 value로 집어넣는
-    // 케이스를 구현하는 데서 꽤 애먹었다.
-    // 처음에는 반복문을 구현해서 map의 키에 없는 값(비어있는 방)을 찾아야 하나 싶었는데
-    // 그렇게 해도 효율성에서 완벽히 통과하지 못했다.
-    // 결론적으로는 재귀적으로 구현해서 다음 비어있는 방을 찾아서 map의 value에 넣고
-    // key 값에 따라서 찾는 것이 이상적이다.
-
-    static Map<Long,Long> map = new HashMap<>();
+    // baekjoon stack 단계 2문제
+    // 스택을 구현하는 문제 2개를 해결했는데 문제가 어렵지않아서 스택의 개념에 대해서
+    // 확실하게 정리한다.
+    // stack 은 LIFO(Last In First Out) 후입선출 구조를 가진다.
+    // 깊이 우선 탐색(DFS) & 재귀 함수 호출에 사용
+    // stack의 여러가지 활용법
+    // stack.push(원소) -> stack에 값 추가
+    // stack.pop() -> stack의 값 제거(가장 최근에 들어간 값 제거)
+    // stack.clear() -> stack 초기화(전체 값 제거)
+    // stack.peek() -> stack의 가장 상단의 값 출력
+    // stack.peek() 와 stack.pop()의 차이는 peek()는 stack에서 값 제거 X
+    // stack.empty() -> stack이 비어있는지 check (비어있으면 true 반환)
+    // stack.contains(원소) -> 원소를 포함하는지 확인(잇으면 true 반환)
 
     public static void main(String[] args) throws IOException {
 
-        long k = 10;
-        long[] room_number = {1,3,4,1,3,1};
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        long[] answer = new long[room_number.length];
+        int T = Integer.parseInt(br.readLine());
 
-        for (int i = 0; i < room_number.length; i++) {
-            answer[i] = assignRoom(room_number[i]);
+        for(int i=0;i<T;i++){
+            String str = br.readLine();
+            System.out.println(isVPS(str));
         }
 
-//         return answer;
+        /*
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        int K = Integer.parseInt(br.readLine());
+        Stack<Integer> stack = new Stack<>();
+
+        for(int i=0;i<K;i++){
+            int number = Integer.parseInt(br.readLine());
+            if(number != 0){
+                stack.add(number);
+            }
+            else{
+                stack.pop();
+            }
+        }
+
+
+        int sum = 0;
+        for(int i=0;i<stack.size();i++){
+            int num = stack.peek();
+            sum += num;
+            stack.pop();
+            i--;
+        }
+
+        System.out.println(sum);
+        */
+
+
 
     }
 
-    private static long assignRoom(long wantRoomNumber) {
+    private static String isVPS(String str) {
+        int open = 0;
+        int close = 0;
 
-        if(!map.containsKey(wantRoomNumber)){ // map에 할당되지 않은 방이라면
-            // 처음으로 원하는 사람이라는 뜻이므로
-            map.put(wantRoomNumber, wantRoomNumber+1); // +1(다음 방)을 해서 value에 넣고
-            return wantRoomNumber; // 그대로 원하는 방을 할당한다.
+        boolean flag = true;
+
+        for(int i=0;i<str.length();i++){
+            if(str.charAt(i)=='('){
+                open++;
+            }
+            else{
+                close++;
+            }
+
+            if(close > open){
+                flag = false;
+                break;
+            }
         }
 
-        // 이미 그 방에 사람이 있는 상태라면
-        long nextRoom = assignRoom(map.get(wantRoomNumber));
-        // 다음 비어있는 방을 할당한다.
-        map.put(wantRoomNumber,nextRoom);
-        return nextRoom;
+        if(!flag || open != close){
+            return "NO";
+        }
+
+        return "YES";
     }
 }

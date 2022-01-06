@@ -6,16 +6,12 @@ import java.util.*;
 public class Main {
 
     // baekjoon 17298 오큰수
-    // stack에 분류되어 있는 문제이다. 문제 자체는 그리 어렵지 않아서
-    // for문을 통해서 구현했더니 테스트 케이스의 크기가 커서 2중 for문을 구현하니
-    // 바로 시간초과가 발생했다.
-    // stack을 활용하기 위해서 방법을 생각해 봤는데 아마 index를 활용하는 방법이지 않을까
-    // 라는 생각까지는 닿았는데 명확한 스택을 활용한 해답이 안 떠올라서 결국
-    // stack을 활용한 풀이 방법에 대해서는 조금 참고를 했다.
-    // 근데! 솔직히 아직 정확히 이해를 하지 못했다.
-    // index를 활용해서 배열의 원소의 크기를 비교해서 index를 stack에 집어넣는 과정은 같은데
-    // 이 과정을 완벽히 구현하고 이해하지 못했다 ㅠㅠ
-    // 좀 더 오래 고민해봐야 겠다. 이해하지 못하고 그냥 따라하는 건 의미가 없지 않을까..
+    // stack을 활용하여 시간초과에 걸리지 않는 풀이법에 대해서 이해하느라 시간이 오래 걸림 ㅠㅠ
+    // 일단 원리자체는 수열의 인덱스를 특정 기준(현재 원소가 이전의 원소보다 작을 때까지)
+    // 을 만족하면 index를 stack에 추가하는 것이다.
+    // 그러다가 현재 원소가 top 원소를 인덱스로 하는 수열의 원소보다 크게 되면
+    // stack의 원소를 pop하면서 해당 인덱스에 해당하는 원소를 현재 원소로 바꾼다.
+    // https://st-lab.tistory.com/196 이 사이트에서 설명 가져왔습니다(설명 어렵네요..)
 
     public static void main(String[] args) throws IOException {
 
@@ -35,7 +31,37 @@ public class Main {
         }
 
         int[] NGE = new int[T];
+        Stack<Integer> stack = new Stack<>();
 
+        for(int i=0;i<T;i++){
+            /*
+             * 스택이 비어있지 않으면서
+             * 현재 원소가 스택의 맨 위 원소가 가리키는 원소보다 큰 경우
+             * 해당 조건을 만족할 때 까지 stack의 원소를 pop하면서
+             * 해당 인덱스의 값을 현재 원소로 바꿔준다.
+             */
+            while(!stack.isEmpty() && N[stack.peek()] < N[i]){
+                N[stack.pop()] = N[i];
+            }
+
+            stack.push(i);
+        }
+
+
+        /*
+         * 스택의 모든 원소를 pop하면서 해당 인덱스의 value를
+         * -1로 초기화한다.
+         */
+        while(!stack.isEmpty()){
+            N[stack.pop()] = -1;
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < T; i++) {
+            sb.append(N[i]).append(' ');
+        }
+
+        System.out.println(sb);
 
 
 

@@ -5,68 +5,43 @@ import java.util.*;
 
 public class Main {
 
-//    정수 X에 사용할 수 있는 연산은 다음과 같이 세 가지 이다.
-//              X가 3으로 나누어 떨어지면, 3으로 나눈다.
-//              X가 2로 나누어 떨어지면, 2로 나눈다.
-//              1을 뺀다.
-//    정수 N이 주어졌을 때, 위와 같은 연산 세 개를 적절히 사용해서 1을 만들려고 한다. 연산을 사용하는 횟수의 최솟값을 출력하시오.
+    // baekjoon - 1932 정수 삼각형
+    // 동적계획법의 가장 대표적인 문제라고 생각될만한 유형이고 프로그래머스에서 비슷한 문제를
+    // 풀어본 경험이 있어서 문제자체는 어렵지 않았다.
+    // 근데 백준이라는 사이트의 특성상 input을 직접 받아야 하기때문에 BufferedReader를 활용해야 하는데
+    // stringtokenizer를 쓰는 과정이 아직 완벽하지 않아서 오히려 입력을 받는 부분을 힘들어했다;;
+    // 다만 프로그래머스에서의 풀이와 달라진 부분은 프로그래머스는 위에서 아래로 내려오면서 계산했다면
+    // 이번엔 아래에서 위로 올라가면서 처리했다.
+    // 그러다 보니 맨 끝줄을 따로 처리해줘야하는 경우가 발생하지 않았고
+    // 보다 빠르고 편하게 코드를 완료할 수 있었다.
 
-//              X = 10 인 경우
-//            1
-//            1
-//            2         오답  정답
-//            5     :    0    3
-//            6     :    1    2
-//            7     :    0    3
-//            8     :    1    3
-//            9     :    2    2
-//            10    :    1    3
-
-    // baekjoon 1로 만들기
-    // 먼저 내가 잘못 생각한 부분은 빨리 1로 만들어야 하기 때문에 최대한 3으로 나누거나 2로 나누는 경우를 먼저 체크했다는 것이다.
-    // 예시에서도 나오지만 10의 경우 2로 먼저 나눠서 5로 가는 거보다 1을 먼저 빼고 9를 3으로 나누는 경우가 더 최소의 경우다.
-    // 따라서 3가지의 경우를 모두 체크할 수 있어야 하기 때문에 동적계획법을 활용한다.
-    // 이런 부분에서 내가 가장 먼저 생각한 부분은 2의 배수라면 dp[i/2]와 dp[i-1] 중 더 작은 값에서 1을 더해야 한다는 것인데
-    // 로직은 맞는 것 같은데 오답이 생겼다...
-    // 그래서 답과 비교해보니 답은 내 생각과는 다르게 dp[i] = dp[i-1] + 1을 if문 밖으로 빼서 계산하고 Math.min을 확인했다.
-    // 내 경우와 다른게 뭘까 싶어서 10을 넣어서 확인했는데 5에서부터 정답과 달랐다....
-    // 생각해보니까 5의 경우 if에 걸리지 않으니까 if에 해당해야만 초기화를 하는 나의 코드에서는 5에 대한 경우에 0을 삽입하는 걸 확인할 수 있었다.
-    // 그렇기 때문에 dp[i] = dp[i-1]+1 을 if문 밖으로 빼서 2나 3의 배수가 아닐 경우 1을 더한다는 문제의 조건을 챙겼어야 한다.
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int X = Integer.parseInt(br.readLine());
+        int N = Integer.parseInt(br.readLine());
 
-        int[] dp = new int[X+1];
+        int[][] arr = new int[N][N];
 
-        dp[0] = 0;
-        dp[1] = 0;
+        StringTokenizer st;
+        for (int i = 0; i < N; i++) {
+            st = new StringTokenizer(br.readLine(), " ");
 
-        // 내가 생각한 코드
-//        for(int i=2;i<=X;i++){
-//            if(i % 2 == 0){
-//                dp[i] = Math.min(dp[i-1]+1,dp[i/2]+1);
-//            }
-//            if(i % 3 == 0){
-//                dp[i] = Math.min(dp[i-1]+1,dp[i/3]+1);
-//            }
-//        }
-
-        // 정답 코드
-        for (int i = 2; i <= X; i++){
-            dp[i] = dp[i-1] + 1;
-            if (i % 2 == 0) dp[i] = Math.min(dp[i], dp[i/2] + 1);
-            if (i % 3 == 0) dp[i] = Math.min(dp[i], dp[i/3] + 1);
+            for (int j = 0; j < i + 1; j++) {
+                arr[i][j] = Integer.parseInt(st.nextToken());
+            }
         }
 
-        for(int i=2;i<=X;i++){
-            System.out.println(dp[i]);
+        for(int i=N-2;i>=0;i--){
+            for(int j=0;j<=i;j++){
+                arr[i][j] = Math.max(arr[i+1][j],arr[i+1][j+1])+arr[i][j];
+            }
         }
+
+        System.out.println(arr[0][0]);
+
+
 
     }
-
-
-
 }

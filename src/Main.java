@@ -5,43 +5,71 @@ import java.util.*;
 
 public class Main {
 
-    // baekjoon - 1932 정수 삼각형
-    // 동적계획법의 가장 대표적인 문제라고 생각될만한 유형이고 프로그래머스에서 비슷한 문제를
-    // 풀어본 경험이 있어서 문제자체는 어렵지 않았다.
-    // 근데 백준이라는 사이트의 특성상 input을 직접 받아야 하기때문에 BufferedReader를 활용해야 하는데
-    // stringtokenizer를 쓰는 과정이 아직 완벽하지 않아서 오히려 입력을 받는 부분을 힘들어했다;;
-    // 다만 프로그래머스에서의 풀이와 달라진 부분은 프로그래머스는 위에서 아래로 내려오면서 계산했다면
-    // 이번엔 아래에서 위로 올라가면서 처리했다.
-    // 그러다 보니 맨 끝줄을 따로 처리해줘야하는 경우가 발생하지 않았고
-    // 보다 빠르고 편하게 코드를 완료할 수 있었다.
+    // baekjoon 11047번 동전 0
+    // 준규가 가지고 있는 동전은 총 N종류이고, 각각의 동전을 매우 많이 가지고 있다.
+    // 동전을 적절히 사용해서 그 가치의 합을 K로 만들려고 한다. 이때 필요한 동전 개수의 최솟값을 구하는 프로그램을 작성하시오.
+    // 가지고 있는 동전을 활용해서 특정 금액을 최소의 동전개수를 이용해 만드는 문제
+    // 최소의 동전을 활용하기 위해서는 큰 단위의 동전을 많이 사용해야 하니까 가장 큰 단위부터
+    // 채워가면서 활용하는 간단한 문제라고 생각했다.
+    // 처음에는 아래처럼 코드를 구현했는데 이런식으로하니 idx가 -1까지 가다보니 배열 범위를 벗어난다ㅠㅠ
+//    while(K != 0){
+//        K -= money[idx];
+//        coin++;
+//
+//        if(K == 0) break;
+//        while(K < money[idx]){
+//            idx--;
+//        }
+//    }
+
+    // 그 후에는 아래처럼 구현했다. idx로 가장 큰 단위를 구하고 for문을 돌렸는데 계속 오류가 발생했다.
+    // 단위만큼의 숫자를 빼는 등 로직이 맞는 것 같아서 한참 헤맸는데 idx가 아닌 i를 가지고 확인해야 했다.
+    // 어차피 초기 i=idx로 설정을 해놓은 상ㅇ태고 for문을 돌면서 i를 통해 확인을 해야 하는데
+    // idx만 체크하니까 가장 큰 단위에서만 계산이 발생했다.
+//    for(int i=idx;i>=0;i--){
+//        if(money[idx] <= K){
+//            coin += (K / money[idx]);
+//            K = K % money[idx];
+//        }
+//    }
+
 
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int N = Integer.parseInt(br.readLine());
+        String str = br.readLine();
 
-        int[][] arr = new int[N][N];
+        StringTokenizer stk = new StringTokenizer(str," ");
 
-        StringTokenizer st;
-        for (int i = 0; i < N; i++) {
-            st = new StringTokenizer(br.readLine(), " ");
+        int N = Integer.parseInt(stk.nextToken());
+        int K = Integer.parseInt(stk.nextToken());
 
-            for (int j = 0; j < i + 1; j++) {
-                arr[i][j] = Integer.parseInt(st.nextToken());
+        int[] money = new int[N];
+
+        int coin = 0;
+        int idx = 0;
+
+        for(int i=0;i<N;i++){
+            int delimeter = Integer.parseInt(br.readLine());
+            money[i] = delimeter;
+        }
+
+        for(int i=N-1;i>=0;i--){
+            if(money[i] <= K){
+                idx = i;
+                break;
             }
         }
 
-        for(int i=N-2;i>=0;i--){
-            for(int j=0;j<=i;j++){
-                arr[i][j] = Math.max(arr[i+1][j],arr[i+1][j+1])+arr[i][j];
+        for(int i=idx;i>=0;i--){
+            if(money[i] <= K){
+                coin += (K / money[i]);
+                K = K % money[i];
             }
         }
 
-        System.out.println(arr[0][0]);
-
-
-
+        System.out.println(coin);
     }
 }

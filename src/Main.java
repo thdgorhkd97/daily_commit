@@ -5,54 +5,81 @@ import java.util.*;
 
 public class Main {
 
-    // baekjoon 1541 - 잃어버린 괄호
-    // 세준이는 양수와 +, -, 그리고 괄호를 가지고 식을 만들었다. 그리고 나서 세준이는 괄호를 모두 지웠다.
-    // 그리고 나서 세준이는 괄호를 적절히 쳐서 이 식의 값을 최소로 만들려고 한다.
-    // 괄호를 적절히 쳐서 이 식의 값을 최소로 만드는 프로그램을 작성하시오.
+    // baekjoon 18258 - 큐 2
+//    push X: 정수 X를 큐에 넣는 연산이다.
+//    pop: 큐에서 가장 앞에 있는 정수를 빼고, 그 수를 출력한다. 만약 큐에 들어있는 정수가 없는 경우에는 -1을 출력한다.
+//    size: 큐에 들어있는 정수의 개수를 출력한다.
+//    empty: 큐가 비어있으면 1, 아니면 0을 출력한다.
+//    front: 큐의 가장 앞에 있는 정수를 출력한다. 만약 큐에 들어있는 정수가 없는 경우에는 -1을 출력한다.
+//    back: 큐의 가장 뒤에 있는 정수를 출력한다. 만약 큐에 들어있는 정수가 없는 경우에는 -1을 출력한다.
 
-    // 최소로 만들기 위해서는 최대한 큰 수를 빼줘야 하기 때문에 - 뒤를 크게 해줘야 한다는 생각을 했다.
-    // 그래서 처음에는 - 뒤에 있는 +를 더해준다고 했는데 그렇게 하니 - 다음을 체크하고 더한 다음
-    // 다시 확인하는 등 번거로웠다.
-    // 그 후 모든 +를 먼저 계산할까라는 생각을 했고 +만 있다면 문제가 해결되고 -가 있다 하더라도
-    // 어차피 가장 큰수를 빼려면 가장 큰수를 만들어야하니까 모든 +를 계산한다고 생각했다.
+    // 큐를 구현하는 알고리즘인데 대부분 큐에 구현된 함수를 이용하면 문제가 해결되지만
+    // 큐의 가장 마지막 원소를 구현하는 건 따로 구현을 해야 했다.
+    // 나는 따로 static 변수를 선언하여 offer 함수를 수행할 때 마지막 수를 따로 변수에 적고
+    // 가장 뒤에 있는 정수는 가장 마지막에 들어간 정수이기 때문에 back을 수행할 때는
+    // static 변수를 출력하도록 구현햇다.
+    // 구현은 했지만 좀 더 찾아보니 큐를 LinkedList로 구현해서
+    // q.peekLast()로 마지막 원소를 출력하는 것도 가능하다고 한다.
 
-    // 처음에는 +를 split으로 나눌 때 문자 그대로 봐야하기 때문에 \\을 추가해야 하는 부분에서 조금 막혓다
-    // -는 그대로 가능한데 +는 \\를 붙였어야 한다.
-    // 그 후 -를 토대로 split한 후에 +에 split한 것을 빼주었는데 이렇게 하니
-    // -가 없는 문자열이 주어지면 오류가 발생했다.
-    // 따라서 가장 먼저 나오는 수는 -가 아닌 양수이기 때문에
-    // 만약 처음이라면 그냥 그대로 두고 그 뒤부터는 -를 붙여 계산했다.
+    // java에서 큐에 대한 추가 정보!!
+    // 큐의 앞 부분인 front는 삭제 연산만 수행
+    // 큐의 뒷 부분 rear는 삽입 연산만 수행
+    // 주로 컴퓨터 버퍼에서 사용하며 대기열을 만들어 순차적으로 처리할 때 사용
+    // 데이터 삽입 : add, offer 중간이 아닌 맨 뒤로만 삽입 가능
+    // 데이터 삭제 : poll 맨 앞의 값 삭제, remove(Object) Object에 해당하는 값 삭제
+    //             poll -> 대기열이 비어있으면 null 반환
+    //             remove -> 대기열이 비어있으면 NoSuchElement 에러 반환
+    // 데이터 초기화 : clear
+    // 데이터 출력 : peek 맨 처름 넣은 값 확인 (모두 확인하려면 Iterator 사용)
+
+
+    static int late = 0;
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        String str = br.readLine();
+        int N = Integer.parseInt(br.readLine());
 
-        String[] sub = str.split("-"); // -를 기준으로 문자열을 나눈다.
+        Queue<Integer> que = new LinkedList<>();
 
-        int answer = 0;
+        for(int i=0;i<N;i++){
+            String str = br.readLine();
 
-        for(int i=0;i<sub.length;i++){
-            String[] plus = sub[i].split("\\+"); // -뒤에 있는 +로 계산하는 부분
-
-            int value = 0;
-            for(int j=0;j<plus.length;j++){
-                value += Integer.parseInt(plus[j]); // +로 연결된 수를 모두 계산한다.
-            }
-
-            if(i==0){ // 맨 앞의 수는 양수
-                answer = value;
-            }
-            else{ // 그 뒤는 앞에 -가 붙어 있는 부분이므로 뺀다.
-                answer -= value;
-            }
-
+            check(str,que);
         }
 
-        System.out.println(answer);
+    }
 
+    public static void check(String str, Queue<Integer> q){
+        switch(str){
+            case "pop" :
+                if(q.isEmpty()) System.out.println("-1");
+                else System.out.println(q.poll());
+                return ;
+            case "size" :
+                System.out.println(q.size());
+                return ;
+            case "empty" :
+                if(q.isEmpty()) System.out.println("1");
+                else System.out.println("0");
+                return ;
+            case "front" :
+                if(q.isEmpty()) System.out.println("-1");
+                else System.out.println(q.peek());
+                return ;
+            case "back" :
+                if(q.isEmpty()) System.out.println("-1");
+                else System.out.println(late);
+                return ;
+        }
 
+        if(str.contains("push")){
+            int X = Integer.parseInt(str.substring(5));
+            late = X;
+            q.offer(X);
+            return ;
+        }
 
     }
 }

@@ -5,71 +5,103 @@ import java.util.*;
 
 public class Main {
 
-    // programmers 신고 결과 받기
-    // hashmap을 활용해서 특정 조건에 맞는 key값에 해당하는 경우를 다 더하고
-    // int형 배열로 반환하는 문제
-    // hashmap에서 조금 문제가 생겼다. 처음에는 getOrDefault를 사용하면 될 줄 알았는데
-    // 자꾸 nullpointerexception이 발생해서 map.containskey()를 활용해보려 했다.
-    // 근데 분명 keyset으로 확인했을 때는 해당 키가 존재하는데 String으로 비교를 하니
-    // map.containskey()가 true가 반환되지 않았다...
-    // 그래서 조금 돌아가는 방법이기는 하지만 keyset을 통해 확인하는 과정에서
-    // if(id_list[i].equals(keyset)) 이렇게 아예 keyset과 비교하려고 했는데
-    // 이 경우 역시도 똑같은 문자열인데도 true로 들어가지 않는 문제가 발생했다...
-    // 문제 자체는 어렵지 않은 것 같은데 hash를 이용해서 key값이 일치하는지를 확인하고
-    // 그에 따라 value값을 저장하는 데 있어서 뭔가가 잘 안되는 것 같다 ㅠㅠ
-
+    // B사 코딩테스트 마지막 문제
+    // 삼각형 모양으로 구성되는 길이가 차이나는 문자열의 탑을
+    // 시계방향이나 반시계방향으로 돌렸을 때 나오는 문자열의 조합을 보낸다.
+    // 처음에는 어떻게 접근할 지 몰랐는데 여러가지 케이스를 두고 돌렸을 경우와
+    // 비교를 해보니 규칙을 찾을 수 있었다.
+    // 시계방향의 경우 오른쪽 아래에서부터 ㄴ자를 좌우반전시킨 모습의 모양을 가지는
+    // 인덱스의 조합을 돌리는 형태로 구현하면 가능하다.
+    // 규칙을 찾은 뒤부터는 index와 for문을 활용하는 문제였다.
+    // 다만 규칙을 찾는 과정이 쉽지 않았는데 단순히 하나만 보는 것이 아니라
+    // 줄을 추가하거나 길이를 줄이는 등 모든 경우에 적용 가능한 케이스를 찾기 위해
+    // 여러 케이스를 확인한 게 주요했다.
 
     public static void main(String[] args) throws IOException {
 
-        String[] id_list = {"muzi", "frodo", "apeach", "neo"};
+        String[] grid = {"A","MAN","DRINK","WATER11"};
+        boolean clockwise = false;
 
-        String[] report = {"muzi frodo","apeach frodo","frodo neo","muzi neo","apeach muzi"};
+        String[] answer = new String[grid.length];
 
-        int k = 2;
-
-        Map<String, Integer> map = new HashMap<>();
-        int[] answer = new int[id_list.length];
-
-        Set<String> set = new HashSet<>();
-
-        ArrayList<String> list = new ArrayList<>();
-
-        for(String str : report){
-            if(set.add(str)){
-                list.add(str);
+        Character[][] map = new Character[grid.length][];
+        for(int i=0;i<map.length;i++){
+            map[i] = new Character[grid[i].length()];
+        }
+        for(int i=0;i<grid.length;i++){
+            for(int j=0;j<grid[i].length();j++){
+                map[i][j] = grid[i].charAt(j);
             }
         }
 
-        for(int i=0;i<list.size();i++){
-            String str = list.get(i);
-
-            int idx = str.indexOf(" ");
-
-            String ing = str.substring(0,idx);
-            String pp = str.substring(idx);
-
-            map.put(pp, map.getOrDefault(pp,0)+1);
+        for(int i=0;i<map.length;i++){
+            for(int j=0;j<map[i].length;j++){
+                System.out.print(map[i][j] + " ");
+            }
+            System.out.println();
         }
+        System.out.println();
 
-        LinkedList<String> key = new LinkedList<>(map.keySet());
+        if(clockwise){
+            int pos = 0;
+            int idx = 0;
+            while(pos <= grid[grid.length-1].length()-1){
+                StringBuffer sb = new StringBuffer();
 
-        for(String keyset : key){
-            System.out.println(keyset + " " + map.get(keyset));
+                int row = grid.length-1;
+                int column = pos;
 
-            for(int i=0;i<id_list.length;i++){
-                System.out.println(id_list[i] + " 비교 " + keyset);
-                if(id_list[i].equals(keyset)){
-                    answer[i] = map.get(keyset);
-                    break;
+                while(row>=0 && column >= 0){
+                    sb.append(map[row][column]);
+                    if(column-1 >=0){
+                        sb.append(map[row][column-1]);
+                        column -= 1;
+                    }
+                    else{
+                        break;
+                    }
+                    row -= 1;
+                    column -= 1;
                 }
+
+                answer[idx] = sb.toString();
+                System.out.println(answer[idx]);
+                idx += 1;
+                pos += 2;
             }
-
-            System.out.println("-----------------------------------");
         }
 
-        for(int i=0;i< id_list.length;i++){
-            System.out.println(answer[i]);
+        else{
+            int idx = 0;
+            int len = grid.length-1;
+
+            while(len >= 0) {
+                int pos = grid[len].length() - 1;
+                StringBuffer sb = new StringBuffer();
+
+                int row = len;
+                int column = pos;
+
+                while(row <= grid.length-1){
+                    sb.append(map[row][column]);
+
+                    if(row + 1 > grid.length-1){
+
+                        answer[idx] = sb.toString();
+                        idx++;
+                        break;
+                    }
+                    else{
+                        sb.append(map[row+1][column+1]);
+
+                    }
+                    row += 1;
+                }
+
+                len--;
+            }
         }
+
 
 
 

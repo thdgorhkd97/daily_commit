@@ -5,76 +5,71 @@ import java.util.*;
 
 public class Main {
 
-    // programmers kakao blind test - 신고 결과 받기
-    // 2일전인가 3일전에 해봤던 문제인데 완벽히 해결하지 못해서 다시 시도해 보았다.
-    // 처음에는 문제에서 구하라는 부분을 잘못 이해해서 문제를 해결하던 도중에 로직을 끝내는 실수를 했었고
-    // substring을 하는 부분에서 startIdx는 바로 그 idx부터인데 신고당한 사람의 아이디를 잘못 자르는 실수를 했었다.
-    // 이번엔 조금 길수도 있지만 차근차근 문제에서 구하라는 그대로 따라가면서 문제를 해결해보았다.
-    // 다만 list나 set, 배열을 생각보다 많이 선언했기 때문에 메모리 측면에서는 조금 마음에 들지 않는다.
-    // String[] report를 잘라서 신고한 사람과 신고당한 사람을 나누는 과정을 2번 반복했는데 이러지 말고
-    // 아예 신고한 사람과 신고당한 사람에 대한 map을 다시 만드는 건 어땠을 까 싶다.
+    // baekjoon 11866 요세푸스 순열
+//    요세푸스 문제는 다음과 같다.
+//
+//    1번부터 N번까지 N명의 사람이 원을 이루면서 앉아있고, 양의 정수 K(≤ N)가 주어진다.
+//    이제 순서대로 K번째 사람을 제거한다. 한 사람이 제거되면 남은 사람들로 이루어진 원을 따라 이 과정을 계속해 나간다. 이 과정은 N명의 사람이 모두 제거될 때까지 계속된다. 원에서 사람들이 제거되는 순서를 (N, K)-요세푸스 순열이라고 한다.
+//    예를 들어 (7, 3)-요세푸스 순열은 <3, 6, 2, 7, 5, 1, 4>이다.
 
+    // 처음에는 K번째 수가 될 때까지 idx를 더하다가 K가 되면 그때 answer에 넣는 식으로 한다는 걸 생각했는데
+    // idx를 초기화해주지 않는 실수를 해서 한 번 실패했었다.
+
+    // K-1까지 for문으로 반복문을 돌리는 방식이나 idx++의 방식이나 똑같다고 생각했는데 결과는 그렇지 않다.
+    // for문을 활용하는 2번 방식은 문제를 해결할 수 있는데 내가 처음에 생각한 idx++해서 K랑 같은지 확인하는
+    // 1번 방식은 채점 도중 61%에서 시간초과가 발생한다ㅠㅠㅠㅠ
+    // 근데 이 이유를 도저히 모르겠어서 오래 고민했다 ㅠㅠ
+    // 시간초과가 발생한다는 건 while문을 빠져나오지 못한다는 것이고 그렇다면 que가 isEmpty()가 되지 않는다는 거니까
+    // 혹시 N이 1일때 케이스에 대해서 이미 1인 N에 ++을 계속해서 못 나오지 않나 싶어서
+    // if문으로 N==1에 대해서 따로 분기를 두었는데도 시간 초과가 똑같이 발생했다....
+    // 테스트 케이스도 없고 어떤 경우인지 알 수가 없어서 정말 오래 고민했는데 끝까지 알 수가 없다ㅠㅠ
 
     public static void main(String[] args) throws IOException {
 
-        String[] id_list = {"muzi", "frodo", "apeach", "neo"};
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        String[] report = {"muzi frodo","apeach frodo","frodo neo","muzi neo","apeach muzi"};
+        String str = br.readLine();
 
-        int k = 2;
+        StringTokenizer stk = new StringTokenizer(str);
 
-        Map<String,Integer> map = new HashMap<>();
+        int N = Integer.parseInt(stk.nextToken());
+        int K = Integer.parseInt(stk.nextToken());
 
-        Set<String> set = new HashSet<>();
-        ArrayList<String> list = new ArrayList<>();
+        Queue<Integer> que = new LinkedList<>();
 
-        for(String str : report){
-            if(set.add(str)){ // 중복된 신고는 1회만 인정한다.
-                list.add(str);
-            }
+        for(int i=1;i<=N;i++){
+            que.offer(i);
         }
 
-        for(String str : list){
+        ArrayList<Integer> answer = new ArrayList<>();
 
-            int idx = str.indexOf(" "); // 공백을 기준으로 신고한 사람과 신고당한사람의 이름이 나뉘어진다.
+        // 1번 방식
+//        int idx = 1;
+//        while(!que.isEmpty()){
+//            que.offer(que.poll());
+//            idx += 1;
+//            if(idx == K){
+//                answer.add(que.poll());
+//                idx=1;
+//            }
+//        }
 
-            String ing = str.substring(0,idx); // 신고한 사람
-            String pp = str.substring(idx+1); // 신고당한 사람
-
-            map.put(pp, map.getOrDefault(pp,0)+1); // 신고당한 사람의 횟수를 1더한다.
+        // 2번 방식
+        while(!que.isEmpty()){
+            for(int i=0;i<K-1;i++){
+                que.offer(que.poll());
+            }
+            answer.add(que.poll());
         }
 
-        int[] answer = new int[id_list.length];
-
-        ArrayList<String> stopUser = new ArrayList<>(); // 정지당한 유저의 리스트
-
-        for(int i=0;i< id_list.length;i++){
-            if(map.containsKey(id_list[i]) && map.get(id_list[i])>=k){ // 신고당한 적있고 그 횟수가 k번 이상이라면
-                stopUser.add(id_list[i]); // 정지당한 유저에 추가한다
-            }
+        System.out.print("<");
+        for(int i=0;i<answer.size()-1;i++){
+            System.out.print(answer.get(i)+", ");
         }
+        System.out.print(answer.get(answer.size()-1));
+        System.out.print(">");
 
-        Map<String, Integer> result = new HashMap<>();
-        for(String str : list){
-            int idx = str.indexOf(" ");
 
-            String ing = str.substring(0,idx); // 신고한 사람
-            String pp = str.substring(idx+1); // 신고당한 사람
-
-            if(stopUser.contains(pp)){ // 신고당한 사람이 이미 정지된 유저라면
-                result.put(ing,result.getOrDefault(ing,0)+1); // 정지된 유저를 신고한 사람에 대해 1을 더한다.
-            }
-        }
-
-        for(int i=0;i<answer.length;i++){
-            if(result.containsKey(id_list[i])){ // 정지된 유저를 신고한 적 있다면
-                answer[i] = result.get(id_list[i]); // 정답 배열에서 1을 더한다.
-            }
-            else{
-                answer[i]=0;
-            }
-
-        }
 
 
 

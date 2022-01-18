@@ -5,73 +5,83 @@ import java.util.*;
 
 public class Main {
 
-    // baekjoon 11866 요세푸스 순열
-//    요세푸스 문제는 다음과 같다.
-//
-//    1번부터 N번까지 N명의 사람이 원을 이루면서 앉아있고, 양의 정수 K(≤ N)가 주어진다.
-//    이제 순서대로 K번째 사람을 제거한다. 한 사람이 제거되면 남은 사람들로 이루어진 원을 따라 이 과정을 계속해 나간다. 이 과정은 N명의 사람이 모두 제거될 때까지 계속된다. 원에서 사람들이 제거되는 순서를 (N, K)-요세푸스 순열이라고 한다.
-//    예를 들어 (7, 3)-요세푸스 순열은 <3, 6, 2, 7, 5, 1, 4>이다.
+    // programmers 줄 서는 방법
+//    사람의 수 n과, 자연수 k가 주어질 때, 사람을 나열 하는 방법을 사전 순으로 나열 했을 때,
+//    k번째 방법을 return하는 solution 함수를 완성해주세요.
+//    예를 들어서 3명의 사람이 있다면 다음과 같이 6개의 방법이 있습니다.
+//        [1, 2, 3]         [1, 3, 2]
+//        [2, 3, 1]         [3, 1, 2]
+//        [2, 1, 3]         [3, 2, 1]
 
-    // 처음에는 K번째 수가 될 때까지 idx를 더하다가 K가 되면 그때 answer에 넣는 식으로 한다는 걸 생각했는데
-    // idx를 초기화해주지 않는 실수를 해서 한 번 실패했었다.
+    // n명을 세웠을 때 나열하는 순서 중 k번째 방법을 구해야 하기 때문에 먼저 사전 순서대로
+    // n명을 세우는 방법을 구하기 위해 순열을 활용했다.
+    // 원래 n명중 n명을 구하는 조합을 구할때 사전순서를 챙기지 않는 순열을 주로 활용했는데
+    // 문제에서 사전 순서를 원하기 때문에 순서를 챙기기 위해서 visited[i]를 활용한
+    // 순열을 활용했다.
+    // 나는 이중배열에 result[n!][n]을 만들어서 사전 순서로 이루어지는 사람 순서를
+    // result배열에 모두 집어넣고 k번째를 구해야하니 result[k-1][0]...result[k-1][n-1]을 구했다.
+    // 이 결과 정확성테스트 12/14 성공(2가지는 메모리 초과) 효율성 테스트 실패가 나왔다.
+    // n!의 결과가 나오기 때문에 n이 20이하의 자연수라해도 20!이 되어 엄청 크다ㅠㅠ
+    // 아예 시간을 줄이기 위해서는 순열을 이용한 방법은 옳지 않은 것 같다.
+    // 그래서 고민을 해봤는데 다르게 생각해보면 k번째 방법만 구하면 되기 때문에 k에 따라서
+    // 앞자리나 특정 자리의 수를 결정하는 것이 가능하지 않을까 싶다.
+    // 근데 확실한 로직이 떠오르지는 않아서 조금 더 고민해봐야 할 것 같다.
 
-    // K-1까지 for문으로 반복문을 돌리는 방식이나 idx++의 방식이나 똑같다고 생각했는데 결과는 그렇지 않다.
-    // for문을 활용하는 2번 방식은 문제를 해결할 수 있는데 내가 처음에 생각한 idx++해서 K랑 같은지 확인하는
-    // 1번 방식은 채점 도중 61%에서 시간초과가 발생한다ㅠㅠㅠㅠ
-    // 근데 이 이유를 도저히 모르겠어서 오래 고민했다 ㅠㅠ
-    // 시간초과가 발생한다는 건 while문을 빠져나오지 못한다는 것이고 그렇다면 que가 isEmpty()가 되지 않는다는 거니까
-    // 혹시 N이 1일때 케이스에 대해서 이미 1인 N에 ++을 계속해서 못 나오지 않나 싶어서
-    // if문으로 N==1에 대해서 따로 분기를 두었는데도 시간 초과가 똑같이 발생했다....
-    // 테스트 케이스도 없고 어떤 경우인지 알 수가 없어서 정말 오래 고민했는데 끝까지 알 수가 없다ㅠㅠ
+
+    static int[] arr;
+    static boolean[] visited;
+    static int[][] result;
+    static int idx = 0;
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = 3;
+        long k = 5;
 
-        String str = br.readLine();
+        int[] answer = new int[n];
+        int[] output = new int[n];
+        visited = new boolean[n];
 
-        StringTokenizer stk = new StringTokenizer(str);
+        arr = new int[n];
 
-        int N = Integer.parseInt(stk.nextToken());
-        int K = Integer.parseInt(stk.nextToken());
-
-        Queue<Integer> que = new LinkedList<>();
-
-        for(int i=1;i<=N;i++){
-            que.offer(i);
+        int factorial = 1;
+        for(int i=n;i>=1;i--){
+            factorial *= i;
         }
 
-        ArrayList<Integer> answer = new ArrayList<>();
+        result = new int[factorial][n];
 
-        // 1번 방식
-//        int idx = 1;
-//        while(!que.isEmpty()){
-//            que.offer(que.poll());
-//            idx += 1;
-//            if(idx == K){
-//                answer.add(que.poll());
-//                idx=1;
-//            }
-//        }
-
-        // 2번 방식
-        while(!que.isEmpty()){
-            for(int i=0;i<K-1;i++){
-                que.offer(que.poll());
-            }
-            answer.add(que.poll());
+        for(int i=0;i<n;i++){
+            arr[i] = i+1;
         }
 
-        System.out.print("<");
-        for(int i=0;i<answer.size()-1;i++){
-            System.out.print(answer.get(i)+", ");
+        perm(arr,output,visited,0,n,n);
+
+        for(int i=0;i<n;i++){
+            answer[i] = result[(int)k-1][i];
         }
-        System.out.print(answer.get(answer.size()-1));
-        System.out.print(">");
-
-
-
-
 
     }
+
+    static void perm(int[] arr, int[] output, boolean[] visited, int depth,int n,int r){
+        if(depth==r){
+            for(int i=0;i< output.length;i++){
+                result[idx][i] = output[i];
+            }
+            idx++;
+            return;
+
+        }
+
+        for(int i=0;i<n;i++){
+            if(!visited[i]){
+                visited[i] = true;
+                output[depth] = arr[i];
+                perm(arr,output,visited,depth+1,n,r);
+                visited[i] = false;
+            }
+        }
+    }
+
+
 }

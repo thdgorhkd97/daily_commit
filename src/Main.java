@@ -6,82 +6,61 @@ import java.util.*;
 public class Main {
 
     // programmers 줄 서는 방법
-//    사람의 수 n과, 자연수 k가 주어질 때, 사람을 나열 하는 방법을 사전 순으로 나열 했을 때,
-//    k번째 방법을 return하는 solution 함수를 완성해주세요.
-//    예를 들어서 3명의 사람이 있다면 다음과 같이 6개의 방법이 있습니다.
-//        [1, 2, 3]         [1, 3, 2]
-//        [2, 3, 1]         [3, 1, 2]
-//        [2, 1, 3]         [3, 2, 1]
+    // 어제 대충 자릿수를 구해서 하면 되지 않을가 싶었는데 모든 경우에 통용되는 로직을
+    // 모르겠어서 결국 로직을 알아보고서야 해결했다 ㅠㅠ 이해하는데 너무 오래 걸렸다...
 
-    // n명을 세웠을 때 나열하는 순서 중 k번째 방법을 구해야 하기 때문에 먼저 사전 순서대로
-    // n명을 세우는 방법을 구하기 위해 순열을 활용했다.
-    // 원래 n명중 n명을 구하는 조합을 구할때 사전순서를 챙기지 않는 순열을 주로 활용했는데
-    // 문제에서 사전 순서를 원하기 때문에 순서를 챙기기 위해서 visited[i]를 활용한
-    // 순열을 활용했다.
-    // 나는 이중배열에 result[n!][n]을 만들어서 사전 순서로 이루어지는 사람 순서를
-    // result배열에 모두 집어넣고 k번째를 구해야하니 result[k-1][0]...result[k-1][n-1]을 구했다.
-    // 이 결과 정확성테스트 12/14 성공(2가지는 메모리 초과) 효율성 테스트 실패가 나왔다.
-    // n!의 결과가 나오기 때문에 n이 20이하의 자연수라해도 20!이 되어 엄청 크다ㅠㅠ
-    // 아예 시간을 줄이기 위해서는 순열을 이용한 방법은 옳지 않은 것 같다.
-    // 그래서 고민을 해봤는데 다르게 생각해보면 k번째 방법만 구하면 되기 때문에 k에 따라서
-    // 앞자리나 특정 자리의 수를 결정하는 것이 가능하지 않을까 싶다.
-    // 근데 확실한 로직이 떠오르지는 않아서 조금 더 고민해봐야 할 것 같다.
-
-
-    static int[] arr;
-    static boolean[] visited;
-    static int[][] result;
-    static int idx = 0;
 
     public static void main(String[] args) throws IOException {
 
         int n = 3;
         long k = 5;
 
+        ArrayList<Integer> list = new ArrayList<>();
+
         int[] answer = new int[n];
-        int[] output = new int[n];
-        visited = new boolean[n];
 
-        arr = new int[n];
+        long factorial = 1;
+        for(int i=1;i<=n;i++){
+            factorial *= i; // n!을 구함 -> 가능한 모든 경우의 수
+            list.add(i);
+        }
+        k = k-1; // 배열의 idx는 0부터 시작이므로 k=5라면 전체 경우의 수 중 4번째 걸 구해야 한다.
 
-        int factorial = 1;
-        for(int i=n;i>=1;i--){
-            factorial *= i;
+        int idx= 0;
+        while(n > 0){ // n--를 해가면서 n번째 까지의 idx를 추가해야 한다. ex) n=3이면 3번째 idx까지 지정
+            factorial /= n; // n번째 자리수를 결정
+
+            answer[idx++] = list.get((int) (k/factorial));
+
+            list.remove((int) (k / factorial));
+            k %= factorial;
+
+            n--;
+        }
+        // 처음에 factorial = 2가 되고 (2번째 자리수를 결정한다는 것)
+        // answer[idx = 0] = list.get((int) k=5/factorial=2)
+        //                 = list.get((int) 2)
+        //                 = list.get(2) = 3
+        // 그 후 list.remove로 3을 제외한다. 이미 줄 세웠으므로
+        // k = 5 % factorial = 2 -> k=1로 변경
+        // n = 3에서 2로 변경
+
+        // 2번째 while 문
+        // factorial = 1이 되고
+        // answer[idx = 1] = list.get((int) k=1/factorial=1)
+        //                 = list.get(1) = 1
+        // 그 후 list.remove로 1을 제외한다.
+        // k = 1 % 1 = 0이 된다.
+
+        // 이런 식으로 n번째 자리를 결정하기 위해서 k/factorial의 list idx를 결정한다.
+
+
+        for(int i=0;i<answer.length;i++){
+            System.out.print(answer[i]+" ");
         }
 
-        result = new int[factorial][n];
 
-        for(int i=0;i<n;i++){
-            arr[i] = i+1;
-        }
 
-        perm(arr,output,visited,0,n,n);
-
-        for(int i=0;i<n;i++){
-            answer[i] = result[(int)k-1][i];
-        }
 
     }
-
-    static void perm(int[] arr, int[] output, boolean[] visited, int depth,int n,int r){
-        if(depth==r){
-            for(int i=0;i< output.length;i++){
-                result[idx][i] = output[i];
-            }
-            idx++;
-            return;
-
-        }
-
-        for(int i=0;i<n;i++){
-            if(!visited[i]){
-                visited[i] = true;
-                output[depth] = arr[i];
-                perm(arr,output,visited,depth+1,n,r);
-                visited[i] = false;
-            }
-        }
-    }
-
-
 }

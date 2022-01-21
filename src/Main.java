@@ -5,24 +5,24 @@ import java.util.*;
 
 public class Main {
 
-    // java 1920 수 찾기
-    // N개의 정수 A[1], A[2], …, A[N]이 주어져 있을 때, 이 안에 X라는 정수가 존재하는지 알아내는 프로그램을 작성하시오.
-    // 배열에 있는지 확인하기 위해서 for문으로 하나하나 확인하다 보면 상당히 오래 걸린다.
-    // 이분탐색이 빠른 건 알고 있는데 얼마나 빠른지는 몰랐다.
-    // 이분탐색 : O(logN) 인 반면 for문으로 확인할 땐 O(N)이 나온다.
-    // 이분탐색은 반드시!! 정렬된 배열에서 사용 가능하다!!
-    // 이분탐색에서 min은 탐색 범위의 왼쪽 끝 인덱스를 의미하고 max는 가장 끝 인덱스를 의미한다.
-    // while문의 종료 조건은 min < max 이다(인덱스를 역전할 때까지)
-    // while문 내에서 mid값(중간값)을 구하고 배열내의 mid 인덱스 값과 value를 비교한다.
-    // 만약 arr[mid] > value 라면 arr 배열 내에서 더 앞쪽에 있다는 것이므로
-    // max = mid - 1로 해서 min과 max 의 범위를 value가 있는 arr 배열의 앞 부분으로 수정한다.
-    // 이런 식으로 value 값의 범위를 맞춰가면서 arr 과 비교한다.
-
-    // *** Arrays.binarySearch 메소드와의 비교 ***
-    // 위 방식과 거의 유사하지만 차이점은 음수값을 기존 리스트에서 어느 값 사이에 있는지 알 수 있도록
-    // 반환 한다는 차이가 있다고 한다.
-    // ex [2,4,7,8] 에서 3을 찾고자 하면 음수를 반환하는데 3은 2와 4사이에 있어야 하므로 -2를 반환
-    // 자바에서는 음수 값을 -(low+1)로 반환하기 때문이다.
+    // java 10816 - 숫자 카드 2
+    // 이분탐색으로 분류된 문제라서 이분탐색으로 풀어봤는데 결국 처음 생각한대로
+    // hashmap을 활용해서 마무리 하였다
+    // 우선 arr배열중에서 특정수가 얼마나 있는지 체크하는 문제였기 때문에 arr배열에 있는 수를
+    // hashmap에 집어넣고 몇개 있는지 찾고자 하는 수가 key로 존재한다면 그 value값을
+    // 존재하지 않는다면 0을 출력하도록 하여 해결하는 데는 전혀 문제가 없었다.
+    // 근데 이 문제는 이분탐색 문제로 분류되어 있었기 때문에 이분탐색으로 해결해보려고 노력했다.
+    // 먼저 이분탐색을 통해서 특정 수가 arr배열에 있는지 없는지를 확인하는 것은 그리 어렵지 않다.
+    // 근데 있다 없다가 아니라 몇 개 있는지를 알아내야 했기 때문에 내가 선택한 방식은
+    // mid인덱스를 기준으로 앞쪽과 뒤쪽으로 같은 원소가 있는지를 체크해서 idx의 범위를 구하는 방식이었다
+    // 만약 arr[mid]가 num과 같다면 num은 arr에 존재하는 것이기 때문에 arr[mid-1], arr[mid-2]...이런 식으로
+    // arr[mid]를 기준으로 앞과 뒤를 보면서 arr배열에서 num과 같은 원소를 가지는 인덱스의 범위를 구하는 것이다.
+    // 이렇게 나는 그 원소가 arr에 있는지 확인하고 있다면 인덱스의 범위를 찾는 방식으로 했는데
+    // 조금 찾아보니 처음부터 원소의 upper bound와 lower bound를 찾는 방식이 있었다.
+    // 찾고자 하는 수의 이상과 초과를 가지는 원소의 인덱스를 찾는 방식이다.
+    // 만약 arr 배열에 원소가 있다면 나와 같은 방식으로 arr배열의 인덱스 범위가 나오고
+    // arr 배열에 없다면 이상과 초과를 뜻하는 인덱스가 같은 인덱스를 가르키게 되기 때문에
+    // 존재하지 않는다는 것을 쉽게 알 수 있는 방법이 있다.
 
     public static void main(String[] args) throws IOException {
 
@@ -33,55 +33,90 @@ public class Main {
         int[] arr = new int[N];
 
         String str = br.readLine();
-        StringTokenizer stk = new StringTokenizer(str," ");
 
-        for(int i=0;i<N;i++){
+        StringTokenizer stk = new StringTokenizer(str, " ");
+
+        HashMap<Integer,Integer> map = new HashMap<>();
+
+        for (int i = 0; i < N; i++) {
             arr[i] = Integer.parseInt(stk.nextToken());
+            map.put(arr[i],map.getOrDefault(arr[i],0)+1);
         }
 
         Arrays.sort(arr);
 
-        for(int i=0;i<N;i++){
-            System.out.print(arr[i] + " ");
-        }
-        System.out.println();
-
         int M = Integer.parseInt(br.readLine());
 
         str = br.readLine();
-        stk = new StringTokenizer(str," ");
+        stk = new StringTokenizer(str, " ");
+
+        int[] answer = new int[M];
+
+        StringBuffer sb = new StringBuffer();
         for(int i=0;i<M;i++){
-            check(arr,Integer.parseInt(stk.nextToken()));
+            int num = Integer.parseInt(stk.nextToken());
+
+            sb.append(map.getOrDefault(num,0)).append(' ');
+
         }
 
+        System.out.println(sb.toString());
+
+
+
+//        int[] answer = new int[M];
+//
+//        for(int i=0;i<M;i++){
+//            int num = Integer.parseInt(stk.nextToken());
+//            answer[i] = check(arr,num);
+//        }
+//
+//
+//        for(int i=0;i<M;i++){
+//            System.out.print(answer[i] + " ");
+//        }
+//
+//
+//    }
+//
+//    static int check(int[] arr, int num){
+//
+//        int min = 0;
+//        int max = arr.length-1;
+//        int cnt = 0;
+//        while(min < max){
+//            int mid = (min+max) / 2;
+//
+//            if(arr[mid] > num){
+//                max = mid - 1;
+//            }
+//            else if(arr[mid] < num){
+//                min = mid + 1;
+//            }
+//            else{ // arr에 num이 존재합니다
+//                int left = 0;
+//                int right = arr.length-1;
+//
+//                for(int i=mid;i>=0 ;i--){
+//                    if(arr[i] != num){
+//                        left = i+1;
+//                        break;
+//                    }
+//                }
+//                for(int i=mid+1;i<arr.length;i++){
+//                    if(arr[i] != num){
+//                        right = i-1;
+//                        break;
+//                    }
+//                }
+//                cnt = right - left + 1;
+//                break;
+//            }
+//        }
+//
+//        return cnt;
+//
+//    }
+//}
     }
-
-    static void check(int[] arr, int num){
-
-        int min = 0;
-        int max = arr.length-1;
-
-        if(num < arr[0] || num > arr[max]){
-            System.out.println("0");
-            return ;
-        }
-
-        while(min <= max){
-            int mid = (min+max) / 2;
-
-            if(arr[mid] > num){
-                max = mid - 1;
-            }
-            else if(arr[mid] < num){
-                min = mid + 1;
-            }
-            else{
-                System.out.println("1");
-                return ;
-            }
-        }
-
-        System.out.println("0");
-    }
-
 }

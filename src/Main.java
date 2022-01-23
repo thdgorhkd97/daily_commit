@@ -5,50 +5,101 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 1655 가운데를 말해요
-    // 문제에서 요구하는 건 쉽다. 정렬된 값들 중 중간값을 찾아서 리턴하면 된다.
-    // 근데 N의 범위가 100,000이기 때문에 반드시 시간초과가 발생할 것이므로
-    // 우선순위 큐를 활용하기로 했다 (우선순위 큐에 분류된 문제지만 왜 우선순위 큐를 활용해야 할까 생각했다)
-    // 최대 힙과 최소 힙의 크기가 같은 경우에는 반드시 최대 힙으로 푸시한다
-    // 최대 힙과 최소 힙의 크기가 같다면 중간 값중 작은 수를 말해야 하기 때문이다.
-    // 그럼 그냥 푸시된 최대 힙의 peek()를 리턴하면 된다.
-    // 근데 크기가 다를 때 최대 힙에 수를 푸시했을 때 만약 최대 힙의 peek가 최소힙의 peek와
-    // 크기 비교했을 때 최대 힙의 peek가 더 크면 최소 힙과 위치를 바꿔줘야 한다.
-    // 그래야지 홀수개 일때 최대 힙의 peek값이 중간값이 되기 때문이다.
+    // java 4949 균형잡힌 세상
+    // 아래 주석처리된 부분은 내가 처음에 단순히 ( [ 와 ) ] 의 개수를 세서
+    // 일치하는지만 체크했던 문제 부분이다. 그 부분이 왜 문제가 되냐면 문제의 조건 중에서
+    // "짝을 이루는 두 괄호가 있을 때, 그 사이에 있는 문자열도 균형이 잡혀야 한다."
+    // 이 부분때문에 문제가 된다.
+    // 전체적인 괄호의 개수가 균형잡혀 있더라도 일부분에서 균형이 무너지면 안 되기 때문이다.
+    // 그래서 하나하나씩 꺼내보면서 확인해야 하는 스택을 활용하기로 했다
+    // 열린 괄호라면 스택에 그대로 추가하고 닫힌 괄호라면 경우를 조금 나눈다.
+    // 닫힌 괄호인데 만약 스택이 비어있거나(열린 괄호가 없는데 닫힌 괄호가 나온 경우)
+    // stack의 pop이 짝에 맞는 괄호가 아니라면 ( ( - ) [ - ] ) no를 반환해야 한다.
+    // stack이 비어있지도 않고 짝에 맞는 괄호가 stack의 맨 위에 있다면
+    // 균형이 맞기 때문에 stack에서 빼내고 그 stack의 다음 문자가 맨 위에 있게 한다.
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int N = Integer.parseInt(br.readLine());
+        while(true){
 
-        PriorityQueue<Integer> maxQue = new PriorityQueue<>(Comparator.reverseOrder());
-        PriorityQueue<Integer> minQue = new PriorityQueue<>();
+            String str = br.readLine();
 
-        for(int i=0;i<N;i++){
-            int num = Integer.parseInt(br.readLine());
+            check(str);
+        }
 
-            if(maxQue.size() == minQue.size()){ // 크기가 같으면 최대힙에 넣는다
-                maxQue.add(num);
+    }
 
-                if(!minQue.isEmpty() && maxQue.peek() > minQue.peek()){
-                    minQue.add(maxQue.poll());
-                    maxQue.add(minQue.poll());
-                }
-            }
-            else{
-                minQue.add(num);
+    static void check(String str){
 
-                if(maxQue.peek() > minQue.peek()){
-                    minQue.add(maxQue.poll());
-                    maxQue.add(minQue.poll());
-                }
+        Stack<Character> stack = new Stack<>();
+
+        for(int i=0;i<str.length();i++){
+            char ch = str.charAt(i);
+
+            if(ch=='(' || ch=='['){
+                stack.push(ch);
             }
 
-            System.out.println(maxQue.peek());
+            else if(ch == ')'){
+                if(stack.empty() || stack.peek()!='('){
+                    System.out.println("no");
+                    return ;
+                }
+                else{
+                    stack.pop();
+                }
+            }
+
+            else if(ch == ']'){
+                if(stack.empty() || stack.peek()!='['){
+                    System.out.println("no");
+                    return ;
+                }
+                else{
+                    stack.pop();
+                }
+            }
+        }
+
+        if(stack.empty()){
+            System.out.println("yes");
+        }
+        else{
+            System.out.println("no");
         }
 
 
+//        int leftSmall = 0; // (
+//        int rightSmall = 0; // )
+//        int leftBig = 0; // [
+//        int rightBig = 0; // ]
+//
+//        System.out.println(str);
+//
+//        for(int i=0;i<str.length();i++) {
+//            char ch = str.charAt(i);
+//
+//            switch (ch){
+//                case '(' : leftSmall++; break;
+//                case ')' : rightSmall++; break;
+//                case '[' : leftBig++; break;
+//                case ']' : rightBig++; break;
+//            }
+//
+//            if(leftSmall < rightSmall || leftBig < rightBig){
+//                System.out.println("no");
+//                return ;
+//            }
+//        }
+//
+//        if(leftBig == rightBig && leftSmall == rightSmall){
+//            System.out.println("yes");
+//        }
+//        else System.out.println("no");
+
 
     }
+
 }

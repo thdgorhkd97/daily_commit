@@ -5,101 +5,112 @@ import java.util.*;
 
 public class Main {
 
-    // java 4949 균형잡힌 세상
-    // 아래 주석처리된 부분은 내가 처음에 단순히 ( [ 와 ) ] 의 개수를 세서
-    // 일치하는지만 체크했던 문제 부분이다. 그 부분이 왜 문제가 되냐면 문제의 조건 중에서
-    // "짝을 이루는 두 괄호가 있을 때, 그 사이에 있는 문자열도 균형이 잡혀야 한다."
-    // 이 부분때문에 문제가 된다.
-    // 전체적인 괄호의 개수가 균형잡혀 있더라도 일부분에서 균형이 무너지면 안 되기 때문이다.
-    // 그래서 하나하나씩 꺼내보면서 확인해야 하는 스택을 활용하기로 했다
-    // 열린 괄호라면 스택에 그대로 추가하고 닫힌 괄호라면 경우를 조금 나눈다.
-    // 닫힌 괄호인데 만약 스택이 비어있거나(열린 괄호가 없는데 닫힌 괄호가 나온 경우)
-    // stack의 pop이 짝에 맞는 괄호가 아니라면 ( ( - ) [ - ] ) no를 반환해야 한다.
-    // stack이 비어있지도 않고 짝에 맞는 괄호가 stack의 맨 위에 있다면
-    // 균형이 맞기 때문에 stack에서 빼내고 그 stack의 다음 문자가 맨 위에 있게 한다.
+    // java baekjoon 2798 - 블랙잭
+    // 3장을 골라서 가장 M에 가까운 조합을 고르는 문제
+    // 3중 for문을 활용하였고 문제 조건에 의해서 M을 넘지 않는 조건과 가장 가까운 조건을 추가하여
+    // 최소의 차이를 가지는 조합을 구하면 되는 문제
+
+    // java baekjoon 7568 - 덩치
+    // 각 사람의 키와 몸무게를 Body class로 저장하여 반복문을 통해 비교하였다.
+    // man[i] = new Body(0,0); 생성한 클래스 객체를 new 키워드를 통해서
+    // 실제 객체를 생성해주지 않아서 NullPointerException이 발생했었다.
+
+    // 따로 어떤 자료구조나 알고리즘이 필요한 문제가 아니라 문제의 조건에 맞춰서
+    // 모든 조건을 확인하는 반복문을 활용한 문제였기 때문에 2문제를 해결했다.
+
+
+    public static class Body{
+        int height;
+        int weight;
+
+        public Body(int height, int weight){
+            this.height = height;
+            this.weight = weight;
+        }
+    }
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        while(true){
+        int N = Integer.parseInt(br.readLine());
 
+        Body[] man = new Body[N];
+
+        for(int i=0;i<N;i++) {
             String str = br.readLine();
 
-            check(str);
+            StringTokenizer stk = new StringTokenizer(str," ");
+
+            man[i] = new Body(0,0);
+
+            int kg = Integer.parseInt(stk.nextToken());
+            int cm = Integer.parseInt(stk.nextToken());
+
+            man[i].height = cm;
+            man[i].weight = kg;
+
         }
 
-    }
+        int[] grade = new int[N];
 
-    static void check(String str){
-
-        Stack<Character> stack = new Stack<>();
-
-        for(int i=0;i<str.length();i++){
-            char ch = str.charAt(i);
-
-            if(ch=='(' || ch=='['){
-                stack.push(ch);
-            }
-
-            else if(ch == ')'){
-                if(stack.empty() || stack.peek()!='('){
-                    System.out.println("no");
-                    return ;
-                }
-                else{
-                    stack.pop();
+        for(int i=0;i<N;i++){
+            int cnt = 0;
+            for(int j=0;j<N;j++){
+                if(man[i].height < man[j].height && man[i].weight < man[j].weight){
+                    cnt++;
                 }
             }
 
-            else if(ch == ']'){
-                if(stack.empty() || stack.peek()!='['){
-                    System.out.println("no");
-                    return ;
-                }
-                else{
-                    stack.pop();
+            grade[i] = cnt+1;
+        }
+
+        for(int i=0;i<N-1;i++){
+            System.out.print(grade[i] + " ");
+        }
+        System.out.println(grade[N-1]);
+
+
+
+
+        /*
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        String N_M = br.readLine();
+
+        StringTokenizer stk = new StringTokenizer(N_M," ");
+
+        int N = Integer.parseInt(stk.nextToken());
+        int M = Integer.parseInt(stk.nextToken());
+
+        String card = br.readLine();
+
+        stk = new StringTokenizer(card," ");
+
+        int[] cards = new int[N];
+
+        for(int i=0;i<N;i++){
+            cards[i] = Integer.parseInt(stk.nextToken());
+        }
+
+        Arrays.sort(cards); // card 목록을 오름차순으로 정렬
+
+        int blackJack = Integer.MAX_VALUE;
+
+        // 카드의 개수(N) >=3 이기 때문에 예외조건 필요 X
+        for(int i=0;i<cards.length;i++){
+            for(int j=i+1;j<cards.length;j++){
+                for(int k=j+1;k<cards.length;k++){
+
+                    int cardSum = cards[i] + cards[j] + cards[k];
+                    if(cardSum  <= M) // M을 넘지 않는 3장의 조합
+                        blackJack = Math.min(blackJack,M-cardSum); // M과 가까울수록 작으므로
                 }
             }
         }
 
-        if(stack.empty()){
-            System.out.println("yes");
-        }
-        else{
-            System.out.println("no");
-        }
-
-
-//        int leftSmall = 0; // (
-//        int rightSmall = 0; // )
-//        int leftBig = 0; // [
-//        int rightBig = 0; // ]
-//
-//        System.out.println(str);
-//
-//        for(int i=0;i<str.length();i++) {
-//            char ch = str.charAt(i);
-//
-//            switch (ch){
-//                case '(' : leftSmall++; break;
-//                case ')' : rightSmall++; break;
-//                case '[' : leftBig++; break;
-//                case ']' : rightBig++; break;
-//            }
-//
-//            if(leftSmall < rightSmall || leftBig < rightBig){
-//                System.out.println("no");
-//                return ;
-//            }
-//        }
-//
-//        if(leftBig == rightBig && leftSmall == rightSmall){
-//            System.out.println("yes");
-//        }
-//        else System.out.println("no");
-
-
+        System.out.println(M-blackJack); // blackJack이 M과의 최소 차이이므로
+         */
     }
 
 }

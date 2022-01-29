@@ -1,3 +1,4 @@
+import java.awt.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -5,27 +6,21 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 나이순 정렬 & 단어 정렬
-    // 나이순 정렬(주석처리된 코드 부분)
-    // 나이와 이름을 기준으로 정렬해야 하기 때문에 person class를 만들어서 나이와 이름을 저장하고
-    // new 객체를 사용해 메모리를 할당한 다음에 나이로 정렬하여 출력한다.
+    // java baekjoon 2839 설탕 배달
+//    봉지는 3킬로그램 봉지와 5킬로그램 봉지가 있다.
+//    상근이는 귀찮기 때문에, 최대한 적은 봉지를 들고 가려고 한다
+//    상근이가 배달하는 봉지의 최소 개수를 출력한다.
+//    만약, 정확하게 N킬로그램을 만들 수 없다면 -1을 출력한다.
 
-    // 단어 정렬
-    // 주어지는 단어를 arraylist에 집어넣은 다음에 길이가 같다면 사전순으로 정렬해야 하기 때문에
-    // 길이가 같은지 확인하고 o1.compareTo(o2)를 활용하여 사전순 정렬하고
-    // else로 길이 순으로 정렬한다.
+    // 처음에는 가장 적은 봉지를 활용해야 하기 때문에 5킬로그램 봉지를 기준으로 생각했다.
+    // 5킬로그램을 N에서 빼가면서 최대한 N을 빠르게 줄이는 데 신경썼는데 그렇게 하다 보니
+    // 3의 배수이거나 3으로 해결되는 경우에 대해서 부정확한 케이스가 있었다.
+    // 그래서 이걸 어떻게 한번에 해결할까 하다가 반대로 생각해서 3을 빼가다가
+    // 5의 배수가 나오면 이걸 처리하는 방식으로 하면 처음에 5의 배수인 것도 해결되고
+    // 3을 빼다가 5의 배수가 나오는 경우도 해결되지 않을까 생각했다.
 
-    /*
-    public static class Person{
-        int age;
-        String name;
-
-        public Person(int age,String name){
-            this.age = age;
-            this.name = name;
-        }
-    }
-     */
+    // java 1011 - fly me to the alpha centauri
+    // 문제를 해결하던 중이다.
 
    public static void main(String[] args) throws IOException {
 
@@ -33,66 +28,71 @@ public class Main {
 
        int N = Integer.parseInt(br.readLine());
 
-       ArrayList<String> list = new ArrayList<>();
-       Set<String> set = new HashSet<>();
+       int[] answer = new int[N];
 
        for(int i=0;i<N;i++){
            String str = br.readLine();
-           if(set.add(str)){
-               list.add(str);
-           }
-       }
-
-       Collections.sort(list, new Comparator<String>() {
-           @Override
-           public int compare(String o1, String o2) {
-               if(o1.length() == o2.length()){
-                   return o1.compareTo(o2);
-               }
-               else return o1.length() - o2.length();
-           }
-       });
-
-
-       for(int i=0;i<list.size();i++){
-           System.out.println(list.get(i));
-       }
-       /*
-       Person[] people = new Person[N];
-
-       for(int i=0;i<N;i++){
-           String str = br.readLine();
-
-           people[i] = new Person(0,"");
 
            StringTokenizer stk = new StringTokenizer(str," ");
-           int age = Integer.parseInt(stk.nextToken());
-           String name = stk.nextToken();
 
-           people[i].age = age;
-           people[i].name = name;
+           int start = Integer.parseInt(stk.nextToken());
+           int end = Integer.parseInt(stk.nextToken());
+
+           System.out.println(minMove(start,end));
        }
 
-       Arrays.sort(people, new Comparator<Person>() {
-           @Override
-           public int compare(Person o1, Person o2) {
-               return o1.age - o2.age;
+       /*
+       int answer = 0;
+
+       while(true){
+           if( N % 5 == 0){
+               answer += N / 5;
+               break;
            }
-       });
-
-       for(int i=0;i<N;i++){
-           System.out.println(people[i].age + " " + people[i].name);
+           else{
+               N -= 3;
+               answer++;
+               if(N < 0){
+                   answer = -1;
+                   break;
+               }
+           }
        }
 
+       System.out.println(answer);
         */
 
 
+    }
+
+    static int minMove(int start, int end){
+       int move = 1;
+
+       int maxMove = 1;
+
+       end--;
+
+       while(true){
+           if(start + maxMove < end){
+               start += maxMove;
+               maxMove++;
+               move++;
+           }
+
+           else if(start + maxMove > end){
+               maxMove--;
+           }
+
+           if(start + maxMove == end){
+               break;
+           }
+       }
 
 
 
 
 
 
-
+       return move;
     }
 }

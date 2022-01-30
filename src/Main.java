@@ -6,93 +6,60 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 2839 설탕 배달
-//    봉지는 3킬로그램 봉지와 5킬로그램 봉지가 있다.
-//    상근이는 귀찮기 때문에, 최대한 적은 봉지를 들고 가려고 한다
-//    상근이가 배달하는 봉지의 최소 개수를 출력한다.
-//    만약, 정확하게 N킬로그램을 만들 수 없다면 -1을 출력한다.
+    // java 3053 택시 기하학
+    // 코드는 진짜 아무것도 아닌건데 택시 기하학이라는 개념을 이해하는데 시간이 걸렸다.
 
-    // 처음에는 가장 적은 봉지를 활용해야 하기 때문에 5킬로그램 봉지를 기준으로 생각했다.
-    // 5킬로그램을 N에서 빼가면서 최대한 N을 빠르게 줄이는 데 신경썼는데 그렇게 하다 보니
-    // 3의 배수이거나 3으로 해결되는 경우에 대해서 부정확한 케이스가 있었다.
-    // 그래서 이걸 어떻게 한번에 해결할까 하다가 반대로 생각해서 3을 빼가다가
-    // 5의 배수가 나오면 이걸 처리하는 방식으로 하면 처음에 5의 배수인 것도 해결되고
-    // 3을 빼다가 5의 배수가 나오는 경우도 해결되지 않을까 생각했다.
+    // 택시 기하학에서 두 점 T1(x1,y1), T2(x2,y2) 사이의 거리는 다음과 같이 구할 수 있다.
+    // D(T1,T2) = |x1-x2| + |y1-y2|
+    // 두 점 사이의 거리를 제외한 나머지 정의는 유클리드 기하학에서의 정의와 같다.
 
-    // java 1011 - fly me to the alpha centauri
-    // 문제를 해결하던 중이다.
+    // 문제에서 제시는 이렇게 되어 있는데 이를 활용해서 반지름이 주어졌을 때 원의 넓이를
+    // 구하는 게 이해가 되지 않아서 따로 개념을 찾아보았다.
+    // 우리가 일반적으로 아는 원의 넓이는 pi * R * R 이다.
+    // 그런데 문제의 택시기하학(맨해튼 거리와 같은 말)에서 원의 넓이를 살펴보면
+    // 택시 기하학에서 두점 사이의 거리를 구하는 방식은 일직선과 같은 개념이기 때문에
+    // 반지름이 3이라고 한다면 (-3,0),(0,3),(3,0),(0,-3) 을 일직선으로 연결한
+    // 마름모꼴의 도형이 나오게 된다.
+    // 즉 택시 기하학에서의 원의 넓이는 R인 반지름이 나오면 2 * R * R이 된다.
 
-   public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
 
-       BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-       int N = Integer.parseInt(br.readLine());
+        int R = Integer.parseInt(br.readLine());
 
-       int[] answer = new int[N];
+        System.out.println(R * R * Math.PI);
+        System.out.println(2 * R * R);
 
-       for(int i=0;i<N;i++){
-           String str = br.readLine();
-
-           StringTokenizer stk = new StringTokenizer(str," ");
-
-           int start = Integer.parseInt(stk.nextToken());
-           int end = Integer.parseInt(stk.nextToken());
-
-           System.out.println(minMove(start,end));
-       }
-
-       /*
-       int answer = 0;
-
-       while(true){
-           if( N % 5 == 0){
-               answer += N / 5;
-               break;
-           }
-           else{
-               N -= 3;
-               answer++;
-               if(N < 0){
-                   answer = -1;
-                   break;
-               }
-           }
-       }
-
-       System.out.println(answer);
-        */
-
-
-    }
-
-    static int minMove(int start, int end){
-       int move = 1;
-
-       int maxMove = 1;
-
-       end--;
-
-       while(true){
-           if(start + maxMove < end){
-               start += maxMove;
-               maxMove++;
-               move++;
-           }
-
-           else if(start + maxMove > end){
-               maxMove--;
-           }
-
-           if(start + maxMove == end){
-               break;
-           }
-       }
-
-
-
-
-
-
-       return move;
     }
 }
+       /*
+       while(true){
+           String str = br.readLine();
+           StringTokenizer stk = new StringTokenizer(str," ");
+
+           int[] tri = new int[3];
+           int idx = 0;
+           tri[idx++] = Integer.parseInt(stk.nextToken());
+           tri[idx++] = Integer.parseInt(stk.nextToken());
+           tri[idx++] = Integer.parseInt(stk.nextToken());
+
+           if(tri[0]==0 && tri[1] == 0 && tri[2] == 0){
+               break;
+           }
+
+           is90(tri);
+       }
+
+
+   }
+
+   public static void is90(int[] arr){
+       Arrays.sort(arr);
+
+       if(Math.pow(arr[2],2) == Math.pow(arr[0],2) + Math.pow(arr[1],2)){
+           System.out.println("right");
+       }
+       else System.out.println("wrong");
+   }
+}*/

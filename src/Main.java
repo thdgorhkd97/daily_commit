@@ -6,60 +6,82 @@ import java.util.*;
 
 public class Main {
 
-    // java 3053 택시 기하학
-    // 코드는 진짜 아무것도 아닌건데 택시 기하학이라는 개념을 이해하는데 시간이 걸렸다.
-
-    // 택시 기하학에서 두 점 T1(x1,y1), T2(x2,y2) 사이의 거리는 다음과 같이 구할 수 있다.
-    // D(T1,T2) = |x1-x2| + |y1-y2|
-    // 두 점 사이의 거리를 제외한 나머지 정의는 유클리드 기하학에서의 정의와 같다.
-
-    // 문제에서 제시는 이렇게 되어 있는데 이를 활용해서 반지름이 주어졌을 때 원의 넓이를
-    // 구하는 게 이해가 되지 않아서 따로 개념을 찾아보았다.
-    // 우리가 일반적으로 아는 원의 넓이는 pi * R * R 이다.
-    // 그런데 문제의 택시기하학(맨해튼 거리와 같은 말)에서 원의 넓이를 살펴보면
-    // 택시 기하학에서 두점 사이의 거리를 구하는 방식은 일직선과 같은 개념이기 때문에
-    // 반지름이 3이라고 한다면 (-3,0),(0,3),(3,0),(0,-3) 을 일직선으로 연결한
-    // 마름모꼴의 도형이 나오게 된다.
-    // 즉 택시 기하학에서의 원의 넓이는 R인 반지름이 나오면 2 * R * R이 된다.
+    // java 1929 소수 구하기
+    // 아래의 주석친 부분은 2부터 N-1까지의 수 중에서 N을 나눠지게 하는 약수가 있다면
+    // N이 소수가 아니라는 것을 활용한 정말 기본적인 소수 판별 프로그램이다.
+    // 해당 방법은 시간초과가 발생하게 되고 다른 방법을 찾아야 했다
+    // 에라토스테네스의 체라는 방법을 활용해보기로 했다.
+    // 먼저 개념을 살펴보면 " k=2부터 루트N 이하까지 반복하여 자연수들 중 k를 제외한
+    // k의 배수들을 제외시킨다 " 라는 개념을 적용시킨다.
+    // 루트N 까지 확인하는 것은 소수를 판별함에 있어서 해당 수가 소수라면 반드시 둘중 하나는
+    // 루트N보다 작거나 같기 때문에 소수인지 아닌지 확인할 때 루트 N까지 확인하는 것이다.
+    // 따라서 확인하고자 하는 수(end)보다 하나 크게 boolean 배열을 잡고서
+    // 소수인 수들의 배수를 해당 범위에서 제거해 나간다.
+    // 에라토스테네스의 체를 이용해 소수를 판별하는 알고리즘이 반복문을 통해 확인하는 O(N)혹은
+    // O(루트N) 의 시간이 걸리는 알고리즘보다 훨씬 빠르다.
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int R = Integer.parseInt(br.readLine());
+        String str = br.readLine();
 
-        System.out.println(R * R * Math.PI);
-        System.out.println(2 * R * R);
+        StringTokenizer stk = new StringTokenizer(str, " ");
+
+        int start = Integer.parseInt(stk.nextToken());
+        int end = Integer.parseInt(stk.nextToken());
+
+        boolean[] isPrime = new boolean[end+1];
+
+        isPrime[0] = true;
+        isPrime[1] = true;
+
+        for(int i=2;i<=Math.sqrt(end);i++){
+            if(isPrime[i]){
+                continue;
+            }
+
+            for(int j=i*i; j< isPrime.length; j=j+i){
+                isPrime[j] = true;
+            }
+        }
+
+        for(int i=start;i<=end;i++){
+            if(!isPrime[i]){
+                System.out.println(i);
+            }
+        }
+
 
     }
 }
-       /*
-       while(true){
-           String str = br.readLine();
-           StringTokenizer stk = new StringTokenizer(str," ");
 
-           int[] tri = new int[3];
-           int idx = 0;
-           tri[idx++] = Integer.parseInt(stk.nextToken());
-           tri[idx++] = Integer.parseInt(stk.nextToken());
-           tri[idx++] = Integer.parseInt(stk.nextToken());
+        /*ArrayList<Integer> list = new ArrayList<>();
 
-           if(tri[0]==0 && tri[1] == 0 && tri[2] == 0){
-               break;
-           }
+        for(int i=start;i<=end;i++){
+            isPrimary(i,list);
+        }
 
-           is90(tri);
-       }
+        for(int i=0;i<list.size();i++){
+            System.out.println(list.get(i));
+        }
 
+    }
 
-   }
+    public static void isPrimary(int num,ArrayList<Integer> list){
+        boolean flag = true;
 
-   public static void is90(int[] arr){
-       Arrays.sort(arr);
+        for(int i=2;i<num;i++){
+            if(num % i == 0){
+                flag = false;
+                break;
+            }
+        }
 
-       if(Math.pow(arr[2],2) == Math.pow(arr[0],2) + Math.pow(arr[1],2)){
-           System.out.println("right");
-       }
-       else System.out.println("wrong");
-   }
+        if(flag){
+            list.add(num);
+        }
+
+    }
 }*/
+

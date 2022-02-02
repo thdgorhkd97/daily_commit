@@ -6,29 +6,29 @@ import java.util.*;
 
 public class Main {
 
-    // java 1011 - fly me to the alpha centauri
+    // java 2579 - 계단 오르기
 
-    // 거리 1 -> 1
-    // 거리 2 -> 1 1
-    // 거리 3 -> 1 1 1
-    // 거리 4 -> 1 2 1
-    // 거리 5 -> 1 2 1 1
-    // 거리 6 -> 1 2 2 1
-    // 거리 7 -> 1 1 2 2 1
-    // 거리 8 -> 1 2 2 2 1
-    // 거리 9 -> 1 2 3 2 1
-    // 거리 10 -> 1 1 2 3 2 1
+//    계단 오르는 데는 다음과 같은 규칙이 있다.
+//
+//    계단은 한 번에 한 계단씩 또는 두 계단씩 오를 수 있다. 즉, 한 계단을 밟으면서 이어서 다음 계단이나, 다음 다음 계단으로 오를 수 있다.
+//    연속된 세 개의 계단을 모두 밟아서는 안 된다. 단, 시작점은 계단에 포함되지 않는다.
+//    마지막 도착 계단은 반드시 밟아야 한다.
+//    따라서 첫 번째 계단을 밟고 이어 두 번째 계단이나, 세 번째 계단으로 오를 수 있다. 하지만, 첫 번째 계단을 밟고 이어 네 번째 계단으로 올라가거나, 첫 번째, 두 번째, 세 번째 계단을 연속해서 모두 밟을 수는 없다.
+//
+//    각 계단에 쓰여 있는 점수가 주어질 때 이 게임에서 얻을 수 있는 총 점수의 최댓값을 구하는 프로그램을 작성하시오.
 
-    // 문제조건을 보고 한참 고민해보다가 뭔가 규칙은 있는 것 같은데 규칙성을 찾기 힘들어서
-    // 결국 풀이를 참고하였다 ㅠㅠ
-    // 위의 조건을 보면 최대 이동거리는 거리의 루트값이하이다. 그래서 거리가 4가 되어야 2만킄 이동한 게 나오고
-    // 거리가 9가 되고 나서야 3만큼 이동한 것이다.
-    // 그래서 4,9,16 ... 이렇게 제곱값이 나올때마다 이동의 최대거리가 변하게 된다.
-    // 그리고 그 순간은 중간 이기 때문에 max * 2 - 1이 된다.
-
-    // 이렇게 규칙성이 보이더라도 이를 코드로 바꾸기 위해서 관통하는 규칙을 찾아야 하는데
-    // 이런 부분이 아직도 많이 부족하다고 느꼈다.
-    // 직관적인 코드 작성 능력이 아니라 규칙성을 찾아내는 통찰력을 길러야 할 것 같다.
+    // 동적 계획법에 분류된 문제이다.
+    // 점수가 적힌 계단을 밟아 올라가면서 얻을 수 있는 최대 점수를 구한다.
+    // 단 연속된 3개의 계단을 밟지 못하며 마지막 계단은 반드시 밟을 것이라는 조건이 붙는다
+    // 어떤 N번째 계단을 밟을 때 얻을 수 있는 점수의 최대값을 구해야 하기 때문에
+    // N번째 계단을 밟을 경우에 얻을 수 있는 점수를 계산해보려고 했다
+    // N번째 계단을 밟는 건 2가지 경우가 있다.
+    // 1. N-3번째 계단과 N-2번째 계단을 밟고서 N번째 계단을 밟는 경우
+    // 2. N-2번째 계단과 N번째 계단을 밟는 경우
+    // 이렇게 2가지 경우가 최대값을 얻으면서 계단을 밟는 경우다.
+    // 그렇기에 이 2가지 경우를 비교해서 더 큰 값을 계속 저장해나가며 비교해나간다.
+    // 단 N-3을 비교해야 하는 경우가 있기에 주어지는 N의 경우를 1,2,3 인 경우는
+    // 따로 구분해 두었다.(처음에 이렇게 안 했더니 ArrayIndexOutOfBound가 발생했다)ㅠㅠ
 
     public static void main(String[] args) throws IOException {
 
@@ -36,28 +36,33 @@ public class Main {
 
         int N = Integer.parseInt(br.readLine());
 
-        for(int i=0;i<N;i++){
-            StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+        int[] stair = new int[N+1];
+        int[] dp = new int[N+1];
 
-            int start = Integer.parseInt(stk.nextToken());
-            int end = Integer.parseInt(stk.nextToken());
-
-            int distance = end - start;
-            int cnt = 0;
-
-            int max = (int)Math.sqrt(distance);
-
-            if(max == Math.sqrt(distance)){
-                cnt = max * 2 - 1;
-            }
-            else if(distance <= max * max + max){
-                cnt = max * 2;
-            }
-            else cnt = max * 2 + 1;
-
-            System.out.println(cnt);
+        for(int i=1;i<=N;i++){
+            stair[i] = Integer.parseInt(br.readLine());
         }
 
+        if(N==1) {
+            dp[1] = stair[1];
+//            System.out.println(dp[1]);
+        }
+        else if(N==2){
+            dp[2] = stair[1] + stair[2];
+//            System.out.println(dp[2]);
+        }
+        else if(N==3){
+            dp[3] = Math.max(stair[1] + stair[3], stair[2] + stair[3]);
+//            System.out.println(dp[3]);
+        }
+
+        else if(N>=4) {
+            for (int i = 4; i <= N; i++) {
+                dp[i] = Math.max(dp[i - 3] + stair[i] + stair[i - 1], dp[i - 2] + stair[i]);
+            }
+        }
+
+        System.out.println(dp[N]);
 
 
 

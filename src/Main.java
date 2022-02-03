@@ -6,66 +6,100 @@ import java.util.*;
 
 public class Main {
 
-    // java 2579 - 계단 오르기
+    // java 전력망을 둘로 나누기 & 큰 수 만들기
+    // 예전에 했던 문제를 다시 풀어보고 설명이 가능할만큼 자세하게 뜯어보았다
+    // 한번 풀어봤던 문제인데도 사용했던 자료구조나 접근방법만 기억날 뿐 사실상 처음부터
+    // 풀었던 거나 다름없는 것 같다.
+    // 1. 전력망을 둘로 나누기
+    // -> arraylist[]로 연결된 전력망을 표현하고 bfs를 활용하기 위해서 boolean[]의
+    // wires[i][0]와 wires[i][1]을 true로 바꾸고 (연결을 끊은 것과 같은의미) bfs 함수에서
+    // 재귀를 활용해서 bfs로 다시 보내 연결된 전력망의 개수를 센다.
 
-//    계단 오르는 데는 다음과 같은 규칙이 있다.
-//
-//    계단은 한 번에 한 계단씩 또는 두 계단씩 오를 수 있다. 즉, 한 계단을 밟으면서 이어서 다음 계단이나, 다음 다음 계단으로 오를 수 있다.
-//    연속된 세 개의 계단을 모두 밟아서는 안 된다. 단, 시작점은 계단에 포함되지 않는다.
-//    마지막 도착 계단은 반드시 밟아야 한다.
-//    따라서 첫 번째 계단을 밟고 이어 두 번째 계단이나, 세 번째 계단으로 오를 수 있다. 하지만, 첫 번째 계단을 밟고 이어 네 번째 계단으로 올라가거나, 첫 번째, 두 번째, 세 번째 계단을 연속해서 모두 밟을 수는 없다.
-//
-//    각 계단에 쓰여 있는 점수가 주어질 때 이 게임에서 얻을 수 있는 총 점수의 최댓값을 구하는 프로그램을 작성하시오.
+    // 2. 큰 수 만들기
+    // -> number에서 k만큼 수를 빼는 것은 number.length() - k만큼 수를 고르는 것과 같기 때문에
+    // i+k라는 인덱스의 범위를 정해놓고 그 중에서 가장 큰 수를 골라낸다.
+    // 이중 for문중 내부 for문에서 종료 조건인 j<=i+k 이 부분을 생각해내는게 너무 어려웟ㄸ ㅏㅠ
 
-    // 동적 계획법에 분류된 문제이다.
-    // 점수가 적힌 계단을 밟아 올라가면서 얻을 수 있는 최대 점수를 구한다.
-    // 단 연속된 3개의 계단을 밟지 못하며 마지막 계단은 반드시 밟을 것이라는 조건이 붙는다
-    // 어떤 N번째 계단을 밟을 때 얻을 수 있는 점수의 최대값을 구해야 하기 때문에
-    // N번째 계단을 밟을 경우에 얻을 수 있는 점수를 계산해보려고 했다
-    // N번째 계단을 밟는 건 2가지 경우가 있다.
-    // 1. N-3번째 계단과 N-2번째 계단을 밟고서 N번째 계단을 밟는 경우
-    // 2. N-2번째 계단과 N번째 계단을 밟는 경우
-    // 이렇게 2가지 경우가 최대값을 얻으면서 계단을 밟는 경우다.
-    // 그렇기에 이 2가지 경우를 비교해서 더 큰 값을 계속 저장해나가며 비교해나간다.
-    // 단 N-3을 비교해야 하는 경우가 있기에 주어지는 N의 경우를 1,2,3 인 경우는
-    // 따로 구분해 두었다.(처음에 이렇게 안 했더니 ArrayIndexOutOfBound가 발생했다)ㅠㅠ
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = 9;
+        int[][] wires = {{1, 3}, {2, 3}, {3, 4}, {4, 5}, {4, 6}, {4, 7}, {7, 8}, {7, 9}};
 
-        int N = Integer.parseInt(br.readLine());
+        ArrayList[] arr = new ArrayList[n+1];
 
-        int[] stair = new int[N+1];
-        int[] dp = new int[N+1];
-
-        for(int i=1;i<=N;i++){
-            stair[i] = Integer.parseInt(br.readLine());
+        for(int i=1;i<=n;i++){
+            arr[i] = new ArrayList<>();
         }
 
-        if(N==1) {
-            dp[1] = stair[1];
-//            System.out.println(dp[1]);
-        }
-        else if(N==2){
-            dp[2] = stair[1] + stair[2];
-//            System.out.println(dp[2]);
-        }
-        else if(N==3){
-            dp[3] = Math.max(stair[1] + stair[3], stair[2] + stair[3]);
-//            System.out.println(dp[3]);
+        for(int i=0;i<wires.length;i++){
+            arr[wires[i][0]].add(wires[i][1]);
+            arr[wires[i][1]].add(wires[i][0]);
         }
 
-        else if(N>=4) {
-            for (int i = 4; i <= N; i++) {
-                dp[i] = Math.max(dp[i - 3] + stair[i] + stair[i - 1], dp[i - 2] + stair[i]);
-            }
+//        for(int i=1;i<=n;i++){
+//            System.out.print(i+ " 번째 : ");
+//            for(int j=0;j<arr[i].size();j++){
+//                System.out.print(arr[i].get(j)+" ");
+//            }
+//            System.out.println();
+//        }
+
+        int answer = Integer.MAX_VALUE;
+
+        for(int i=0;i<wires.length;i++){
+            boolean[] check = new boolean[n+1];
+
+            check[wires[i][0]] = true;
+            check[wires[i][1]] = true;
+            int a = bfs(wires[i][0],check,arr);
+            int b = bfs(wires[i][1],check,arr);
+            answer = Math.min(answer, Math.abs(a-b));
         }
 
-        System.out.println(dp[N]);
-
-
+        System.out.println(answer);
 
     }
+
+    public static int bfs(int idx,boolean[] check,ArrayList[] arr){
+        int sum = 1;
+        check[idx] = true;
+        for(int i=0;i<arr[idx].size();i++){
+            if(check[(int) arr[idx].get(i)]){
+                continue;
+            }
+            sum += bfs((int)arr[idx].get(i),check,arr);
+        }
+        return sum;
+    }
 }
+
+        /*
+        String number = "1231234";
+        int k = 3;
+
+        StringBuffer sb = new StringBuffer();
+
+        int pos = 0;
+        int index = 0;
+
+        for(int i=0; i<number.length()-k; i++) {
+
+            int max = Integer.MIN_VALUE;
+
+            System.out.println("i = " + i + " / "+pos+" 부터 "+(i+k)+" 까지 확인");
+            for(int j=pos; j<=i+k; j++) {
+                int cur_num = number.charAt(j)-'0'; //String 속 숫자를 int로
+                if(max < cur_num) {
+                    index = j; // 큰 숫자일때의 인덱스
+                    max = cur_num; // 그때 합칠 숫자
+                }
+            }
+            System.out.println("정답에 "+max+" 를 추가합니다");
+            sb.append(max);
+            pos = index + 1; // 추가한 문자의 다음 인덱스부터 다시 서치 시작
+        }
+
+        System.out.println(sb.toString());
+         */
 

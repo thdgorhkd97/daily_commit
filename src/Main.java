@@ -6,100 +6,63 @@ import java.util.*;
 
 public class Main {
 
-    // java 전력망을 둘로 나누기 & 큰 수 만들기
-    // 예전에 했던 문제를 다시 풀어보고 설명이 가능할만큼 자세하게 뜯어보았다
-    // 한번 풀어봤던 문제인데도 사용했던 자료구조나 접근방법만 기억날 뿐 사실상 처음부터
-    // 풀었던 거나 다름없는 것 같다.
-    // 1. 전력망을 둘로 나누기
-    // -> arraylist[]로 연결된 전력망을 표현하고 bfs를 활용하기 위해서 boolean[]의
-    // wires[i][0]와 wires[i][1]을 true로 바꾸고 (연결을 끊은 것과 같은의미) bfs 함수에서
-    // 재귀를 활용해서 bfs로 다시 보내 연결된 전력망의 개수를 센다.
+    // java baekjoon 11286
 
-    // 2. 큰 수 만들기
-    // -> number에서 k만큼 수를 빼는 것은 number.length() - k만큼 수를 고르는 것과 같기 때문에
-    // i+k라는 인덱스의 범위를 정해놓고 그 중에서 가장 큰 수를 골라낸다.
-    // 이중 for문중 내부 for문에서 종료 조건인 j<=i+k 이 부분을 생각해내는게 너무 어려웟ㄸ ㅏㅠ
+//    배열에 정수 x (x ≠ 0)를 넣는다.
+//    배열에서 절댓값이 가장 작은 값을 출력하고, 그 값을 배열에서 제거한다. 절댓값이 가장 작은 값이 여러개일 때는, 가장 작은 수를 출력하고, 그 값을 배열에서 제거한다.
+//    프로그램은 처음에 비어있는 배열에서 시작하게 된다.
 
+    // java에서 우선순위 큐를 활용하는 기본적인 문제를 접하면서 여러 기준을 잡는 문제를 해봤다
+    // 그냥 선언했을 때는 오름차순, Comparator.reverseOrder()로 뒤바꾸면 내림차순
+    // 근데 새로운 Comparator 기준으로 우선순위 큐의 정렬 기준을 선언해서
+    // 우선순위 큐의 기준을 바꿀 수 있다는 것을 알게 되었다.
+    // 우선순위 큐는 정해진 정렬 기준으로 값을 넣을 때마다 정렬을 시행하여 프로그래머가 쉽게
+    // 사용할 수 있는 자료구조이기 때문에 정해진 정렬 기준이 주어져 있다면 이를 활용하여
+    // 문제를 용이하게 해결할 수 있다고 생각한다.
 
     public static void main(String[] args) throws IOException {
 
-        int n = 9;
-        int[][] wires = {{1, 3}, {2, 3}, {3, 4}, {4, 5}, {4, 6}, {4, 7}, {7, 8}, {7, 9}};
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        ArrayList[] arr = new ArrayList[n+1];
+        int N = Integer.parseInt(br.readLine());
 
-        for(int i=1;i<=n;i++){
-            arr[i] = new ArrayList<>();
-        }
-
-        for(int i=0;i<wires.length;i++){
-            arr[wires[i][0]].add(wires[i][1]);
-            arr[wires[i][1]].add(wires[i][0]);
-        }
-
-//        for(int i=1;i<=n;i++){
-//            System.out.print(i+ " 번째 : ");
-//            for(int j=0;j<arr[i].size();j++){
-//                System.out.print(arr[i].get(j)+" ");
-//            }
-//            System.out.println();
-//        }
-
-        int answer = Integer.MAX_VALUE;
-
-        for(int i=0;i<wires.length;i++){
-            boolean[] check = new boolean[n+1];
-
-            check[wires[i][0]] = true;
-            check[wires[i][1]] = true;
-            int a = bfs(wires[i][0],check,arr);
-            int b = bfs(wires[i][1],check,arr);
-            answer = Math.min(answer, Math.abs(a-b));
-        }
-
-        System.out.println(answer);
-
-    }
-
-    public static int bfs(int idx,boolean[] check,ArrayList[] arr){
-        int sum = 1;
-        check[idx] = true;
-        for(int i=0;i<arr[idx].size();i++){
-            if(check[(int) arr[idx].get(i)]){
-                continue;
-            }
-            sum += bfs((int)arr[idx].get(i),check,arr);
-        }
-        return sum;
-    }
-}
-
-        /*
-        String number = "1231234";
-        int k = 3;
-
-        StringBuffer sb = new StringBuffer();
-
-        int pos = 0;
-        int index = 0;
-
-        for(int i=0; i<number.length()-k; i++) {
-
-            int max = Integer.MIN_VALUE;
-
-            System.out.println("i = " + i + " / "+pos+" 부터 "+(i+k)+" 까지 확인");
-            for(int j=pos; j<=i+k; j++) {
-                int cur_num = number.charAt(j)-'0'; //String 속 숫자를 int로
-                if(max < cur_num) {
-                    index = j; // 큰 숫자일때의 인덱스
-                    max = cur_num; // 그때 합칠 숫자
+//        PriorityQueue<Integer> que = new PriorityQueue<>();
+//        PriorityQueue<Integer> que = new PriorityQueue<>(Comparator.reverseOrder());
+        PriorityQueue<Integer> que = new PriorityQueue<>(new Comparator<Integer>() {
+            @Override
+            public int compare(Integer o1, Integer o2) {
+                if(Math.abs(o1) > Math.abs(o2)){
+                    return 1;
+                }
+                else if(Math.abs(o1) == Math.abs(o2)){
+                    return o1-o2;
+                }
+                else{
+                    return -1;
                 }
             }
-            System.out.println("정답에 "+max+" 를 추가합니다");
-            sb.append(max);
-            pos = index + 1; // 추가한 문자의 다음 인덱스부터 다시 서치 시작
+        });
+        ArrayList<Integer> list = new ArrayList<>();
+
+        for(int i=0;i<N;i++){
+            int num = Integer.parseInt(br.readLine());
+
+            if(num !=0){
+                que.add(num);
+            }
+            else{
+                if(que.isEmpty()){
+                    list.add(0);
+                }
+                else{
+                    list.add(que.poll());
+                }
+            }
         }
 
-        System.out.println(sb.toString());
-         */
+        for(int i=0;i<list.size();i++){
+            System.out.println(list.get(i));
+        }
 
+    }
+}

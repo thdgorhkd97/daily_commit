@@ -6,19 +6,19 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 11286
+    // java baekjoon 2156 포도주 시식
+    // 동적 계획법으로 푸는 문제라는 걸 파악하고 dp 배열을 활용해 해결하려 했다.
+    // 근데 한 가지를 간과했던 부분이 있었다.
+    // 문제 조건에서 3개의 연속된 포도주를 선택할 수 없기 때문에 연속된 3가지가 불가능 했는데
+    // 처음에 내가 구현한 동적 계획법 코드(for문 내의 주석친 부분)을 확인해보면
+    // 그 자리를 고르지 않고 이전 2잔을 고르는 OOX 의 경우 -> dp[i-1]
+    // 직전 잔을 고르지 않고 그 자리를 고르는 OXO의 경우 -> dp[i-2] + alcohol[i]
+    // 까지는 생각했었는데 한 가지 경우가 더 존재했다.
+    // 바로 2잔 전을 선택하지 않고 직전 잔과 그 자리를 고르는 XOO 의 경우다
+    // -> dp[i-3] + alcohol[i-1] + alcohol[i]가 있다.
 
-//    배열에 정수 x (x ≠ 0)를 넣는다.
-//    배열에서 절댓값이 가장 작은 값을 출력하고, 그 값을 배열에서 제거한다. 절댓값이 가장 작은 값이 여러개일 때는, 가장 작은 수를 출력하고, 그 값을 배열에서 제거한다.
-//    프로그램은 처음에 비어있는 배열에서 시작하게 된다.
-
-    // java에서 우선순위 큐를 활용하는 기본적인 문제를 접하면서 여러 기준을 잡는 문제를 해봤다
-    // 그냥 선언했을 때는 오름차순, Comparator.reverseOrder()로 뒤바꾸면 내림차순
-    // 근데 새로운 Comparator 기준으로 우선순위 큐의 정렬 기준을 선언해서
-    // 우선순위 큐의 기준을 바꿀 수 있다는 것을 알게 되었다.
-    // 우선순위 큐는 정해진 정렬 기준으로 값을 넣을 때마다 정렬을 시행하여 프로그래머가 쉽게
-    // 사용할 수 있는 자료구조이기 때문에 정해진 정렬 기준이 주어져 있다면 이를 활용하여
-    // 문제를 용이하게 해결할 수 있다고 생각한다.
+    // 이 경우를 빼놓고 2가지 중 최대값을 고르니 정답이 옳지 않았고 하나의 경우는
+    // XOO의 경우가 있다는 것을 알고 나서 구현하였다.
 
     public static void main(String[] args) throws IOException {
 
@@ -26,43 +26,28 @@ public class Main {
 
         int N = Integer.parseInt(br.readLine());
 
-//        PriorityQueue<Integer> que = new PriorityQueue<>();
-//        PriorityQueue<Integer> que = new PriorityQueue<>(Comparator.reverseOrder());
-        PriorityQueue<Integer> que = new PriorityQueue<>(new Comparator<Integer>() {
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                if(Math.abs(o1) > Math.abs(o2)){
-                    return 1;
-                }
-                else if(Math.abs(o1) == Math.abs(o2)){
-                    return o1-o2;
-                }
-                else{
-                    return -1;
-                }
-            }
-        });
-        ArrayList<Integer> list = new ArrayList<>();
-
-        for(int i=0;i<N;i++){
+        int[] alcohol = new int[N+1];
+        for(int i=1;i<=N;i++){
             int num = Integer.parseInt(br.readLine());
-
-            if(num !=0){
-                que.add(num);
-            }
-            else{
-                if(que.isEmpty()){
-                    list.add(0);
-                }
-                else{
-                    list.add(que.poll());
-                }
-            }
+            alcohol[i] = num;
         }
 
-        for(int i=0;i<list.size();i++){
-            System.out.println(list.get(i));
+        int[] dp = new int[N+1];
+
+        dp[1] = alcohol[1];
+//        if(N==1) return alcohol[1];
+        dp[2] = alcohol[1]+alcohol[2];
+//        if(N==2) return dp[2];
+        dp[3] = Math.max(dp[2],Math.max(dp[1]+alcohol[3],alcohol[2]+alcohol[3]));
+
+        for(int i=3;i<=N;i++){
+//            dp[i] = Math.max(dp[i-1],dp[i-2]+ alcohol[i]);
+            dp[i] = Math.max(dp[i-1], Math.max(dp[i-2]+alcohol[i],dp[i-3]+alcohol[i-1]+alcohol[i]));
         }
+
+
+        System.out.println(dp[N]);
+
 
     }
 }

@@ -6,48 +6,59 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 2156 포도주 시식
-    // 동적 계획법으로 푸는 문제라는 걸 파악하고 dp 배열을 활용해 해결하려 했다.
-    // 근데 한 가지를 간과했던 부분이 있었다.
-    // 문제 조건에서 3개의 연속된 포도주를 선택할 수 없기 때문에 연속된 3가지가 불가능 했는데
-    // 처음에 내가 구현한 동적 계획법 코드(for문 내의 주석친 부분)을 확인해보면
-    // 그 자리를 고르지 않고 이전 2잔을 고르는 OOX 의 경우 -> dp[i-1]
-    // 직전 잔을 고르지 않고 그 자리를 고르는 OXO의 경우 -> dp[i-2] + alcohol[i]
-    // 까지는 생각했었는데 한 가지 경우가 더 존재했다.
-    // 바로 2잔 전을 선택하지 않고 직전 잔과 그 자리를 고르는 XOO 의 경우다
-    // -> dp[i-3] + alcohol[i-1] + alcohol[i]가 있다.
+    // java 1010 다리 놓기
+    //
 
-    // 이 경우를 빼놓고 2가지 중 최대값을 고르니 정답이 옳지 않았고 하나의 경우는
-    // XOO의 경우가 있다는 것을 알고 나서 구현하였다.
+//    재원이는 서쪽의 사이트와 동쪽의 사이트를 다리로 연결하려고 한다.
+//        (이때 한 사이트에는 최대 한 개의 다리만 연결될 수 있다.)
+//    재원이는 다리를 최대한 많이 지으려고 하기 때문에 서쪽의 사이트 개수만큼 (N개) 다리를 지으려고 한다.
+//    다리끼리는 서로 겹쳐질 수 없다고 할 때 다리를 지을 수 있는 경우의 수를 구하는 프로그램을 작성하라.
+
+    // 처음에 주어진 예시를 보면서 규칙을 생각해보니까 조합과 식이 똑같다는 생각이 들었다.
+    // 그래서 조합의 공식인 n! / r!(n-r)! 을 계산하려고 했는데
+    // 처음에 그냥 int로 했더니 29!은 범위를 넘었고 Long으로 했는데도 범위를 넘어섰다.
+    // double로 처리하였고 Long이 범위가 넘은 것은 29! 계산하는 부분에서 터진 것 같아서 아예 29! * 16! (13,29 예시에서)
+    // 부분을 아예 함수에서 처리하고서 return 하는 식으로 코드를 수정했다.
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int N = Integer.parseInt(br.readLine());
+        int T = Integer.parseInt(br.readLine());
 
-        int[] alcohol = new int[N+1];
-        for(int i=1;i<=N;i++){
-            int num = Integer.parseInt(br.readLine());
-            alcohol[i] = num;
+        ArrayList<Double> list = new ArrayList<>();
+
+        for(int i=0;i<T;i++){
+            StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+            double west = Integer.parseInt(stk.nextToken());
+            double east = Integer.parseInt(stk.nextToken());
+
+
+            System.out.printf("%.0f\n",howManySite(west,east,list));
         }
 
-        int[] dp = new int[N+1];
+    }
 
-        dp[1] = alcohol[1];
-//        if(N==1) return alcohol[1];
-        dp[2] = alcohol[1]+alcohol[2];
-//        if(N==2) return dp[2];
-        dp[3] = Math.max(dp[2],Math.max(dp[1]+alcohol[3],alcohol[2]+alcohol[3]));
+    public static double howManySite(double west, double east, ArrayList<Double> list){
+        double many = 0;
 
-        for(int i=3;i<=N;i++){
-//            dp[i] = Math.max(dp[i-1],dp[i-2]+ alcohol[i]);
-            dp[i] = Math.max(dp[i-1], Math.max(dp[i-2]+alcohol[i],dp[i-3]+alcohol[i-1]+alcohol[i]));
+        many = Combination(west,east);
+
+        return many;
+    }
+
+    public static double Combination(double west,double east){
+        double number1 = 1;
+        double number2 = 1;
+
+        for(double i=east;i>east-west;i--){
+            number1 *= i;
         }
 
+        for(double i=west;i>=1;i--){
+            number2 *= i;
+        }
 
-        System.out.println(dp[N]);
-
-
+        return number1 / number2;
     }
 }

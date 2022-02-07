@@ -6,19 +6,22 @@ import java.util.*;
 
 public class Main {
 
-    // java 1010 다리 놓기
-    //
+    // java 9461 파도반 수열
 
-//    재원이는 서쪽의 사이트와 동쪽의 사이트를 다리로 연결하려고 한다.
-//        (이때 한 사이트에는 최대 한 개의 다리만 연결될 수 있다.)
-//    재원이는 다리를 최대한 많이 지으려고 하기 때문에 서쪽의 사이트 개수만큼 (N개) 다리를 지으려고 한다.
-//    다리끼리는 서로 겹쳐질 수 없다고 할 때 다리를 지을 수 있는 경우의 수를 구하는 프로그램을 작성하라.
+    // 파도반 수열 P(N)은 나선에 있는 정삼각형의 변의 길이이다.
+    // P(1)부터 P(10)까지 첫 10개 숫자는 1, 1, 1, 2, 2, 3, 4, 5, 7, 9이다
+    // N이 주어졌을 때, P(N)을 구하는 프로그램을 작성하시오.
 
-    // 처음에 주어진 예시를 보면서 규칙을 생각해보니까 조합과 식이 똑같다는 생각이 들었다.
-    // 그래서 조합의 공식인 n! / r!(n-r)! 을 계산하려고 했는데
-    // 처음에 그냥 int로 했더니 29!은 범위를 넘었고 Long으로 했는데도 범위를 넘어섰다.
-    // double로 처리하였고 Long이 범위가 넘은 것은 29! 계산하는 부분에서 터진 것 같아서 아예 29! * 16! (13,29 예시에서)
-    // 부분을 아예 함수에서 처리하고서 return 하는 식으로 코드를 수정했다.
+    // 주어지는 파도반 수열의 첫 10개의 숫자를 보면 (2번째 전 + 3번째 전) 이렇게 된다.
+    // N에 대해서 동적 계획법을 구현하면 될 것 같다.
+
+    // 되게 간단한 동적 계획법 문제인데 생각보다 시간이 오래 걸렸다.
+    // 이유는 pado[] 라는 수열을 int로 선언했는데 int의 범위를 넘어선다는 걸 늦게 생각했다.
+    // 1 <= N <= 100 이라는 범위가 있어서 N이 100이하이기 때문에 문제 없을 것이라 생각했는데
+    // 888855064897 N이 100 이면 다음과 같은 값이 나온다.
+    // 이 값이 int의 허용범위를 벗어나기 때문에 long형으로 받았어야 했다.
+    // 주어지는 크기값이 작다고 해서 배열의 원소값이 작은 게 아닌건데 코드를 잘못 한 것이라
+    // 생각해서 다른 부분을 계속 체크하고 로그확인한게 시간을 오래 잡았다.
 
     public static void main(String[] args) throws IOException {
 
@@ -26,39 +29,28 @@ public class Main {
 
         int T = Integer.parseInt(br.readLine());
 
-        ArrayList<Double> list = new ArrayList<>();
-
+        ArrayList<Integer> list = new ArrayList<>();
+        int max = 0;
         for(int i=0;i<T;i++){
-            StringTokenizer stk = new StringTokenizer(br.readLine()," ");
-            double west = Integer.parseInt(stk.nextToken());
-            double east = Integer.parseInt(stk.nextToken());
-
-
-            System.out.printf("%.0f\n",howManySite(west,east,list));
+            int num = Integer.parseInt(br.readLine());
+            list.add(num);
+            max = Math.max(num,max);
         }
 
-    }
+        long[] pado = new long[max + 1];
 
-    public static double howManySite(double west, double east, ArrayList<Double> list){
-        double many = 0;
+        pado[1] = 1;
+        pado[2] = 1;
+        pado[3] = 1;
 
-        many = Combination(west,east);
-
-        return many;
-    }
-
-    public static double Combination(double west,double east){
-        double number1 = 1;
-        double number2 = 1;
-
-        for(double i=east;i>east-west;i--){
-            number1 *= i;
+        for(int i=4;i<=max;i++){
+            pado[i] = pado[i-2] + pado[i-3];
         }
 
-        for(double i=west;i>=1;i--){
-            number2 *= i;
+        for(int i=0;i<list.size();i++){
+            System.out.println(pado[list.get(i)]);
         }
 
-        return number1 / number2;
+
     }
 }

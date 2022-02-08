@@ -6,22 +6,19 @@ import java.util.*;
 
 public class Main {
 
-    // java 9461 파도반 수열
+    // java 2579 계단 오르기(baekjoon)
 
-    // 파도반 수열 P(N)은 나선에 있는 정삼각형의 변의 길이이다.
-    // P(1)부터 P(10)까지 첫 10개 숫자는 1, 1, 1, 2, 2, 3, 4, 5, 7, 9이다
-    // N이 주어졌을 때, P(N)을 구하는 프로그램을 작성하시오.
+//    계단은 한 번에 한 계단씩 또는 두 계단씩 오를 수 있다. 즉, 한 계단을 밟으면서 이어서 다음 계단이나, 다음 다음 계단으로 오를 수 있다.
+//    연속된 세 개의 계단을 모두 밟아서는 안 된다. 단, 시작점은 계단에 포함되지 않는다.
+//    마지막 도착 계단은 반드시 밟아야 한다.
+//    따라서 첫 번째 계단을 밟고 이어 두 번째 계단이나, 세 번째 계단으로 오를 수 있다.
+//    하지만, 첫 번째 계단을 밟고 이어 네 번째 계단으로 올라가거나, 첫 번째, 두 번째, 세 번째 계단을 연속해서 모두 밟을 수는 없다.
 
-    // 주어지는 파도반 수열의 첫 10개의 숫자를 보면 (2번째 전 + 3번째 전) 이렇게 된다.
-    // N에 대해서 동적 계획법을 구현하면 될 것 같다.
-
-    // 되게 간단한 동적 계획법 문제인데 생각보다 시간이 오래 걸렸다.
-    // 이유는 pado[] 라는 수열을 int로 선언했는데 int의 범위를 넘어선다는 걸 늦게 생각했다.
-    // 1 <= N <= 100 이라는 범위가 있어서 N이 100이하이기 때문에 문제 없을 것이라 생각했는데
-    // 888855064897 N이 100 이면 다음과 같은 값이 나온다.
-    // 이 값이 int의 허용범위를 벗어나기 때문에 long형으로 받았어야 했다.
-    // 주어지는 크기값이 작다고 해서 배열의 원소값이 작은 게 아닌건데 코드를 잘못 한 것이라
-    // 생각해서 다른 부분을 계속 체크하고 로그확인한게 시간을 오래 잡았다.
+    // 동적계획법 문제인데 마지막 계단을 반드시 밟아야 한다는 조건때문에 dp로만 만들어지는게 아니라
+    // stair[T] 원소를 더해야 하는 조건을 추가했다.
+    // 동적계획법을 많이 풀면서 어느정도 일정한 규칙에 따라서 원소를 채워가는 형식에는
+    // 어느정도 익숙해진것 같은데 원소의 개수가 초과되는 ArrayIndexOutOfBound 오류가
+    // 자주 발생해서 이 오류를 위해 if문으로 분기문을 만들어야 하는 게 번거로운 것 같다.
 
     public static void main(String[] args) throws IOException {
 
@@ -29,28 +26,25 @@ public class Main {
 
         int T = Integer.parseInt(br.readLine());
 
-        ArrayList<Integer> list = new ArrayList<>();
-        int max = 0;
-        for(int i=0;i<T;i++){
-            int num = Integer.parseInt(br.readLine());
-            list.add(num);
-            max = Math.max(num,max);
+        int[] stair = new int[T+1];
+
+        for(int i=1;i<=T;i++){
+            stair[i] = Integer.parseInt(br.readLine());
         }
 
-        long[] pado = new long[max + 1];
+        int[] dp = new int[T+1];
 
-        pado[1] = 1;
-        pado[2] = 1;
-        pado[3] = 1;
+        dp[0] = stair[0];
+        dp[1] = stair[1];
+        if(T >= 2 ) {
+            dp[2] = stair[1] + stair[2];
 
-        for(int i=4;i<=max;i++){
-            pado[i] = pado[i-2] + pado[i-3];
+            for (int i = 3; i <= T; i++) {
+                dp[i] = Math.max(dp[i - 2], dp[i - 3] + stair[i - 1]) + stair[i];
+            }
         }
 
-        for(int i=0;i<list.size();i++){
-            System.out.println(pado[list.get(i)]);
-        }
-
+        System.out.println(dp[T]);
 
     }
 }

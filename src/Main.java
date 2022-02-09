@@ -6,45 +6,59 @@ import java.util.*;
 
 public class Main {
 
-    // java 2579 계단 오르기(baekjoon)
+    // java baekjoon 11053 가장 긴 증가하는 부분 수열
+    // LIS를 활용하는 문제인데 처음에는 조금 잘못 접근했던 것 같다.
+    // 처음에는 이중 for문을 이용해서 더 작은 수를 카운트했었는데 그렇게 하니
+    // 단순히 대소관계만 비교하게 되어 증가수열을 구할 수 없었다.
+    // 그러고 조금 더 생각해보니까 사실상 알고자 하는 인덱스의 원소를 기준으로
+    // 그 이전의 원소들을 비교해보면서 크기는 더 크고 LIS의 크기는 더 작다면 그때를 기준으로
+    // 1을 더해야 한다고 생각했다.
+    // 증가하는 수열을 구해야 하는 것이기 때문에 수를 고르고 안 고르고를 선택할 수 있게 하기
+    // 위해서 LIS에 1을 더해서 LIS를 구해가야 한다.
 
-//    계단은 한 번에 한 계단씩 또는 두 계단씩 오를 수 있다. 즉, 한 계단을 밟으면서 이어서 다음 계단이나, 다음 다음 계단으로 오를 수 있다.
-//    연속된 세 개의 계단을 모두 밟아서는 안 된다. 단, 시작점은 계단에 포함되지 않는다.
-//    마지막 도착 계단은 반드시 밟아야 한다.
-//    따라서 첫 번째 계단을 밟고 이어 두 번째 계단이나, 세 번째 계단으로 오를 수 있다.
-//    하지만, 첫 번째 계단을 밟고 이어 네 번째 계단으로 올라가거나, 첫 번째, 두 번째, 세 번째 계단을 연속해서 모두 밟을 수는 없다.
-
-    // 동적계획법 문제인데 마지막 계단을 반드시 밟아야 한다는 조건때문에 dp로만 만들어지는게 아니라
-    // stair[T] 원소를 더해야 하는 조건을 추가했다.
-    // 동적계획법을 많이 풀면서 어느정도 일정한 규칙에 따라서 원소를 채워가는 형식에는
-    // 어느정도 익숙해진것 같은데 원소의 개수가 초과되는 ArrayIndexOutOfBound 오류가
-    // 자주 발생해서 이 오류를 위해 if문으로 분기문을 만들어야 하는 게 번거로운 것 같다.
+    // java에서 LIS에 대해서 조금 표현해보고자 한다
+    // LIS를 동적계획법을 이용해 구하는 방식은 O(n^2)의 시간 복잡도를 가진다.
+    // ( 2중 for문을 활용하기 때문이다)
+    // 단, 이분탐색을 활용하면 O(log N)이 가능한데 이분탐색을 활용한 LIS의 풀이법은 조금 더...
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int T = Integer.parseInt(br.readLine());
+        int N = Integer.parseInt(br.readLine());
 
-        int[] stair = new int[T+1];
+        int[] LIS = new int[N+1];
+        int[] arr = new int[N+1];
 
-        for(int i=1;i<=T;i++){
-            stair[i] = Integer.parseInt(br.readLine());
+        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+        for(int i=1;i<=N;i++){
+            arr[i] = Integer.parseInt(stk.nextToken());
         }
 
-        int[] dp = new int[T+1];
+        LIS[1] = 1;
 
-        dp[0] = stair[0];
-        dp[1] = stair[1];
-        if(T >= 2 ) {
-            dp[2] = stair[1] + stair[2];
-
-            for (int i = 3; i <= T; i++) {
-                dp[i] = Math.max(dp[i - 2], dp[i - 3] + stair[i - 1]) + stair[i];
+        for(int i=2;i<=N;i++){
+            LIS[i] = 1;
+            for(int j=1;j < i;j++){
+                if(arr[i] > arr[j] && LIS[i] <= LIS[j]){
+                    LIS[i] = LIS[j] + 1;
+                }
             }
         }
 
-        System.out.println(dp[T]);
+        int max = 0;
+
+        for(int i=1;i<=N;i++){
+            max = Math.max(LIS[i],max);
+        }
+
+        System.out.println(max);
+
+
+
+
+
+
 
     }
 }

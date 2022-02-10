@@ -6,20 +6,17 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 11053 가장 긴 증가하는 부분 수열
-    // LIS를 활용하는 문제인데 처음에는 조금 잘못 접근했던 것 같다.
-    // 처음에는 이중 for문을 이용해서 더 작은 수를 카운트했었는데 그렇게 하니
-    // 단순히 대소관계만 비교하게 되어 증가수열을 구할 수 없었다.
-    // 그러고 조금 더 생각해보니까 사실상 알고자 하는 인덱스의 원소를 기준으로
-    // 그 이전의 원소들을 비교해보면서 크기는 더 크고 LIS의 크기는 더 작다면 그때를 기준으로
-    // 1을 더해야 한다고 생각했다.
-    // 증가하는 수열을 구해야 하는 것이기 때문에 수를 고르고 안 고르고를 선택할 수 있게 하기
-    // 위해서 LIS에 1을 더해서 LIS를 구해가야 한다.
+    // java baekjoon 11054 가장 긴 바이토닉 부분수열
 
-    // java에서 LIS에 대해서 조금 표현해보고자 한다
-    // LIS를 동적계획법을 이용해 구하는 방식은 O(n^2)의 시간 복잡도를 가진다.
-    // ( 2중 for문을 활용하기 때문이다)
-    // 단, 이분탐색을 활용하면 O(log N)이 가능한데 이분탐색을 활용한 LIS의 풀이법은 조금 더...
+    // 수열 S가 어떤 수 Sk를 기준으로 S1 < S2 < ... Sk-1 < Sk > Sk+1 > ... SN-1 > SN을 만족한다면,
+    // 그 수열을 바이토닉 수열이라고 한다.
+
+    // LIS를 양쪽으로 계산해야 한다고 생각했다.(산 모양으로 증가하는 수열을 구해야 하기 때문에)
+    // 그래서 LIS를 왼쪽에서 증가하는 수열 & 오른쪽에서 부터 증가하는 수열을 구해서
+    // 2개의 LIS를 더한다.
+    // 다만 오른쪽에서부터 증가하는 수열을 구하는 과정에서 인덱스가 헷갈려서 몇 번 수정을 거쳤고
+    // 왼쪽에서의 증가수열과 오른쪽에서의 증가수열이 하나가 겹치는 부분이 있기 때문에
+    // 최종적으로 더해진 수열에서 가장 큰 값 - 1을 해서 답을 도출한다.
 
     public static void main(String[] args) throws IOException {
 
@@ -27,34 +24,55 @@ public class Main {
 
         int N = Integer.parseInt(br.readLine());
 
-        int[] LIS = new int[N+1];
         int[] arr = new int[N+1];
+        int[] bitonic = new int[N+1];
+        int[] bitonic_left = new int[N+1];
+        int[] bitonic_right = new int[N+1];
 
         StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+
         for(int i=1;i<=N;i++){
             arr[i] = Integer.parseInt(stk.nextToken());
         }
 
-        LIS[1] = 1;
-
-        for(int i=2;i<=N;i++){
-            LIS[i] = 1;
-            for(int j=1;j < i;j++){
-                if(arr[i] > arr[j] && LIS[i] <= LIS[j]){
-                    LIS[i] = LIS[j] + 1;
+        for(int i=1;i<=N;i++){
+            bitonic_left[i] = 1;
+            for(int j=1;j<i;j++){
+                if(arr[i] > arr[j] && bitonic_left[i] <= bitonic_left[j]){
+                    bitonic_left[i] = bitonic_left[j] + 1;
                 }
             }
         }
 
-        int max = 0;
-
-        for(int i=1;i<=N;i++){
-            max = Math.max(LIS[i],max);
+        for(int i=N;i>=1;i--){
+            bitonic_right[i] = 1;
+            for(int j=N;j>i;j--){
+                if(arr[i] > arr[j] && bitonic_right[i] <= bitonic_right[j]){
+                    bitonic_right[i] = bitonic_right[j] + 1;
+                }
+            }
         }
 
-        System.out.println(max);
+        for(int i=1;i<=N;i++){
+            bitonic[i] = bitonic_left[i] + bitonic_right[i];
+        }
 
+//        System.out.println("왼쪽에서부터");
+//        for(int i=1;i<=N;i++){
+//            System.out.print(bitonic_left[i] + " ");
+//        }
+//        System.out.println();
+//
+//        System.out.println("오른쪽에서부터");
+//        for(int i=1;i<=N;i++){
+//            System.out.print(bitonic_right[i] + " ");
+//        }
+        int max = 0;
+        for(int i=1;i<=N;i++){
+            max = Math.max(bitonic[i],max);
+        }
 
+        System.out.println(max-1);
 
 
 

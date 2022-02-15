@@ -6,54 +6,48 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 1912 연속합
-//    n개의 정수로 이루어진 임의의 수열이 주어진다.
-//    우리는 이 중 연속된 몇 개의 수를 선택해서 구할 수 있는 합 중 가장 큰 합을 구하려고 한다. 단, 수는 한 개 이상 선택해야 한다.
-//
-//    예를 들어서 10, -4, 3, 1, 5, 6, -35, 12, 21, -1 이라는 수열이 주어졌다고 하자.
-//    여기서 정답은 12+21인 33이 정답이 된다.
-    // 2중 for문으로 시작하는 지점부터 끝지점까지 합을 구해서 max값과 비교하는 방식으로 하는 것은
-    // n이 100000이하이기 때문에 O(n^2)에서 시간초과가 날 것이라 생각했다.
-    // (주석처리한 부분은 n이 작은 경우에 가능한 2중 for문으로 해결한 부분이다)
-    // 그래서 n이 크기 때문에 동적 계획법을 이용해야 한다고 생각했고 해당 인덱스까지 더해진 것과
-    // 해당 인덱스의 값의 대소 비교를 해서 더 큰 값을 계속 취하는 식으로 진행하였다.
+    // java programmers level 2 - 스킬트리
+    // 토요일에 programmers에서 코딩테스트를 볼 게 있어서 다시 programmers 문제를 해결한다
+    // java가 아닌 c++로 해결한 문제가 있어서 java로 다시 풀어보려고 했다
+
+    // skill_trees에 있는 원소들을 skill에 있는 문자들만 꺼내서 string으로 만든다
+    // 그러면 skill_trees[i]에서 skill에 포함된 문자로만 만들어진 string을 만들었을 때
+    // 순서가 일치하면 answer+1을 해준다
+    // 순서가 일치하는지를 보는 과정에서 조금 시간이 걸렸다.
+    // 나는 그 과정을 contains로 포함되는지 확인한 다음에 첫 문자의 시작 인덱스가 0인지를 확인했는데
+    // 그 과정에서 런타임 에러가 발생했다.
+    // 그래서 indexOf를 검색해봤는데 단순히 문자의 위치만을 확인하는 것이 아니라 indexOf는
+    // string이 인자로 주어지면 첫 문자가 일치하는 지점을 리턴하기 때문에
+    // indexOf(str) == 0으로 하면 첫번째 문자와 같은지를 비교할 수 있었다.
 
     public static void main(String[] args) throws IOException {
 
+        String skill = "CBD";
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String[] skill_trees = {"BACDE","CBADF","AECB","BDA"};
 
-        int n = Integer.parseInt(br.readLine());
+        int answer =  0;
 
-        int[] arr = new int[n+1];
+        for(int i=0;i< skill_trees.length;i++){
 
-        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
-        for(int i=1;i<=n;i++){
-            arr[i] = Integer.parseInt(stk.nextToken());
+            StringBuffer sb = new StringBuffer();
+            for(int j=0;j<skill_trees[i].length();j++){
+                if(skill.contains(String.valueOf(skill_trees[i].charAt(j)))){
+                    sb.append(skill_trees[i].charAt(j));
+                }
+            }
+
+            System.out.println(sb.toString());
+
+            if(skill.indexOf(sb.toString()) == 0){ // string 끼리 비교하면 처음만나는 지점을 의미
+                answer++;
+            }
+
+
         }
 
-//        int max = 0;
+        System.out.println(answer);
 
-//        for(int i=1;i<n;i++){
-//            int sum = arr[i];
-//            for(int j=i+1;j<=n;j++){
-//                sum += arr[j];
-//                max = Math.max(max, sum);
-//            }
-//
-//        }
-
-        int[] dp = new int[n+1];
-
-        dp[1] = arr[1];
-        int max = arr[1];
-        for(int i=2;i<=n;i++){
-            dp[i] = Math.max(dp[i-1] + arr[i], arr[i]);
-
-            max = Math.max(max,dp[i]);
-        }
-
-        System.out.println(max);
 
     }
 }

@@ -6,48 +6,47 @@ import java.util.*;
 
 public class Main {
 
-    // java programmers level 2 - 스킬트리
-    // 토요일에 programmers에서 코딩테스트를 볼 게 있어서 다시 programmers 문제를 해결한다
-    // java가 아닌 c++로 해결한 문제가 있어서 java로 다시 풀어보려고 했다
-
-    // skill_trees에 있는 원소들을 skill에 있는 문자들만 꺼내서 string으로 만든다
-    // 그러면 skill_trees[i]에서 skill에 포함된 문자로만 만들어진 string을 만들었을 때
-    // 순서가 일치하면 answer+1을 해준다
-    // 순서가 일치하는지를 보는 과정에서 조금 시간이 걸렸다.
-    // 나는 그 과정을 contains로 포함되는지 확인한 다음에 첫 문자의 시작 인덱스가 0인지를 확인했는데
-    // 그 과정에서 런타임 에러가 발생했다.
-    // 그래서 indexOf를 검색해봤는데 단순히 문자의 위치만을 확인하는 것이 아니라 indexOf는
-    // string이 인자로 주어지면 첫 문자가 일치하는 지점을 리턴하기 때문에
-    // indexOf(str) == 0으로 하면 첫번째 문자와 같은지를 비교할 수 있었다.
+    // java programmers level 2 주식가격
+    // 떨어지지 않는 주식가격의 시간을 구하는 문제인데 2중 for문으로 기준이 되는 인덱스와
+    // 그 뒤쪽의 인덱스를 비교하는 문제라 쉽다고 생각했는데 한 가지 고려 요소가 있었다.
+    // 바로 가격이 떨어지는 구간을 시간에 더한다는 점이었다
+    // 예를 들면 2 3 4 3 이렇게 있다면 2는 끝까지 떨어지지 않기 때문에 answer[0] = 3이 된다
+    // 하지만 3은 바로뒤의 원소가 4로 가격이 올라가기 때문에 for문을 종료시켜야 하는데
+    // 이 경우에 answer[1] = 0이 아니라 1초후에 올랐다는 의미로 answer[1] = 1이 된다.
+    // 이 부분을 하나의 조건으로 해결하기는 부분에서 조금 걸려서
+    // if문으로 분기를 두어 가격이 올라가서 종료되는 경우와 끝까지 가격이 오르지 않고 인덱스가 끝나서
+    // 종료되는 경우로 나눠서 !flag 와 flag로 조건을 두어 문제를 해결했다.
 
     public static void main(String[] args) throws IOException {
 
-        String skill = "CBD";
+        int[] prices = {2,4,5,3,1,6};
 
-        String[] skill_trees = {"BACDE","CBADF","AECB","BDA"};
+        int[] answer = new int[prices.length];
 
-        int answer =  0;
-
-        for(int i=0;i< skill_trees.length;i++){
-
-            StringBuffer sb = new StringBuffer();
-            for(int j=0;j<skill_trees[i].length();j++){
-                if(skill.contains(String.valueOf(skill_trees[i].charAt(j)))){
-                    sb.append(skill_trees[i].charAt(j));
+        for(int i=0;i< prices.length-1;i++){
+            int cnt = 0;
+            boolean flag = true;
+            for(int j=i+1;j< prices.length;j++){
+                if(prices[i] <= prices[j]){
+                    cnt++;
+                }
+                else{
+                    flag = false;
+                    break;
                 }
             }
 
-            System.out.println(sb.toString());
-
-            if(skill.indexOf(sb.toString()) == 0){ // string 끼리 비교하면 처음만나는 지점을 의미
-                answer++;
+            if(!flag){
+                answer[i] = cnt + 1;
             }
-
-
+            else answer[i] = cnt;
         }
 
-        System.out.println(answer);
+        answer[prices.length-1] = 0;
 
+        for(int i=0;i<answer.length;i++){
+            System.out.print(answer[i] + " ");
+        }
 
     }
 }

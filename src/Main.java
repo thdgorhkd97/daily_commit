@@ -6,47 +6,59 @@ import java.util.*;
 
 public class Main {
 
-    // java programmers level 2 주식가격
-    // 떨어지지 않는 주식가격의 시간을 구하는 문제인데 2중 for문으로 기준이 되는 인덱스와
-    // 그 뒤쪽의 인덱스를 비교하는 문제라 쉽다고 생각했는데 한 가지 고려 요소가 있었다.
-    // 바로 가격이 떨어지는 구간을 시간에 더한다는 점이었다
-    // 예를 들면 2 3 4 3 이렇게 있다면 2는 끝까지 떨어지지 않기 때문에 answer[0] = 3이 된다
-    // 하지만 3은 바로뒤의 원소가 4로 가격이 올라가기 때문에 for문을 종료시켜야 하는데
-    // 이 경우에 answer[1] = 0이 아니라 1초후에 올랐다는 의미로 answer[1] = 1이 된다.
-    // 이 부분을 하나의 조건으로 해결하기는 부분에서 조금 걸려서
-    // if문으로 분기를 두어 가격이 올라가서 종료되는 경우와 끝까지 가격이 오르지 않고 인덱스가 끝나서
-    // 종료되는 경우로 나눠서 !flag 와 flag로 조건을 두어 문제를 해결했다.
+    // java programmers level 2 - 전화번호 목록
+    // for문으로 원소들을 확인하면서 indexOf로 시작하는 접두사인지를 확인해보는데
+    // StartsWith으로 확인해도 된다.
+    // 근데 2중 for문으로 O(n^2)이 되다 보니까 정확성은 모두 통과하더라도 효율성에서
+    // 문제가 생겼다. 그래서 배열을 정렬하기도 하고 어떤 조건을 걸어서 최대한 빨리 for문을
+    // 벗어나려 하더라도 시간초과가 발생했다..
 
     public static void main(String[] args) throws IOException {
 
-        int[] prices = {2,4,5,3,1,6};
+        String[] phone_book = {"456789", "45622", "78912313123"};
 
-        int[] answer = new int[prices.length];
+//        Arrays.sort(phone_book, new Comparator<String>() {
+//            @Override
+//            public int compare(String o1, String o2) {
+//                return o1.length() - o2.length();
+//            }
+//        });
+//
+//        boolean flag = true;
+//        boolean answer = true;
+//
+//        for(int i=0;i< phone_book.length-1;i++){
+//            for(int j=i+1;j< phone_book.length;j++){
+//                if(phone_book[j].indexOf(phone_book[i]) == 0){
+//                    flag = false;
+//                    break;
+//                }
+//            }
+//
+//            if(!flag) {
+//                answer = false;
+//                break;
+//            }
+//        }
 
-        for(int i=0;i< prices.length-1;i++){
-            int cnt = 0;
-            boolean flag = true;
-            for(int j=i+1;j< prices.length;j++){
-                if(prices[i] <= prices[j]){
-                    cnt++;
-                }
-                else{
-                    flag = false;
-                    break;
-                }
+        /* 이 부분은 풀이법을 알아보고나서 체크해본 건데 정렬 후에
+        그 다음 원소가 이전 원소로 시작하는 지를 확인하는 건데 내가 문제를 잘못 이해한건지
+        그 직후의 원소만 체크하면 되는 건지 잘 모르겠다 ㅠㅠ
+        문제에는 길이로 정렬한 후에 바로 다음 원소만을 체크하면 된다는 식의 지문이 없다고
+        생각하는데 왜 이렇게 해결하는 것 만으로 해결이 가능한건지...
+
+         */
+       Arrays.sort(phone_book);
+
+        for(int i=0;i< phone_book.length-1;i++){
+            if(phone_book[i+1].startsWith(phone_book[i])){
+//                return false;
             }
-
-            if(!flag){
-                answer[i] = cnt + 1;
-            }
-            else answer[i] = cnt;
         }
 
-        answer[prices.length-1] = 0;
+//        return true;
 
-        for(int i=0;i<answer.length;i++){
-            System.out.print(answer[i] + " ");
-        }
+
 
     }
 }

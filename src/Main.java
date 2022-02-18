@@ -6,57 +6,86 @@ import java.util.*;
 
 public class Main {
 
-    // java programmers level 2 - 전화번호 목록
-    // for문으로 원소들을 확인하면서 indexOf로 시작하는 접두사인지를 확인해보는데
-    // StartsWith으로 확인해도 된다.
-    // 근데 2중 for문으로 O(n^2)이 되다 보니까 정확성은 모두 통과하더라도 효율성에서
-    // 문제가 생겼다. 그래서 배열을 정렬하기도 하고 어떤 조건을 걸어서 최대한 빨리 for문을
-    // 벗어나려 하더라도 시간초과가 발생했다..
+    // java 구명보트 & 튜플
+    //
 
     public static void main(String[] args) throws IOException {
 
-        String[] phone_book = {"456789", "45622", "78912313123"};
-
-//        Arrays.sort(phone_book, new Comparator<String>() {
-//            @Override
-//            public int compare(String o1, String o2) {
-//                return o1.length() - o2.length();
-//            }
-//        });
+//        String s = "{{2},{2,1},{2,1,3},{2,1,3,4}}";
 //
-//        boolean flag = true;
-//        boolean answer = true;
+//        s = s.substring(2,s.length()-2);
 //
-//        for(int i=0;i< phone_book.length-1;i++){
-//            for(int j=i+1;j< phone_book.length;j++){
-//                if(phone_book[j].indexOf(phone_book[i]) == 0){
-//                    flag = false;
+//        s = s.replace("},{","/");
+//
+//        String[] arr = s.split("/");
+//
+//        System.out.println(s);
+//
+//        Arrays.sort(arr,((o1, o2) -> o1.length() - o2.length()));
+//
+//        // 처음에는 단순히 arr배열의 각 순서의 맨 마지막 원소만을 취하는 방식으로 했었는데
+//        // 문제를 보면 원소 순서가 반드시 맨 마지막 원소가 새로운 원소일 것이라는 조건이 없기 때문에
+//        // 그렇게 하면 안 된다.
+//        // 예를들어 1 / 1 2 / 1 2 3 / 1 2 3 4 이런 식이면 1 2 3 4 라는 정답이 나오지만
+//        // 1 / 2 1 / 2 1 3 / 2 1 3 4 이렇게 정렬이 안 되어 있다면 단순히 맨 뒤 원소를 취하는 건
+//        // 정답이 될 수 없다.
+//
+//        /* 그래서 혹시 정렬을 해서 맨 마지막 원소를 취하면 되지 않을까 생각해서 이렇게도 구현해 봤는데
+//
+//        // 길이가 1인 제일 첫번째 arr[0]가 길이가 2인 두번째 arr[1]을 기준으로 큰 지 작은지 모르기 때문에
+//        // 크기를 비교해서 정렬하는 기준을 잡아야 하는 문제가 또 생긴다
+//        // 예를 들어 arr[0] = 1이면 1 2 이렇게 되어야 하므로 오름차순 정렬
+//        // arr[1] = 2면 2 1 이렇게 되어야 하므로 내림차순 정렬이 되어야 하므로 맨 뒤를 취하는 건 옳지 않은 것 같다.
+//        for(int i=1;i<arr.length;i++){
+//            String[] str = arr[i].split(",");
+//
+//            Arrays.sort(str);
+//
+//            list.add(Integer.parseInt(String.valueOf(str[i].charAt(str[i].length()-1))));
+//        }
+//        */
+//
+//        ArrayList<Integer> list = new ArrayList<>();
+//        list.add(Integer.parseInt(arr[0]));
+//
+//        for(int i=1;i<arr.length;i++){
+//            String[] str = arr[i].split(",");
+//
+//            for(int j=0;j<str.length;j++){
+//                if(!list.contains(Integer.parseInt(str[j]))){
+//                    list.add(Integer.parseInt(str[j]));
 //                    break;
 //                }
 //            }
+//        }
 //
-//            if(!flag) {
-//                answer = false;
-//                break;
-//            }
+//        int[] answer = new int[list.size()];
+//
+//        for(int i=0;i<list.size();i++){
+//            answer[i] = list.get(i);
 //        }
 
-        /* 이 부분은 풀이법을 알아보고나서 체크해본 건데 정렬 후에
-        그 다음 원소가 이전 원소로 시작하는 지를 확인하는 건데 내가 문제를 잘못 이해한건지
-        그 직후의 원소만 체크하면 되는 건지 잘 모르겠다 ㅠㅠ
-        문제에는 길이로 정렬한 후에 바로 다음 원소만을 체크하면 된다는 식의 지문이 없다고
-        생각하는데 왜 이렇게 해결하는 것 만으로 해결이 가능한건지...
+        int[] people = {70,80,50};
+        int limit = 100;
+        int answer = 0;
 
-         */
-       Arrays.sort(phone_book);
+        Arrays.sort(people); // 50 60 70 80
 
-        for(int i=0;i< phone_book.length-1;i++){
-            if(phone_book[i+1].startsWith(phone_book[i])){
-//                return false;
+        int l = 0, r = people.length-1;
+
+        while(l <= r){
+            if(people[l] + people[r] <= limit){
+                l++;
             }
+            r--;
+            answer++;
+
         }
 
-//        return true;
+        System.out.println(answer);
+
+
+
 
 
 

@@ -6,110 +6,69 @@ import java.util.*;
 
 public class Main {
 
-    // devcourse 백엔드 코딩테스트 2번문제
-    // push 되는 string의 share / comment 가 일치하게 되면
-    // 인원수에 따라 push 되는 string을 따로 구분해야 하는데 이 부분을 어떻게 처리할까 고민하다가
-    // 시간이 많이 소모 되었다 ㅠㅠㅠ
-    // 그래서 결국 모든 push 되는 string을 저장해 두었다가 push 되는 조건이 일치하게 되면
-    // push되는 string을 변경함으로써 조건을 맞추는 작업을 추가했다.
+    // java baekjoon 2231 분해합
+
+//    어떤 자연수 N이 있을 때, 그 자연수 N의 분해합은 N과 N을 이루는 각 자리수의 합을 의미한다.
+//    어떤 자연수 M의 분해합이 N인 경우, M을 N의 생성자라 한다.
+//    예를 들어, 245의 분해합은 256(=245+2+4+5)이 된다. 따라서 245는 256의 생성자가 된다.
+//    물론, 어떤 자연수의 경우에는 생성자가 없을 수도 있다. 반대로, 생성자가 여러 개인 자연수도 있을 수 있다.
+//    자연수 N이 주어졌을 때, N의 가장 작은 생성자를 구해내는 프로그램을 작성하시오.
+
+    // 가장 작은 생성자를 구해야 하기 때문에 for문을 1부터 돌면서 해당 숫자에 대한 분해합이 N과 일치하는지
+    // 확인하는 식으로 진행하였다. 근데 문제 자체는 되게 간단한데 for문을 N번 돌아야만 하는건가 싶어서
+    // 시간을 줄일 수 있는 방법에 대해서 더 고민해보았다.
+    // 분해합을 구하는 방법은 줄일 부분이 없는 것 같다. 각 자릿수를 구해야 하기 때문에 Array로 바꿔서 더하는 방식을
+    // 생각했지만 array에 넣고 index를 돌면서 더하나 다른 변수에 대입하고 나눠가면서 더하나 시간은 같다.
+    // 그렇다면 분해합으로 될 수 있는 범위가 나눠질 가능성이 있을까? 라고 생각했는데 처음에 나는
+    // 절반 이상이면 괜찮겠지라고 생각했는데 이건 느낌이었고 좀 더 알아보니
+    // 분해합이라는 건 각 수에 자릿수를 더한 것이기 떄문에 각 자릿수는 0~9 까지니까 최댓값은 9이다.
+    // 따라서 N - ( 9 * 자리수 ) 를 시작 인덱스로 지정하는 것이 가능하다는 소리다.
 
     public static void main(String[] args) throws IOException {
 
-        String[] records = {
-                "john share",
-                "mary comment",
-                "jay share",
-                "check notification",
-                "check notification",
-                "sally comment",
-                "james share",
-                "check notification",
-                "lee share",
-                "laura share",
-                "will share",
-                "check notification",
-                "alice comment",
-                "check notification"};
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        Stack<String> alarm = new Stack<>();
-        Stack<String> savings = new Stack<>();
+        int N = Integer.parseInt(br.readLine());
 
-        for(int i=0;i< records.length;i++){
-            String name = records[i].substring(0,records[i].indexOf(" "));
-            String category = records[i].substring(records[i].indexOf(" ") + 1);
-
-            if(alarm.isEmpty()){ // 스택이 비어있으면
-                alarm.push(records[i]);
-            }
-            else if(records[i].equals("check notification")){ // 보관함으로 이동
-                savings.push(alarm.pop());
-            }
-            else{
-                String prev = alarm.peek();
-                String prevName = prev.substring(0,prev.indexOf(" ")); // 이전 이름
-                String prevCategory = prev.substring(prev.indexOf(" ") + 1); // 이전 comment ? share ?
-
-                String together = "";
-                if(prevCategory.equals(category)){
-                    together = prevName + "&&" + name;
-                    alarm.pop();
-                    alarm.push(together+" "+prevCategory);
-                }
-                else{
-                    alarm.push(records[i]);
-                }
-            }
-        }
-
-
-        String[] answer = new String[savings.size()];
-        int idx = 0;
-        for(String str : savings){
-
-            String people = str.substring(0,str.indexOf(" ")); // 같은 카테고리를 가지는 사람을 && 으로 구분한 문자열
-            String category = str.substring(str.indexOf(" ") + 1); // 어떤 카테고리?
-            String[] person = people.split("&&"); // 같은 카테고리를 가지는 사람 수
-
-            StringBuffer save = new StringBuffer();
-
-            if(person.length == 1){ // 1명 일때
-                save.append(person[0]);
-            }
-            else if(person.length == 2){ // 2명 일때
-                String appned = person[0] + " and " + person[1];
-                save.append(appned);
-            }
-            else{ // 3명 이상이면 맨 앞사람 + n 명
-                String append = person[0] + " and " + String.valueOf(person.length-1) + " others";
-                save.append(append);
-            }
-
-            if(category.equals("share")){
-                save.append(" shared your post");
-            }
-            else if(category.equals("comment")){
-                save.append(" commented on your post");
-            }
-
-
-            answer[idx++] = save.toString();
-        }
-
-
+        int answer = 0;
         /*
-        while(!savings.isEmpty()){
-        System.out.println(savings.pop());
+        for(int i=N/2;i<=N;i++){
+            if(BoonHaeHap(i,N)){
+                answer = i;
+                break;
+            }
         }
-        */
+         */
 
-        for(int i=0;i<answer.length;i++){
-            System.out.println(answer[i]);
+        int cnt = 0,number = N;
+        while(number > 0){ // 자릿수 구하기
+            number = number / 10;
+            cnt++;
         }
 
+        for(int i= (N - (cnt * 9));i<=N;i++){
+            if(BoonHaeHap(i,N)){
+                answer = i;
+                break;
+            }
+        }
 
+        System.out.println(answer);
 
+    }
 
+    static public boolean BoonHaeHap(int num,int N){
 
+        int boonhaehap = num;
 
+        int number = num;
+        while(num > 0){
+            boonhaehap += num % 10;
+            num = num / 10;
+        }
+
+//        System.out.println(number+" 의 분해합 = " + boonhaehap);
+        if(boonhaehap == N) return true;
+        else return false;
     }
 }

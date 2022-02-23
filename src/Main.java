@@ -6,92 +6,126 @@ import java.util.*;
 
 public class Main {
 
-    // java 13305 주유소
-
-    // 5(도시의 주유값) 2(거리) 2(도시의 주유값) 3(거리) 4(도시의 주유값) 1(거리) 1(도시의 주유값)
-//    제일 왼쪽 도시에서 6리터의 기름을 넣고, 더 이상의 주유 없이 제일 오른쪽 도시까지 이동하면 총 비용은 30원이다.
-//    만약 제일 왼쪽 도시에서 2리터의 기름을 넣고(2×5 = 10원) 다음 번 도시까지 이동한 후 3리터의 기름을 넣고(3×2 = 6원)
-//    다음 도시에서 1리터의 기름을 넣어(1×4 = 4원) 제일 오른쪽 도시로 이동하면, 총 비용은 20원이다.
-//    또 다른 방법으로 제일 왼쪽 도시에서 2리터의 기름을 넣고(2×5 = 10원) 다음 번 도시까지 이동한 후 4리터의 기름을 넣고(4×2 = 8원) 제일 오른쪽 도시까지 이동하면, 총 비용은 18원이다.
-//
-//    각 도시에 있는 주유소의 기름 가격과, 각 도시를 연결하는 도로의 길이를 입력으로 받아 제일 왼쪽 도시에서 제일 오른쪽 도시로 이동하는 최소의 비용을 계산하는 프로그램을 작성하시오.
-
-    // 처음의 생각은 어떤 도시에서의 기름값보다 다음 도시의 기름값이 비싸면 그 도시에서 기름을 다다음 도시까지 갈 분량을 집어넣는 게 이득이다.
-    // 그래서 도시를 idx로 보면서 도시와 그 다음 도시의 기름값을 비교해서 더 값싼 도시의 기름을 최대한 많이 넣는 식으로 하려는 데
-    // 기름값과 거리가 index가 다르니까 이게 되게 구현하는 게 쉽지 않았다 ㅠㅠㅠ
-    // 그런데 알맞은 로직은 직접 index를 바꿔가면서 비교하는 게 아니라 기름값 자체를 내림차순이 되도록 ( 다음 도시의 기름값이 더 크면 이전 기름값과 같게 바꿔서)
-    // 바꾼 다음에 도시의 기름값을 곱해서 더하면 가능하다고 한다.
-    // 그렇게 구현해본 것 같은데... 정답은 아니었다... 내일 더 공부해봐야겠다...
-
+    // java programmers 피로도
+    // https://programmers.co.kr/learn/courses/30/lessons/87946
+    // 처음에는 필요피로도나 소모피로도를 기준을 정렬해서 for문을 돌며 몇 개의 던전을
+    // 돌 수 있는지를 체크하려고 했으나 한번의 정렬을 기준으로 문제를 해결할 수 있는
+    // 기준을 모르겠다 ㅠㅠㅠ
+    // 그래서 던전의 길이가 8밖에 되지않기 때문에 조합을 통해서 아예 가능한 던전 방문의
+    // 모든 경우의 수를 구하고 해당 던전 방문 순서를 지키면서 몇 개의 던전을 갈 수 있는지
+    // 체크하는 식으로 문제를 해결해보았다.
+    // 근데 문제가 던전의 길이가 짧기 때문에 가능했던 것이지 다른 방법을 찾아야 할 것으로 보인다...
+    static int[][] list;
+    static int idx = 0;
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int k = 80;
 
-        int N = Integer.parseInt(br.readLine());
-
-        int[] road = new int[N-1];
-        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
-        for(int i=0;i<N-1;i++){
-            road[i] = Integer.parseInt(stk.nextToken());
-        }
-
-        stk = new StringTokenizer(br.readLine()," ");
-        int[] money = new int[N];
-        for(int i=0;i<N;i++){
-            money[i] = Integer.parseInt(stk.nextToken());
-        }
+        int[][] dungeons = {{80, 20}, {50, 40}, {30, 10}};
 
         int answer = 0;
-        int idx = 0;
+
+        int n = dungeons.length;
+
+        int[] arr = new int[n];
+
+        int factorial = 1;
+        for(int i=1;i<=n;i++){
+            factorial *= i;
+        }
+        list = new int[factorial][n];
+
+        for(int i=0;i<n;i++) arr[i] = i;
+
+        int depth = 0;
+
+        permu(arr,depth,n,n);
+
+        for(int i=0;i<factorial;i++){
+            int result = 0;
+            int pirodo = k;
+            for(int j=0;j<n;j++){
+                if(pirodo >= dungeons[list[i][j]][0]){
+                    pirodo -= dungeons[list[i][j]][1];
+                    result++;
+                }
+
+                else break;
+            }
+
+            answer = Math.max(answer, result);
+        }
+    }
+
+    public static void permu(int[] arr,int depth,int n, int r){
+        if(depth == r){
+            for(int i=0;i<arr.length;i++){
+                list[idx][i] = arr[i];
+            }
+            idx++;
+        }
+
+        for(int i=depth;i<n;i++){
+            swap(arr,depth,i);
+            permu(arr,depth+1,n,r);
+            swap(arr,depth,i);
+        }
+    }
+
+    public static void swap(int[] arr, int depth,int i){
+        int tmp = arr[depth];
+        arr[depth] = arr[i];
+        arr[i] = tmp;
+    }
+
+}
 
         /*
-        while(idx != N-1){
+        Arrays.sort(dungeons,((o1, o2) -> o2[0] - o1[0]));
 
-            int distance = 0;
-            for(int i=idx; idx < N-1 ;i++){
-                if(money[i] < money[i+1]){
-                    distance += road[i];
-                }
-                else {
-                    idx = i;
-                    distance = road[i];
-                    break;
+        int idx = 0;
+        while(idx < dungeons.length && k >= dungeons[idx][0] ){
+            k -= dungeons[idx][1];
+            idx++;
+
+            for(int i=idx;i< dungeons.length-1;i++){
+                if(dungeons[i][1] > dungeons[i+1][1]){
+                    int[] arr = new int[2];
+                    arr[0] = dungeons[i][0];
+                    dungeons[i][0] = dungeons[i+1][0];
+                    dungeons[i+1][0] = arr[0];
+
+                    arr[1] = dungeons[i][1];
+                    dungeons[i][1] = dungeons[i+1][1];
+                    dungeons[i+1][1] = arr[1];
                 }
             }
 
-            answer += distance * money[idx];
-
+            answer++;
         }
          */
 
-        for(int i=0;i< money.length-1;i++){
-            if(money[i] < money[i+1]){
-                money[i+1] = money[i];
+        /*
+        Arrays.sort(dungeons, new Comparator<int[]>() {
+            @Override
+            public int compare(int[] o1, int[] o2) {
+                if(o1[1] == o2[1]){
+                    return o2[0] - o1[0];
+                }
+                return o1[1] - o2[1];
             }
-        }
-
-        for(int i=0;i<money.length-1; i++){
-            answer += money[i] * road[i];
-        }
-
-        System.out.println(answer);
+        });
 
 
+        int idx = 0;
+        while(k >= 0 && idx < dungeons.length){
+            System.out.println("k = " + k + " " + dungeons[idx][0]);
+            if(k >= dungeons[idx][0]){
+                k -= dungeons[idx][1];
+                answer++;
+            }
+            idx++;
 
+        }*/
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    }
-}

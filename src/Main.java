@@ -6,72 +6,59 @@ import java.util.*;
 
 public class Main {
 
-    // java 13305 주유소
+    // java 1037 약수
 
-    // 5(도시의 주유값) 2(거리) 2(도시의 주유값) 3(거리) 4(도시의 주유값) 1(거리) 1(도시의 주유값)
-//    제일 왼쪽 도시에서 6리터의 기름을 넣고, 더 이상의 주유 없이 제일 오른쪽 도시까지 이동하면 총 비용은 30원이다.
-//    만약 제일 왼쪽 도시에서 2리터의 기름을 넣고(2×5 = 10원) 다음 번 도시까지 이동한 후 3리터의 기름을 넣고(3×2 = 6원)
-//    다음 도시에서 1리터의 기름을 넣어(1×4 = 4원) 제일 오른쪽 도시로 이동하면, 총 비용은 20원이다.
-//    또 다른 방법으로 제일 왼쪽 도시에서 2리터의 기름을 넣고(2×5 = 10원) 다음 번 도시까지 이동한 후 4리터의 기름을 넣고(4×2 = 8원) 제일 오른쪽 도시까지 이동하면, 총 비용은 18원이다.
-//
-//    각 도시에 있는 주유소의 기름 가격과, 각 도시를 연결하는 도로의 길이를 입력으로 받아 제일 왼쪽 도시에서 제일 오른쪽 도시로 이동하는 최소의 비용을 계산하는 프로그램을 작성하시오.
+//    양수 A가 N의 진짜 약수가 되려면, N이 A의 배수이고, A가 1과 N이 아니어야 한다.
+//    어떤 수 N의 진짜 약수가 모두 주어질 때, N을 구하는 프로그램을 작성하시오.
 
-    // 내림차순으로 거리를 조정해서 그 거리에 해당하는 기름값을 곱하는 로직을 구한다고 생각했는데
-    // 도저히 거기서 진전이 없어서 결국 코드를 알아보고 말았다ㅠㅠㅠ
-    // 근데 코드를 보고서도 '아 내꺼랑 로직이 같은데' 싶어서 한참 더 고민하다가 알아냈다
-    // 원래 내 코드의 문제점은 거리만 내림차순으로 정렬함으로써 주유값을 곱하는데
-    // 최소의 주유값을 초기화하지 않아서 문제였다
-    // 예를 들어 어떤 지역에서 그 다음지역으로 갈때 기름값이 더 비싸면 지금 지역에서
-    // 다다음 지역까지의 거리값을 한번에 곱해야 하는데 해당 거리값이 계산이 안 되는 문제가 있었다.
+    // 1과 N이 아닌 N의 약수가 모두 주어지는 것이기 때문에 정렬한 후를 확인해보면
+    // 총 i개의 약수가 있다면 1*i / 2*(i-1) ... 이런 식으로 합쳐서 i+1이 되는 순번을
+    // 곱하면 N이 나오게 된다. (혹시 제곱수라면 같은수가 2번 곱해진다.)
 
+    // java 1085 직사각형에서 탈출
+    // 한수는 지금 (x, y)에 있다. 직사각형은 각 변이 좌표축에 평행하고, 왼쪽 아래 꼭짓점은 (0, 0), 오른쪽 위 꼭짓점은 (w, h)에 있다.
+    // 직사각형의 경계선까지 가는 거리의 최솟값을 구하는 프로그램을 작성하시오.
+
+    // 지나치게 복잡하게 생각해서 시간이 상당히 오래걸리는 문제가 있었다 ㅠㅠ
+    // 직사각형의 경계선까지 거리를 구해야 하기 때문에 (x,y)의 위치를 Math.abs()로 절댓값으로 거리계산하고
+    // (w,h)의 직선으로 위치하고 있어서 직선거리가 대각선인 경우에 (즉 꼭짓점으로 도달해야하는 경우)
+    // 를 계산하기 위해서 피타고라스의 정리를 활용하고 그랬는데 문제를 보니
+    // xy가 반드시 wh보다 1이상 작다는 조건이 있어서 쉽게 해결할 수 있었다.
+    // 그냥 직사각형의 4가지 선분까지의 거리를 비교하면 되었다.
+    // x y w-x h-y 4가지
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
+        /*
         int N = Integer.parseInt(br.readLine());
 
-        int[] road = new int[N-1];
+        int[] real = new int[N];
+
         StringTokenizer stk = new StringTokenizer(br.readLine()," ");
-        for(int i=0;i<N-1;i++){
-            road[i] = Integer.parseInt(stk.nextToken());
-        }
-
-        stk = new StringTokenizer(br.readLine()," ");
-        int[] money = new int[N];
         for(int i=0;i<N;i++){
-            money[i] = Integer.parseInt(stk.nextToken());
+            real[i] = Integer.parseInt(stk.nextToken());
         }
 
-        long answer = 0;
+        Arrays.sort(real);
 
-//        int cost = money[0];
-//        for(int i=0;i< money.length-1;i++){
-//            if(money[i] < money[i+1]){
-//                money[i+1] = money[i];
-//            }
-//        }
-//
-//        for(int i=0;i< money.length-1;i++){
-//            if(money[i] < cost){
-//                cost = money[i];
-//            }
-//
-//            answer += cost * road[i];
-//        }
+        System.out.println(real[0] * real[real.length-1]);
+         */
 
-        long cost = money[0];
+        StringTokenizer  stk = new StringTokenizer(br.readLine()," ");
 
-        for(int i=0;i< money.length-1;i++){
-            if(money[i] < cost){
-                cost = money[i];
-            }
-
-            answer += cost * road[i];
+        int[] point = new int[4];
+        for(int i=0;i<4;i++){
+            point[i] = Integer.parseInt(stk.nextToken());
         }
 
-        System.out.println(answer);
+        int x = point[0];
+        int y = point[1];
+        int w = point[2];
+        int h = point[3];
 
+        System.out.println(Math.min(Math.min(Math.min(x,y),w-x),h-y));
 
 
 

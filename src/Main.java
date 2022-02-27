@@ -6,22 +6,16 @@ import java.util.*;
 
 public class Main {
 
-    // java 2981 검문
+    // java 18870 좌표 압축
+    // 문제의 예시를 통해서 이해한 바로는 중복되는 값을 제외하고 해당 인덱스의 값보다
+    // 더 작은 원소의 개수를 구해서 다시 만들면 되는 것이라고 이해했다.
+    // 그래서 중복되지 않게 원소들을 넣고 (set을 활용) 정렬한 후(Collections.sort)
+    // 원소가 같으면 그때의 인덱스를 넣는다(정렬되어 있기 때문에 인덱스 순서는 자기 자신보다
+    // 작은 원소들의 개수를 의미한다)
+    // 이렇게 해서 예시에 해당하는 정답은 잘 나오는데 돌려보면 시간초과가 발생한다.
+    // 아무래도 2중 for문을 돌면서 break를 쓴다해도 배열의 크기가 커지면 시간초과가 발생하는
+    // 문제가 생기는 것 같다. 2중 for문이 아니라면 hash를 써야하나싶다
 
-//    먼저 근처에 보이는 숫자 N개를 종이에 적는다. 그 다음, 종이에 적은 수를 M으로 나누었을 때, 나머지가 모두 같게 되는 M을 모두 찾으려고 한다.
-//    M은 1보다 커야 한다.
-//
-//    N개의 수가 주어졌을 때, 가능한 M을 모두 찾는 프로그램을 작성하시오.
-
-    // 실패다.. 메모리 초과가 발생한다..
-    // 나름 시간을 줄이기 위해서 정렬후에 2부터 가장 작은 원소까지만 for문을 돌리면서
-    // ( 큰수로 나누면 나머지가 없기 때문에)
-    // 나머지를 set에 저장하고 만약 같지 않다면 set에 추가로 저장되면서 size가 커지기 때문에
-    // 나머지를 저장하면서 set의 사이즈가 2이상이라면 바로 break로 for문을 빠지면서
-    // 해당 i를 벗어나도록 했는데도 메모리 초과가 발생한다.
-    // 아마 약수를 사용하기 때문에 약수를 활용한 공식인 유클리드 호제법이나 최대공약수를 활용한
-    // 공식을 활용해야 할 거 같긴한데... 해당 방법은 내가 미리 아는 게 아니라서 다른 방법을
-    // 최대한 고민했는데도 결국 알지 못하겠다 ㅠㅠ
 
     public static void main(String[] args) throws IOException {
 
@@ -29,33 +23,41 @@ public class Main {
 
         int N = Integer.parseInt(br.readLine());
 
-        int[] num = new int[N];
+        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+
+        int[] arr = new int[N];
 
         for(int i=0;i<N;i++){
-            num[i] = Integer.parseInt(br.readLine());
+            arr[i] = Integer.parseInt(stk.nextToken());
         }
 
-        Arrays.sort(num);
+        int[] answer = new int[N];
 
         ArrayList<Integer> list = new ArrayList<>();
-        for(int i=2;i<=num[0];i++){
-            Set<Integer> set = new HashSet<>();
-            boolean flag = true;
-            for(int j=0;j<num.length;j++){
-                set.add(num[j] % i);
-                if(set.size() > 1){
-                    flag = false;
+        Set<Integer> set = new HashSet<>();
+
+        for(Integer num : arr){
+            if(set.add(num)) list.add(num);
+        }
+
+        Collections.sort(list);
+
+        for(int i=0;i<arr.length;i++){
+            int num = arr[i];
+            for(int j=0;j<list.size();j++){
+                if(list.get(j) == num){
+                    answer[i] = j;
                     break;
                 }
             }
-
-            if(flag){
-                list.add(i);
-            }
         }
 
-        for(int i=0;i<list.size();i++){
-            System.out.print(list.get(i) + " ");
+        StringBuffer sb = new StringBuffer();
+        for(int i=0;i<answer.length;i++){
+            sb.append(answer[i]).append(' ');
         }
+
+        System.out.println(sb.toString());
+
     }
 }

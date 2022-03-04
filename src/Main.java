@@ -6,54 +6,61 @@ import java.util.HashMap;
 
 public class Main {
 
-    // java 9095 1,2,3 더하기
-
-    // dp가 아닌 완전 탐색 방법으로 해결하는 경우
-    // 재귀를 통해서 특정 수가 되면 답에 +1 하고 특정 수를 넘어서면 해당 케이스를 종료한다.
-    // 근데 이게 재귀를 통해서 할 때 재귀의 종료 조건을 어떻게 걸어야 하나 고민을 많이 했다.
-    // 더해나가다가 타겟 넘버를 넘어서면 종료하면 되는 것이었고
-    // 1,2,3을 차례로 계속 더해나가면서 재귀를 통해서 구현하면 되는 건데.. 재귀는 해도해도 참..
-
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        // 내일있을 software Maestro 코딩테스트를 대비해서 외부 IDE가 아닌
+        // 코딩테스트 사이트 내에서 환경설정을 위해 문제를 해결해 보려고 했다.
+        // 자동완성이나 자동 import 때문에 별로 보지 않던 부분을 다시 볼 수 있었다.
+        // 나는 Scanner보다 BufferedReader를 좋아해서 BufferedReader를 사용하려는 데
+        // BufferedReader는 java.util이 아닌 java.io를 사용해야 하고 IOException을 thorw 해줘야 하는 등
+        // 자동완성이 아니라 스스로 구현해야 할 때 이것저것 체크해야 할 부분이 꽤 있었다.
+//
+//        import java.util.Scanner;
+//        import java.io.*;
+//
+//        class Main {
+//            public static void main(String args[]) throws IOException {
+//                // String x;
+//                // Scanner sc = new Scanner(System.in);
+//
+//                // x = sc.nextInt();
+//                // System.out.println(x);
+//
+//                BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+//
+//                String str = br.readLine();
+//
+//                int bomb = 0;
+//                int razor = 0;
+//                boolean flag = true;
+//                for(int i=0;i<str.length();i++){
+//                    if(str.charAt(i)== '('){
+//                        bomb++;
+//                    }
+//                    else{
+//                        razor++;
+//                    }
+//                }
+//
+//                if(bomb != razor) flag = false;
+//
+//                if(!flag) System.out.println("NO");
+//                else System.out.println("YES");
+//            }
+//        }
 
-        int T = Integer.parseInt(br.readLine());
+//        insert into customer values (1,'Elice','2010-01-15',100);
+//        insert into customer values (2,'Cheshire','2005-03-10',100);
+//        insert into customer values (3,'Dodo','2010-04-30',100);
+//
+//        select * from customer;
 
-        for(int i=0;i<T;i++){
-            int n = Integer.parseInt(br.readLine());
+        // animal_outs 테이블에 있는데 animal_ins 테이블에 없는 자료를 찾아서 출력하는 문제
+        // join을 쓰는 건데 from 1번테이블 left outer join 2번테이블 이렇게 있을 때 1번 테이블을 기준으로 on 뒤의 컬럼으로
+        // join을 실행하는 모습을 보인다.
+        // join을 사용할 때 있지 않은 부분에 대해서 null을 반환하는 데 이를 사용해서 한쪽 테이블에 존재하지 않는다는 기준을 체크한다.
+//        SELECT a.animal_id, a.name from animal_outs as a left outer join animal_ins as b
+//        on a.animal_id = b.animal_id where b.animal_id is null order by a.animal_id;
 
-            System.out.println(OneTwoThree(0,n));
-
-        }
-
-    }
-
-    private static int OneTwoThree(int number, int n){
-        if(number > n){
-            return 0;
-        }
-
-        if(number == n){
-            return 1;
-        }
-
-        int cnt = 0;
-        for(int i=1;i<=3;i++){
-            cnt += OneTwoThree(number + i,n);
-        }
-
-        return cnt;
     }
 }
-
-
-//    중복제거할 때 distinct 를 사용하는데
-//    select distinct count(name) 이렇게 썼는데 괄호 안에 넣어 주어야 한다.
-//    SELECT count(distinct name) from animal_ins;
-
-//    group by 순서를 from 앞에 둬서 실패했었다.
-//    문법은 얼추 아는 데 순서를 헷갈리거나 위치가 확실하지 않은 경우가 꽤 있다.
-//    select animal_type, count(*)
-//    from animal_ins group by animal_type order by animal_type;
-//    < select -> from -> where -> group by -> having -> order by >

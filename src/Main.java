@@ -2,65 +2,81 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 
 public class Main {
 
+    // S 교육 coding test 문제 중 하나
+    // N이 주어지고 각 식단이 주어지면 겹치지 않는 식단 중에서 3끼 식사의 칼로리 합이 2000에서 2500인 경우의 수 구하기
+    // 각 식단의 칼로리가 주어진다.
+
+    // 이 문제를 나는 3중 for문을 활용해서 겹치지 않는 식단 부분을 해결하였는데 시간초과를 우려해서 시간을
+    // 줄이려고 해서 문제를 제출했는데 이게 실제로 실행시간에 유의미한 차이가 있는지 확인해보고자 한다.
+
+    // 1번 실험. N = 3000
+    // sum이 2500을 넘어가면 break 하는 부분이 없을 때 4초
+    // sum이 2500을 넘어가면 break 하는 부분이 있을 때 0초
+
+    // 2번 실험. N = 6000
+    // sum이 2500을 넘어가면 break 하는 부분이 없을 때 37초
+    // sum이 2500을 넘어가면 break 하는 부분이 있을 때 0초
+
+    // money 배열에 50정도씩 계속 더해가면서 값을 넣은 거라서 원소의 값이 더 차이나는
+    // 실제 케이스에서는 좀 더 이 차이가 줄어들 수도 있겠지만 우선 시간을 줄이는 부분은
+    // 확실하다고 생각한다.
+
     public static void main(String[] args) throws IOException {
 
-        // 내일있을 software Maestro 코딩테스트를 대비해서 외부 IDE가 아닌
-        // 코딩테스트 사이트 내에서 환경설정을 위해 문제를 해결해 보려고 했다.
-        // 자동완성이나 자동 import 때문에 별로 보지 않던 부분을 다시 볼 수 있었다.
-        // 나는 Scanner보다 BufferedReader를 좋아해서 BufferedReader를 사용하려는 데
-        // BufferedReader는 java.util이 아닌 java.io를 사용해야 하고 IOException을 thorw 해줘야 하는 등
-        // 자동완성이 아니라 스스로 구현해야 할 때 이것저것 체크해야 할 부분이 꽤 있었다.
-//
-//        import java.util.Scanner;
-//        import java.io.*;
-//
-//        class Main {
-//            public static void main(String args[]) throws IOException {
-//                // String x;
-//                // Scanner sc = new Scanner(System.in);
-//
-//                // x = sc.nextInt();
-//                // System.out.println(x);
-//
-//                BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-//
-//                String str = br.readLine();
-//
-//                int bomb = 0;
-//                int razor = 0;
-//                boolean flag = true;
-//                for(int i=0;i<str.length();i++){
-//                    if(str.charAt(i)== '('){
-//                        bomb++;
-//                    }
-//                    else{
-//                        razor++;
-//                    }
-//                }
-//
-//                if(bomb != razor) flag = false;
-//
-//                if(!flag) System.out.println("NO");
-//                else System.out.println("YES");
-//            }
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        int N = Integer.parseInt(br.readLine());
+
+//        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+
+        int[] money = new int[N];
+
+//        for(int i=0;i<N;i++){
+//            money[i] = Integer.parseInt(stk.nextToken());
 //        }
 
-//        insert into customer values (1,'Elice','2010-01-15',100);
-//        insert into customer values (2,'Cheshire','2005-03-10',100);
-//        insert into customer values (3,'Dodo','2010-04-30',100);
-//
-//        select * from customer;
+        Arrays.sort(money);
 
-        // animal_outs 테이블에 있는데 animal_ins 테이블에 없는 자료를 찾아서 출력하는 문제
-        // join을 쓰는 건데 from 1번테이블 left outer join 2번테이블 이렇게 있을 때 1번 테이블을 기준으로 on 뒤의 컬럼으로
-        // join을 실행하는 모습을 보인다.
-        // join을 사용할 때 있지 않은 부분에 대해서 null을 반환하는 데 이를 사용해서 한쪽 테이블에 존재하지 않는다는 기준을 체크한다.
-//        SELECT a.animal_id, a.name from animal_outs as a left outer join animal_ins as b
-//        on a.animal_id = b.animal_id where b.animal_id is null order by a.animal_id;
+        long beforeTime = System.currentTimeMillis();
+
+        int value = 200;
+
+        for(int i=0;i<N;i++){
+            money[i] = value;
+            value += 50;
+        }
+
+        int cnt = 0;
+        for(int i=0;i<money.length;i++){
+            for(int j=i+1;j<money.length;j++){
+                for(int k=j+1;k<money.length;k++){
+                    int sum = money[i] + money[j] + money[k];
+                    if(sum>=2000 && sum <= 2500){
+                        cnt++;
+                    }
+                    else if (sum > 2500) {
+                        // money[k] 이후로는 money[k]보다 크기 때문에 sum이 2500을 초과하면
+                        // 더 이상 i j 는 고정된 채로 k만 증가시키면서 확인할 필요가 없다.
+                        // 3중 for문의 시간을 줄이기 위해서 추가한 부분
+                        break;
+
+                    }
+
+                }
+            }
+        }
+
+        System.out.println("정답 : " + cnt);
+
+        long afterTime = System.currentTimeMillis();
+        long DiffTime = (afterTime - beforeTime)/1000;
+        System.out.println("시간 : " + DiffTime);
 
     }
 }

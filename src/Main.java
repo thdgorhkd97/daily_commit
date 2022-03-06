@@ -8,75 +8,74 @@ import java.util.StringTokenizer;
 
 public class Main {
 
-    // S 교육 coding test 문제 중 하나
-    // N이 주어지고 각 식단이 주어지면 겹치지 않는 식단 중에서 3끼 식사의 칼로리 합이 2000에서 2500인 경우의 수 구하기
-    // 각 식단의 칼로리가 주어진다.
+    // java programmers level 2 - k진수에서 소수 구하기
 
-    // 이 문제를 나는 3중 for문을 활용해서 겹치지 않는 식단 부분을 해결하였는데 시간초과를 우려해서 시간을
-    // 줄이려고 해서 문제를 제출했는데 이게 실제로 실행시간에 유의미한 차이가 있는지 확인해보고자 한다.
+    // 0P0처럼 소수 양쪽에 0이 있는 경우
+    // P0처럼 소수 오른쪽에만 0이 있고 왼쪽에는 아무것도 없는 경우
+    // 0P처럼 소수 왼쪽에만 0이 있고 오른쪽에는 아무것도 없는 경우
+    // P처럼 소수 양쪽에 아무것도 없는 경우
+    // 단, P는 각 자릿수에 0을 포함하지 않는 소수입니다.
 
-    // 1번 실험. N = 3000
-    // sum이 2500을 넘어가면 break 하는 부분이 없을 때 4초
-    // sum이 2500을 넘어가면 break 하는 부분이 있을 때 0초
+    // 437674을 3진수로 바꾸면 211020101011입니다. 여기서 찾을 수 있는 조건에 맞는 소수는 왼쪽부터 순서대로 211, 2, 11이 있으며, 총 3개입니다.
+    // (211, 2, 11을 k진법으로 보았을 때가 아닌, 10진법으로 보았을 때 소수여야 한다는 점에 주의합니다.)
+    // 211은 P0 형태에서 찾을 수 있으며, 2는 0P0에서, 11은 0P에서 찾을 수 있습니다.
 
-    // 2번 실험. N = 6000
-    // sum이 2500을 넘어가면 break 하는 부분이 없을 때 37초
-    // sum이 2500을 넘어가면 break 하는 부분이 있을 때 0초
-
-    // money 배열에 50정도씩 계속 더해가면서 값을 넣은 거라서 원소의 값이 더 차이나는
-    // 실제 케이스에서는 좀 더 이 차이가 줄어들 수도 있겠지만 우선 시간을 줄이는 부분은
-    // 확실하다고 생각한다.
+    // 우선 n을 k진수로 변경하고 나서 0과0 사이에 있거나 0뒤, 0앞 등으로 어떻게
+    // 잘라서 소수인지를 확인하려고 하는데 어떻게 3가지 기준으로 수를 잘라서 나눠야 하는지
+    // 한참을 고민했는데 생각해보니까 어차피 0으로 잘라야 하는 건데 굳이 0의 위치에 따라서
+    // 나누지 않아도 될 것 같아서 0을 기준으로 자르고 나오는 모든 수를 확인하면 될 것 같았다.
+    // 16가지 중 2가지 경우에 런타임 에러가 뜨는데.. 길이가 특이 케이스가 있는건가. 해결해야 한다.
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = 1;
+        int k = 10;
 
-        int N = Integer.parseInt(br.readLine());
+        String number = k_jinsoo(n,k);
 
-//        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+        String[] num = number.split("0");
 
-        int[] money = new int[N];
-
-//        for(int i=0;i<N;i++){
-//            money[i] = Integer.parseInt(stk.nextToken());
+//        System.out.println("num");
+//        for(int i=0;i<num.length;i++){
+//            System.out.println(num[i]);
 //        }
 
-        Arrays.sort(money);
-
-        long beforeTime = System.currentTimeMillis();
-
-        int value = 200;
-
-        for(int i=0;i<N;i++){
-            money[i] = value;
-            value += 50;
+        int answer = 0;
+        for(int i=0;i<num.length;i++){
+            if(isPrime(num[i])) answer++;
         }
 
-        int cnt = 0;
-        for(int i=0;i<money.length;i++){
-            for(int j=i+1;j<money.length;j++){
-                for(int k=j+1;k<money.length;k++){
-                    int sum = money[i] + money[j] + money[k];
-                    if(sum>=2000 && sum <= 2500){
-                        cnt++;
-                    }
-                    else if (sum > 2500) {
-                        // money[k] 이후로는 money[k]보다 크기 때문에 sum이 2500을 초과하면
-                        // 더 이상 i j 는 고정된 채로 k만 증가시키면서 확인할 필요가 없다.
-                        // 3중 for문의 시간을 줄이기 위해서 추가한 부분
-                        break;
+        System.out.println(answer);
+    }
 
-                    }
+    public static boolean isPrime(String str){
+        if(str.equals("1") || str.equals("")) return false;
+        else if(str.equals("2")) return true;
+        int number = Integer.parseInt(str);
 
-                }
+        for(int i=2;i<number;i++){
+            if(number % i == 0){
+                return false;
             }
         }
 
-        System.out.println("정답 : " + cnt);
+        return true;
+    }
 
-        long afterTime = System.currentTimeMillis();
-        long DiffTime = (afterTime - beforeTime)/1000;
-        System.out.println("시간 : " + DiffTime);
+    public static String k_jinsoo(int n,int k){
+        StringBuffer sb = new StringBuffer();
 
+        while(n > 0){
+            sb.append(n % k);
+            n = n/k;
+        }
+
+        StringBuffer str = new StringBuffer();
+        for(int i=sb.toString().length()-1;i>=0;i--){
+            str.append(sb.toString().charAt(i));
+        }
+
+
+        return str.toString();
     }
 }

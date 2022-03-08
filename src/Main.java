@@ -8,72 +8,78 @@ import java.util.StringTokenizer;
 
 public class Main {
 
-    // java programmers level 2 - N개의 최소공배수
+    // 피보나치 수
+    // 재귀로 구현하려고 했는데 재귀로 구현하게 되면 n자체가 너무 크고 1234567의 나머지가
+    // 저장되어야 하다보니 시간초과가 발생하게 된다.
+    // 동적 계획법으로 해결했다.
 
-    // arr의 모든 원소의 공통된 최소공배수를 구하는 문제
-    // 처음에 생각했던 방식은 lcd_long 방식이었다.
-    // 가장 큰 숫자를 기준으로 그 숫자에 +1씩 해가면서 다른 모든 수가 그 수의 약수인지 확인하는
-    // 식으로 진행하였다. 공통된 배수는 반드시 가장 큰 숫자보다도 커야 하기 때문에 for문의
-    // 첫 시작점의 수를 설정하는 것으로 시간을 줄이려고 했다
+    // programmers level 2 - 기능개발
+    // 우선 각 기능별로 종료시킬 수 있는 모든 일자를 구한 뒤에 한번에 배포할 수 있는 기능의 수를 구한다,
+    // 예를 들어 7 3 9 이렇게 있으면 두번째 기능은 3일만에 완료되었으므로
+    // 첫번째 기능이 배포될때 두번째 기능까지 배포 가능하므로 2 1 이렇게 정답이 된다.
+    // 기능이 완료되는 일자를 비교해가면서 한 번에 배포 가능한 기능을 list에 넣고
+    // 마지막으로 남은 기능의 수를 넣으면 완성
 
-    // 근데 시간초과가 우려되어 다른 생각을 해봤다.
-    // 공통 공배수라는 건 단순히 가장 큰 숫자보다 더 크다는 것 뿐 아니라 가장 큰 숫자보다
-    // n배씩 해가는 배수이기 때문에 1,2,3,4... 가장 큰 숫자의 배수를 다른 원소들로 나누면서
-    // 공배수인지 확인하면 되는 것이다.
 
-    // 실제로 시간상 이득이 있는건지 확인하기 위해서 시간을 재보았는데
-    // 내가 임의로 정한 이름(lcd_short vs lcd_long) 의 시간 비교는 arr의 크기를 2000으로
-    // 설정했을 때 lcd_short 는 2 lcd_long은 17이라는 숫자가 나왔다.
-    // 물론 원소가 임의로 마구 들어가 있어서 정확한 비교는 안 될 수있지만 같은 상황에서 시간이
-    // 줄어드는 것은 확실한 것 가탇.
+
 
     public static void main(String[] args) throws IOException {
 
-        int[] arr = new int[2000];
+        int[] progresses = {95,90,99,99,80,99};
+        int[] speeds = {1,1,1,1,1,1};
 
-        for(int i=0;i<arr.length;i++){
-            arr[i] = 2*i + 2;
-        }
-        Arrays.sort(arr);
+        int length = progresses.length;
+        int[] successDays = new int[length];
 
-        long beforeTime = System.currentTimeMillis();
-        int answer = lcd_short(arr,arr[arr.length-1]);
-
-        long afterTime = System.currentTimeMillis();
-        System.out.println(" 시간 : " + (afterTime- beforeTime)/1000);
-
-        System.out.println(answer);
-    }
-
-    public static int lcd_short(int[] arr,int max){
-
-
-        for(int i=1; ;i++){
-            int num = max * i;
-            boolean flag = true;
-            for(int j=0;j<arr.length;j++){
-                if(num % arr[j] != 0){
-                    flag = false;
-                    break;
-                }
+        for(int i=0;i<length;i++){ // 완료 일자 구하는 for문
+            int day = 0;
+            while(progresses[i] < 100){
+                progresses[i] += speeds[i];
+                day++;
             }
-            if(flag) return num;
+            successDays[i] = day;
         }
-    }
 
-
-    public static int lcd_long(int[] arr,int max){
-
-        for(int i=max; ;i++){
-            boolean flag = true;
-            for(int j=0;j<arr.length;j++){
-                if( i % arr[j] != 0){
-                    flag = false;
-                    break;
-                }
+        int cnt = 1;
+        int num = successDays[0];
+        ArrayList<Integer> list = new ArrayList<>();
+        for(int i=1;i< successDays.length;i++){
+            if(successDays[i] <= num){ // 이미 구현되어 있는 기능이 있는지 확인
+                cnt++;
             }
-            if(flag) return i;
+            else{
+                list.add(cnt);
+                cnt = 1;
+                num = successDays[i];
+            }
         }
-    }
 
+        list.add(cnt);
+
+        int[] answer = new int[list.size()];
+        for(int i=0;i<list.size();i++){
+            answer[i] = list.get(i);
+        }
+
+        /* 피보나치 수
+        int n = 5;
+
+        int[] fibo = new int[n+1];
+
+        fibo[0] = 0;
+        fibo[1] = 1;
+        fibo[2] = 1;
+
+        if(n > 2){
+            for(int i=3;i<=n;i++){
+                fibo[i] = fibo[i-1] % 1234567 + fibo[i-2] % 1234567;
+                System.out.println(i + " 번째 수는 " + fibo[i]);
+            }
+        }
+
+        int answer = fibo[n] % 1234567;
+
+         */
+
+    }
 }

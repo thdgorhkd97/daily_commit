@@ -5,155 +5,56 @@ import java.util.*;
 
 public class Main {
 
-    // java
-    // bfs dfs 순열 중복순열 조합
-    // bfs와 dfs의 개념 및 dfs로 구현하는 순열, 중복순열, 조합에 대해서 개념이 잘 안잡힌 것 같아서
-    // 다시 한 번 확실히 정리하는 시간을 가졌다.
-    // dfs 자체로 구현하는 방법도 그렇지만 순열이나 조합같은 경우는 다른 문제에서
-    // 많이 활용할 수 있는 개념이라고 생각하기 때문에 더 생각해야 할 것 같다.
-    // 그리고 dfs를 스택을 이용해서 구현한 것이 아니라 재귀를 이용해서 구현하였는데
-    // 이렇듯 여러 가지 상황을 통해서 구현 가능하다는 것도 알고 상황이나 문제 조건에 따라서
-    // 선택해야 하기에 경우의 수를 모두 알고 선택해야 할 것으로 보인다.
+    // java programmers level 3 - 입국심사
+
+    // 입국심사를 기다리는 사람 수 n, 각 심사관이 한 명을 심사하는데 걸리는 시간이 담긴 배열 times가 매개변수로 주어질 때,
+    // 모든 사람이 심사를 받는데 걸리는 시간의 최솟값을 return 하도록 solution 함수를 작성해주세요.
+
+    // 처음에는 큐를 만들어서 시간의 n배가 되면 사람의 심사가 끝났다는 것이기 때문에 그 다음 사람을 넣는 식으로 for문을 사용하기도 하고
+    // 했는데 times의 길이가 정해져 있지 않고 수의 범위가 int를 범어나기 때문에 적절치 않은 방법이었다.
+    // 근데 문제는 이분탐색으로 나뉘어 있길래 이걸 어떻게 이분탐색으로 할 수 있는건가 싶어서 한참을 고민하다 결국 길을 못찾고 찾아보았다.
+    // 문제를 찾아보고는 이해하는 데도 시간이 꽤 걸렸다. 이분탐색의 개념이나 구현법은 알고있지만 이 문제를 풀어서 이분탐색으로 해결할 수 있는
+    // 세팅을 하기가 상당히 어려웠다.
+
+    // 계속 문제를 보니까 이해를 할 수 있었는데 이분탐색의 조건을 시간으로 해서 해당 시간동안 몇 명을 통과시킬 수 있는지를
+    // 확인하는 것이 포인트였던 문제다.
+    // 해결에 관한 멘트를 읽어보고 코드로 구현하였으며 직접 주석을 달면서 문제에 대한 이해를 확실시 했다.
+    // 이렇게 문제를 많이 접하면서 어떤 개념을 활용할 수 있는 응용 문제에 대해 많이 보고 풀어보면서 익숙해져야 할 것 같다.
 
     public static void main(String[] args) throws IOException {
 
-        int[][] map = new int[5][5];
+        int n = 6;
+        int[] times = {7,10};
 
-        addLine(0,1,map);
-        addLine(0,4,map);
-        addLine(1,2,map);
-        addLine(0,2,map);
-        addLine(3,2,map);
-        addLine(4,2,map);
-        addLine(3,4,map);
+        long min = 0; // 최소의 시간 0초로 세팅
+        Arrays.sort(times);
+        long max = (long) times[times.length - 1] * n; // 가장 긴 시간을 가진 심사관에서만 n명이 심사를 다 받을 때(가능한 최대의 시간)
 
-        for(int i=0;i<map.length;i++){
-            for(int j=0;j<map.length;j++){
-                System.out.print(map[i][j] + " ");
+        long answer = 0;
+
+        while(min <= max){ // 이분탐색의 종료 조건
+            long mid = (min + max) / 2;
+            long people = 0; // mid 시간 내에 심사를 통과하는 사람의 수
+
+            for(int i=0;i<times.length;i++){
+                people += mid / times[i]; // mid 시간내의 각 심사관이 통과시키는 사람의 수를 모두 더함
+            } // people은 mid 시간에 통과한 사람의 수
+
+
+            System.out.println(mid + " 시간동안 " + people + " 명이 통과 ");
+
+            if(people >= n){ // mid 시간에 통과한 사람의 수가 n명보다 크면
+                max = mid-1; // 더 짧은 시간내에 모두가 통과할 수 있는지 확인하기 위해서
+                answer = mid; // 일단 정답은 mid로 초기화
             }
-            System.out.println();
-        }
-
-        boolean[] visited = new boolean[map.length];
-
-        System.out.println(" dfs 실행 순서 ");
-        dfs(0,visited,map);
-
-        System.out.println();
-        visited = new boolean[map.length];
-        System.out.println(" bfs 실행 순서");
-        bfs(0,visited,map);
-
-        System.out.println();
-
-
-        int[] arr = {1,2,3,4,5};
-        visited = new boolean[arr.length];
-        int depth = 0;
-        int[] result = new int[arr.length];
-        System.out.println(" permutation ");
-        permutation(result,arr,depth,3,visited);
-        System.out.println();
-
-        visited = new boolean[arr.length];
-        result = new int[arr.length];
-        System.out.println(" 중복 있는 permutation ");
-        permutationCanRepeat(result,arr,depth,3,visited);
-
-        System.out.println();
-        visited = new boolean[arr.length];
-        result = new int[arr.length];
-        int startIdx = 0;
-        System.out.println(" 조합 (순서 바꾼 순열이 없도록) ");
-        permutationNoRepeat(result,arr,depth,3,visited,startIdx);
-
-    }
-
-    private static void permutationNoRepeat(int[] result, int[] arr, int depth, int r, boolean[] visited,int start) {
-        if(depth == r){
-            for(int i=0;i<r;i++){
-                System.out.print(result[i]+ " ");
+            else{ // mid 시간에 통과한 사람이 n명보다 작다면
+                min = mid+1; // 시간이 더 필요하다는 의미이므로 mid를 늘려서 다시 체크
             }
-            System.out.println();
-            return ;
-        }
-
-        for(int i=start;i<arr.length;i++){
-            result[depth] = arr[i];
-            permutationNoRepeat(result,arr,depth+1,r,visited,i+1);
-        }
-
-
-    }
-
-    private static void permutationCanRepeat(int[] result, int[] arr, int depth, int r, boolean[] visited) {
-        if(depth == r){
-            for(int i=0;i<r;i++){
-                System.out.print(result[i]+ " ");
-            }
-            System.out.println();
-            return ;
-        }
-
-        for(int i=0;i<arr.length;i++){
-
-               result[depth] = arr[i];
-            permutationCanRepeat(result,arr,depth+1,r,visited);
 
         }
-    }
 
-    public static void permutation(int[] result,int[] arr,int depth,int r,boolean[] visited){
-        if(depth == r){
-            for(int i=0;i<r;i++){
-                System.out.print(result[i]+ " ");
-            }
-            System.out.println();
-            return ;
-        }
-
-        for(int i=0;i<arr.length;i++){
-            if(!visited[i]){
-                visited[i] = true;
-                result[depth] = arr[i];
-                permutation(result,arr,depth+1,r,visited);
-                visited[i] = false;
-            }
-        }
-    }
+        System.out.println(answer);
 
 
-
-    public static void bfs(int start, boolean[] visited, int[][] map){
-        Queue<Integer> que = new LinkedList<>();
-        que.offer(start);
-        visited[start] = true;
-
-        while(!que.isEmpty()){
-            int v = que.poll();
-            System.out.print(v+ " ");
-            for(int i=0;i<map.length;i++){
-                if(map[v][i] == 1 && !visited[i]){
-                    que.offer(i);
-                    visited[i] = true;
-                }
-            }
-        }
-    }
-
-    public static void dfs(int start,boolean[] visited,int[][] map){
-        visited[start] = true;
-        System.out.print(start + " ");
-
-        for(int i=0;i<visited.length;i++){
-            if(map[start][i] == 1 && !visited[i] ){
-                dfs(i,visited,map);
-            }
-        }
-    }
-
-    public static void addLine(int edge1,int edge2,int[][] map){
-        map[edge1][edge2] = 1;
-        map[edge2][edge1] = 1;
     }
 }

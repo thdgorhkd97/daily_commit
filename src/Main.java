@@ -5,54 +5,103 @@ import java.util.*;
 
 public class Main {
 
-    // sk 계열사 코딩 테스트 1번 문제
-    // 오늘 코딩 테스트를 봤는데 조금 아쉬워서 내가 마무리한 코드를 다시 정리해본다
-    // money를 만들기 위해 정해진 금액의 동전을 얼만큼 사용했을 때 가장 작은 금액으로 만들 수 있는지 만드는 문제였다.
-    // 각 동전마다 사용하는 데 드는 돈이 다르다.
-    // 그래서 문제에 접근할 때 같은 금액이라 가정했을때 드는 비용이 작은 걸 찾으려고 했다.(비용이 작을수록 해당 동전을 많이 사용해야 한다는 뜻)
-    // 예를 들어 100원을 만들때 9원이 들고 500원을 만들때 50원이 들면 100원 * 5 => 45원 이므로 500원 하나보다 100원짜리 5개를 쓰는 게 최소다.
-    // 그렇게 동전의 우선순위를 정해서 목표 금액에서 우선순위에 따른 동전의 금액만큼 빼가면서 정답에 값을 더해나간다.
+    // sk 계열사 코딩 테스트 4번 문제
+    // 코딩 테스트 당시에는 문제를 해결하지 못했는데 문제를 마무리한 지금도 모든 경우에
+    // 해당하는 풀이법은 아닐 것 같다는 느낌이다.
+    // 간단히 말하면 문제 자체는 트리에서 각 정점사이의 거리를 내면 되는 문제인데
+    // 내가 한 방식은 단순히 두 정점에서 첫번째 노드까지의 거리를 더하는 방식이다.
+    // 이 경우에 두 정점의 공통조상이 첫번째 노드인 경우는 해결되는데
+    // 만약 그 전에 만나게 되는 구조라면 거리가 맞지 않는다. 이럴 경우에
+    // 공통 조상에서 첫번재 노드까지의 거리를 빼거나 해야 하는데
+    // 이 부분을 아직 처리하지 못했다...
+    // 트리구조에서 각 정점사이의 최단거리를 구하는 것 내일 그 부분에 대해서만 고민해보자.
 
+    static int depth = 0;
+
+    static int[] edgeDepth;
 
     public static void main(String[] args) throws IOException {
 
-        int money = 1999;
-        int[] costs = {2, 11, 20, 100, 200, 600};
+        int n = 5;
 
-        int[] coin = {1,5,10,50,100,500};
+        int[][] edges = {{0,1},{0,2},{1,3},{1,4}};
 
-        int[][] value = new int[6][2];
+        int[][] graph = new int[n][n];
+        edgeDepth = new int[n];
 
-        for(int i=0;i<value.length;i++){
-            value[i][0] = i;
-            value[i][1] = costs[i] * (500/coin[i]);
-
+        for(int i=0;i< edges.length;i++){
+            graph[edges[i][0]][edges[i][1]] = 1;
+            graph[edges[i][1]][edges[i][0]] = 1;
         }
 
-        Arrays.sort(value, new Comparator<int[]>() {
-            @Override
-            public int compare(int[] o1, int[] o2) {
-                if(o1[1] == o2[1]){
-                    return o2[0] - o1[0];
-                }
-                return o1[1] - o2[1];
-            }
-        });
 
-        int answer = 0;
-        int idx = 0;
-        while(money > 0){
+        boolean[] visited = new boolean[graph.length];
+        bfs(0,graph,visited);
 
-            for(int i=idx;i<6;i++) {
-                while (money >= coin[value[i][0]]) {
-                    answer += costs[value[i][0]];
-                    money -= coin[value[i][0]];
+//        for(int i=0;i<edgeDepth.length;i++){
+//            System.out.println(edgeDepth[i] + " ");
+//        }
+
+        long answer = 0;
+        for(int i=0;i<n;i++){
+            for(int j=0;j<n;j++){
+                for(int k=0;k<n;k++){
+
+                    if(i != j && j!=k && i!= k ) {
+                        if (distance(i, j, graph) + distance(j, k, graph) == distance(i, k, graph)) {
+                            //System.out.println(i + " " + j + " " + k + " " + distance(i, j, graph) + " " + distance(k, j, graph) + " " + distance(i, k, graph));
+                            answer++;
+                        }
+                    }
                 }
-                if(money < 0 ) break;
             }
         }
 
-        System.out.println(answer);
+//        System.out.println(answer);
+
 
     }
+
+    private static void bfs(int startPoint,int[][] graph,boolean[] visited){
+        Queue<Integer> queue = new LinkedList<>();
+
+        visited[startPoint] = true;
+        queue.offer(startPoint);
+
+        int depth = 0; //시작지점으로부터의 거리
+
+        while ( !queue.isEmpty() ){
+
+            int qSize = queue.size();
+            System.out.println("====================depth " + depth + "==========================");
+            for(int i=1; i<=qSize; i++){
+                int pos = queue.poll();
+                edgeDepth[pos] = depth;
+                System.out.println(pos);
+
+                for(int j=0; j< graph.length; j++){
+                    if( graph[pos][j]==1 && !visited[j] ){
+                        queue.offer(j);
+                        visited[j] = true;
+                    }
+                }
+            }
+
+            depth++;
+
+        }
+
+    }
+
+    private static int distance(int a, int b, int[][] graph){
+
+        if(graph[a][b] == 1){ //직접 연결
+            return 1;
+        }
+        else{
+            return edgeDepth[a] + edgeDepth[b];
+        }
+
+    }
+
 }

@@ -5,56 +5,99 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 1931 회의실 배정
+    // java 다익스트라 알고리즘
+    // 다익스트라 알고리즘을 활용한 문제를 풀었는데 조금 흔들리는 것 같아서 개념을 다시 정리하기로 했다.
+    // 다익스트라 알고리즘은 양의 간선 가중치를 가진 경우에만 해당하기 때문에 실생활에서 유용하다.
+    // 먼저 그래프를 무한대로 초기화하고 가중치를 넣은 다음 한 정점에서 다른 정점까지의 거리를
+    // 모두 구하는 알고리즘이다.
+    // 최단 거리를 저장할 배열(distance)와 노드 방문 여부를 저장한 배열(check)를 만들고
+    // 방문하지 않았고 초기 값이 무한대가 아니면 최단 거리 배열을 graph의 값으로 바꾼다.
+    // 모든 노드를 돌면서 다른 노드를 거쳐서 가는 경우와 비교한다.
 
-    // 한 개의 회의실이 있는데 이를 사용하고자 하는 N개의 회의에 대하여 회의실 사용표를 만들려고 한다.
-    // 각 회의 I에 대해 시작시간과 끝나는 시간이 주어져 있고, 각 회의가 겹치지 않게 하면서 회의실을 사용할 수 있는 회의의 최대 개수를 찾아보자.
-    // 단, 회의는 한번 시작하면 중간에 중단될 수 없으며 한 회의가 끝나는 것과 동시에 다음 회의가 시작될 수 있다.
-    // 회의의 시작시간과 끝나는 시간이 같을 수도 있다. 이 경우에는 시작하자마자 끝나는 것으로 생각하면 된다.
-
-    // 회의시간이 주어지고 가장 많은 회의를 진행할 수 있도록 할 때 몇개의 회의를 할수 있겠느냐라는 문제다.
-    // 종료시간이 최대한 짧아야지 다른 회의의 시작이 빨라지기 때문에 회의의 종료시간을 기준으로
-    // 정렬하고 다음 회의들의 시작 시간이 이전 회의의 종료 시간보다 다음인지를 확인하여
-    // 진행할 수 있는 회의인지를 확인하는 식으로 로직을 진행하였다.
-    // 근데 도저히 이상한 부분을 모르겠는데 계속해서 문제가 안 풀리길래 결국 풀이를 보고 말았는데
-    // 문제에서 시작과 동시에 끝나는 회의가 존재한다는 점에서 회의의 시작시간과 종료시간이 같을 때를 대비해서
-    // 회의의 시작 시간에 대한 정렬 또한 필요하다는 것을 알게 되었다.
-    // 시작 시간에 대한 정렬이 없어서 문제가 해결되지 않는 것이었다 ㅠㅠ'
+    static int[][] graph = new int[6][6];
+    static int n = 6;
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-        int N = Integer.parseInt(br.readLine());
-
-        int[][] time = new int[N][2];
-
-        for(int i=0;i<N;i++) {
-            StringTokenizer stk = new StringTokenizer(br.readLine(), " ");
-            time[i][0] = Integer.parseInt(stk.nextToken());
-            time[i][1] = Integer.parseInt(stk.nextToken());
+        for(int i=0;i<6;i++){
+            for(int j=0;j<6;j++){
+                graph[i][j] = Integer.MAX_VALUE;
+            }
         }
 
-        Arrays.sort(time, new Comparator<int[]>() {
-            @Override
-            public int compare(int[] o1, int[] o2) {
-                if(o1[1] == o2[1]){
-                    return o1[0]-o2[0];
+        addLine(0,1,7);
+        addLine(0,2,9);
+        addLine(0,5,14);
+        addLine(1,2,10);
+        addLine(1,3,15);
+        addLine(2,3,11);
+        addLine(2,5,2);
+        addLine(3,4,6);
+        addLine(4,5,9);
+
+        dijkstra(0);
+
+    }
+
+    private static void dijkstra(int v){
+        int[] distance = new int[n];
+        boolean[] check = new boolean[n];
+
+        Arrays.fill(distance,Integer.MAX_VALUE); // 시작점을 0으로 초기화할 것이기 때문에 기본 초기화는 Integer.Max로 한다.
+
+        distance[v] = 0; // 시작점 초기화
+        check[v] = true; // 방문했다는 표시
+
+//        for(int i=0; i<n; ++i){ if(distance[i] == 2147483647)
+//            System.out.print("∞ ");
+//            else System.out.print(distance[i]+" "); }
+//        System.out.println("");
+
+        for(int i=0;i<n;i++){
+            if(!check[i] && graph[v][i] != Integer.MAX_VALUE){ // 방문한 적 없고 무한대가 아니면 직접 연결이기때문에 거리를 입력
+                distance[i] = graph[v][i];
+            }
+        }
+
+        for(int i=0; i<n; ++i){ if(distance[i] == 2147483647)
+            System.out.print("∞ ");
+        else System.out.print(distance[i]+" "); }
+        System.out.println("");
+
+        for(int i=0;i<n-1;i++){
+            int min = Integer.MAX_VALUE;
+            int min_idx = -1;
+
+            for(int j=0;j<n;j++){ // 해당 노드의 최소값 찾기
+                if(!check[j]){
+                    if(distance[j] < min){
+                        min = distance[j];
+                        min_idx = j;
+                    }
                 }
-                return o1[1] - o2[1];
             }
-        });
 
-        int answer = 0;
-
-        int end = 0;
-        for(int i=0;i<time.length;i++){
-            if(end <= time[i][0]){
-                end = time[i][1];
-                answer++;
+            check[min_idx] = true;
+            for(int j=0;j<n;j++){ // 다른 노드를 거치는 거랑 비교
+                if(!check[j] && graph[min_idx][j] != Integer.MAX_VALUE){
+                    if(distance[min_idx] + graph[min_idx][j] < distance[j]){
+                        distance[j] = distance[min_idx] + graph[min_idx][j];
+                    }
+                }
             }
+
+
         }
 
-        System.out.println(answer);
+        for(int k=0; k<n; ++k){ if(distance[k] == Integer.MAX_VALUE)
+            System.out.print("∞ ");
+        else System.out.print(distance[k]+" "); }
+        System.out.println("");
+
+    }
+    private static void addLine(int a,int b,int weight){
+
+        graph[a][b] = weight;
+        graph[b][a] = weight;
     }
 }

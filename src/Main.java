@@ -1,103 +1,100 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.util.*;
 
 public class Main {
 
-    // java 다익스트라 알고리즘
-    // 다익스트라 알고리즘을 활용한 문제를 풀었는데 조금 흔들리는 것 같아서 개념을 다시 정리하기로 했다.
-    // 다익스트라 알고리즘은 양의 간선 가중치를 가진 경우에만 해당하기 때문에 실생활에서 유용하다.
-    // 먼저 그래프를 무한대로 초기화하고 가중치를 넣은 다음 한 정점에서 다른 정점까지의 거리를
-    // 모두 구하는 알고리즘이다.
-    // 최단 거리를 저장할 배열(distance)와 노드 방문 여부를 저장한 배열(check)를 만들고
-    // 방문하지 않았고 초기 값이 무한대가 아니면 최단 거리 배열을 graph의 값으로 바꾼다.
-    // 모든 노드를 돌면서 다른 노드를 거쳐서 가는 경우와 비교한다.
+    // java 알고리즘 코딩 테스트에서 있었던 문제에 대해 복기 해보자
+    // 시험중에는 문제에 대해 복사나 캡쳐가 불가능해서 기억나는 대로 문제를 옮겨보려 합니다
+    // 친구관계가 주어지고 개인이 매긴 평점이 주어지는 데 만약 개인이 매긴 평점이 없다면 친구관계로 이어진
+    // 사람들의 평균 평점을 그 개인의 평점으로 저장하는 문제
+    // ex) 1번이 3점 2번이 5점으로 평점을 매기고 1-2-3 이렇게 3명이 친구라고 한다면 (1-2, 2-3 이런식도 가능)
+    // 3번은 평점을 안 매겼어도 친구관계인 1번과 2번의 평균 평점인 4점으로 저장한다.
 
-    static int[][] graph = new int[6][6];
-    static int n = 6;
+    // 구현한 내용인데 내가 직접 넣어본 케이스들에는 올바른 정답을 리턴하는 것으로 보인다.
+    // 나는 bfs를 활용해서 만약 어떤 인원에 대해 평점을 매기지 않았다면 ( grade[i] == -1 이라면) 함수를 통해
+    // 친구관계인 다른 인원들을 확인함과 동시에 친구관계라면 그 친구들의 평점을 더하고 인원을 더해서
+    // 마지막에 while  문을 통과할 때 sum / cnt로 리턴한다.
+
+    // 이렇게 하면 되는 것 같은데 시험당시에는 bfs를 통해 친구들을 직접 눈으로 보기 위해서 로그를 찍는 시간이 오히려
+    // 더 걸렸던 것 같다. 그리고 문제의 추가 조건으로 친구들 중에서도 평점을 매긴 인원이 없으면 그 인물은 평점을 안 매긴것으로
+    // 간주한다는 조건이 있었는데 이 조건에 대한 예외 처리를 너무 신경쓰다 보니 시간이 너무 오래 걸렸다.
+    // 지금 구현하고 나서 보니까 모두 구현해놓고 sum이 음수라면 이렇게 처리하면 되는 것 같은데 처음부터 예외 처리에 너무 신경쓴 게
+    // 결과론 적으로는 안 좋은 선택이었던 것 같다.
+
+
+    static int[][] graph;
+    static int[] grade;
+    static int ave = 0;
+    static int cnt = 0;
 
     public static void main(String[] args) throws IOException {
 
-        for(int i=0;i<6;i++){
-            for(int j=0;j<6;j++){
-                graph[i][j] = Integer.MAX_VALUE;
+        int n = 5;
+        graph = new int[n+1][n+1]; // 1 2 3 4 5
+        friend(1,2); // 1번과 2번이 친구관계
+        friend(2,3); // 2번과 3번이 친구관계 (1번과 3번역시 친구관계다)
+        friend(4,5); // 4번과 5번이 친구관계
+
+        grade = new int[n+1];
+        Arrays.fill(grade,-1);
+        grade[1] = 5;
+        grade[2] = 5;
+        grade[4] = 4;
+        // 3번과 5번은 점수를 매기지 않은 상태
+
+        int sum = 0;
+        for(int i=1;i<=grade.length-1;i++){
+            if(grade[i] != -1){
+                sum += grade[i];
+            }
+            else{
+                boolean[] visited = new boolean[n+1];
+                grade[i] = makeGradeByFriend(i,visited);
+                ave= 0;
+                cnt = 0;
             }
         }
 
-        addLine(0,1,7);
-        addLine(0,2,9);
-        addLine(0,5,14);
-        addLine(1,2,10);
-        addLine(1,3,15);
-        addLine(2,3,11);
-        addLine(2,5,2);
-        addLine(3,4,6);
-        addLine(4,5,9);
+        for(int i=1;i<=graph.length-1;i++){
+            System.out.println(i + " 일 때 " + grade[i]);
+        }
 
-        dijkstra(0);
+
+
+
 
     }
 
-    private static void dijkstra(int v){
-        int[] distance = new int[n];
-        boolean[] check = new boolean[n];
+    private static int makeGradeByFriend(int idx,boolean[] visited){
 
-        Arrays.fill(distance,Integer.MAX_VALUE); // 시작점을 0으로 초기화할 것이기 때문에 기본 초기화는 Integer.Max로 한다.
+        Queue<Integer> que = new LinkedList<>();
 
-        distance[v] = 0; // 시작점 초기화
-        check[v] = true; // 방문했다는 표시
+        que.add(idx);
+        visited[idx] = true;
 
-//        for(int i=0; i<n; ++i){ if(distance[i] == 2147483647)
-//            System.out.print("∞ ");
-//            else System.out.print(distance[i]+" "); }
-//        System.out.println("");
+        while(!que.isEmpty()){
+            int v = que.poll();
 
-        for(int i=0;i<n;i++){
-            if(!check[i] && graph[v][i] != Integer.MAX_VALUE){ // 방문한 적 없고 무한대가 아니면 직접 연결이기때문에 거리를 입력
-                distance[i] = graph[v][i];
+            if(grade[v] != -1 ) {
+                cnt++;
+                ave += grade[v];
+            }
+            for(int i=1;i<=graph.length-1;i++){
+                if(!visited[i] && graph[v][i] == 1){
+                    que.add(i);
+                    visited[i] = true;
+                }
             }
         }
 
-        for(int i=0; i<n; ++i){ if(distance[i] == 2147483647)
-            System.out.print("∞ ");
-        else System.out.print(distance[i]+" "); }
-        System.out.println("");
-
-        for(int i=0;i<n-1;i++){
-            int min = Integer.MAX_VALUE;
-            int min_idx = -1;
-
-            for(int j=0;j<n;j++){ // 해당 노드의 최소값 찾기
-                if(!check[j]){
-                    if(distance[j] < min){
-                        min = distance[j];
-                        min_idx = j;
-                    }
-                }
-            }
-
-            check[min_idx] = true;
-            for(int j=0;j<n;j++){ // 다른 노드를 거치는 거랑 비교
-                if(!check[j] && graph[min_idx][j] != Integer.MAX_VALUE){
-                    if(distance[min_idx] + graph[min_idx][j] < distance[j]){
-                        distance[j] = distance[min_idx] + graph[min_idx][j];
-                    }
-                }
-            }
-
-
-        }
-
-        for(int k=0; k<n; ++k){ if(distance[k] == Integer.MAX_VALUE)
-            System.out.print("∞ ");
-        else System.out.print(distance[k]+" "); }
-        System.out.println("");
+        return ave / cnt;
 
     }
-    private static void addLine(int a,int b,int weight){
-
-        graph[a][b] = weight;
-        graph[b][a] = weight;
+    private static void friend(int a,int b){
+        graph[a][b] = 1;
+        graph[b][a] = 1;
     }
 }

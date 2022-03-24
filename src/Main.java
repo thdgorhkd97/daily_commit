@@ -6,72 +6,71 @@ import java.util.*;
 
 public class Main {
 
-    // java 14391 종이 조각
+    // 토요일 날 라인 코딩 테스트를 해야 해서 좀 알아보니 라인은 string 관련 문제가
+    // 상당히 많이 나온다고 해서 string을 쫙 정리해보고자 한다.
 
-//    영선이는 숫자가 쓰여 있는 직사각형 종이를 가지고 있다. 종이는 1×1 크기의 정사각형 칸으로 나누어져 있고, 숫자는 각 칸에 하나씩 쓰여 있다. 행은 위에서부터 아래까지 번호가 매겨져 있고, 열은 왼쪽부터 오른쪽까지 번호가 매겨져 있다.
-//
-//    영선이는 직사각형을 겹치지 않는 조각으로 자르려고 한다. 각 조각은 크기가 세로나 가로 크기가 1인 직사각형 모양이다. 길이가 N인 조각은 N자리 수로 나타낼 수 있다. 가로 조각은 왼쪽부터 오른쪽까지 수를 이어 붙인 것이고, 세로 조각은 위에서부터 아래까지 수를 이어붙인 것이다.
-//
-//    아래 그림은 4×4 크기의 종이를 자른 한 가지 방법이다.
-//    종이를 적절히 잘라서 조각의 합을 최대로 하는 프로그램을 작성하시오
-
-    // 잘랐을 때 가장 큰 값을 찾아야 하기 때문에 자릿수가 가장 큰 게 가장 크다고 생각했다.
-    // 그래서 가로로 쫙 잘라서 더하것과 세로로 쫙 잘라서 더한 것 중 max 값을 리턴했는데
-    // 해당 케이스를 벗어나는 케이스가 있는 것 같다.
-    // 근데 예외 케이스가 뭐가 될까 싶다... 도저히 못 찾겠어서 공부해야겠다..
+    // 일단 string을 정리하는 과정에서 python과 비교하면서 java로 내가 구현 못하는 게
+    // 뭐가 있을까 싶은 걸 찾으면서 하다보니 코드로 정리를 많이 하진 못했다.
+    // 그나마 정규표현식이 가장 껄끄러울 것으로 보인다.
+    // python에서는 함수 하나로 처리되는 것이 java에서는 for문을 돌리거나 특별 조건으로 처리되기때문에
+    // 그래도 편하게 처리할 수 있도록 처리하는 정규표현식을 다시 보고 했다.
+    // 또한, 조합 순열 중복순열 등 비슷한 개념들에 대해서 왔다갔다해서 조합만 다시 한 번 처리해봤다.
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        // TCP school의 string method
+        String str = "송해광";
+        // charAt => str.charAt(i) -> i 번째 char를 반환
+        System.out.println(str.charAt(0));
 
-        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+        // compareTo(i) -> i와 문자열을 사전 순으로 비교하여 int로 반환
+        System.out.println(str.compareTo("조이현")); // -1743
+        System.out.println(str.compareTo("김김김")); // 4961
 
-        int N = Integer.parseInt(stk.nextToken());
-        int M = Integer.parseInt(stk.nextToken());
+        // indexOf() -> 처음 등장하는 위치의 인덱스 반환
+        // lastIndexOf() -> 마지막으로 등장하는 위치의 인덱스 반환
+        str = "abcdabcd";
 
-        int[][] map = new int[N][M];
+        System.out.println(str.indexOf('c')); // 2
+        System.out.println(str.lastIndexOf('c')); // 6
 
-        for(int i=0;i<N;i++){
-            String str = br.readLine();
-            for(int j=0;j<M;j++){
-                map[i][j] = Integer.parseInt(String.valueOf(str.charAt(j)));
-            }
-        }
+        // String 관련 함수는 꽤 안다고 생각하는데 가장 필요한 건 정규표현식이라 생각한다.
+        // 정규표현식은 '특정한 규칙을 가진 문자열의 집합을 표현하는 데 사용하는 형식 언어'다.
 
-//        for(int i=0;i<N;i++){
-//            for(int j=0;j<M;j++){
-//                System.out.print(map[i][j] + " ");
-//            }
-//            System.out.println();
-//        }
+        // [abc] -> a,b,c 중 하나의 문자
+        // [^abc] -> a,b,c 이외의 하나의 문자
+        // [0-9] -> 0~9 까지
+        str = "a_b_c";
+        System.out.println(str.replaceAll("[_]","A")); // aAbAc
+        System.out.println(str.replaceAll("[^_]","A")); // A_A_A
+        System.out.println(str.replaceAll("[a-z]","A")); // A_A_A
 
+        str = "a_b_c932_12_1";
+        System.out.println(str.replaceAll("[0-9]","N")); //숫자만 N으로
 
-        int answer = 0;
-        answer = Math.max(Seroro(map,N,M),Garoro(map,N,M));
-        System.out.println(answer);
+        int start = 0;
+        int[] arr = {1,2,3,4,5};
+
+        int depth = 0;
+
+        int r = 2;
+        int[] output = new int[r];
+        combination(start,r,arr,depth,output);
+
 
     }
+    private static void combination(int start,int r,int[] arr,int depth,int[] output){
+        if(depth == r){
+            for(int i=0;i< output.length;i++){
+                System.out.print(output[i] + " ");
+            }
+            System.out.println();
+            return ;
+        }
 
-    private static int Seroro(int[][] map,int N,int M){
-        int sum = 0;
-        for(int i=0;i<M;i++){
-            StringBuffer sb = new StringBuffer();
-            for(int j=0;j<N;j++){
-                sb.append(map[j][i]);
-            }
-            sum += Integer.parseInt(sb.toString());
+        for(int i=start;i<arr.length;i++){
+            output[depth] = arr[i];
+            combination(i+1,r,arr,depth+1,output);
         }
-        return sum;
-    }
-    private static int Garoro(int[][] map,int N,int M){
-        int sum = 0;
-        for(int i=0;i<N;i++){
-            StringBuffer sb = new StringBuffer();
-            for(int j=0;j<M;j++){
-                sb.append(map[i][j]);
-            }
-            sum += Integer.parseInt(sb.toString());
-        }
-        return sum;
     }
 }

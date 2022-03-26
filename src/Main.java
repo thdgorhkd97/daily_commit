@@ -6,177 +6,73 @@ import java.util.*;
 
 public class Main {
 
-    // java
-    // graph와 tree 에서 문제를 풀면서 접했던 문제에 사용된 개념을 다시 정리했다.
-    // graph에서는 다익스트라를 정리했다.
-    // 다익스트라는 간선에 가중치가 있을 때 한 정점에서 각 정점까지의 거리를 구하는 알고리즘이다.
-    // 순서로 간략하게 표현하자면
-    // 1. distance[n+1]을 Integer.MAX_VALUE로 초기화한다.
-    // 2. 시작노드의 거리와 check를 0과 true로 변경
-    // 3. 시작노드와 연결된 노드들의 distance를 연결된 거리로 갱신
-    // 4. 방문하지 않은 노드 중 distance 값이 최소인 노드를 찾는다
-    // 5. 그 최소의 노드의 인덱스를 minIdx라 하면, check[minIdx] = true로 바꾸고
-    //    minIdx와 연결되고 방문하지 않은 노드의 distance값을 갱신한다.
-    //    이때 다른 정점을 거치는 거리가 더 짧다면 이를 바꾼다.
-
-    // findLevel과 findChain을 구현했다.
-    // findLevel은 트리구조에서 각 노드가 몇 번째 깊이에 있는지를 확인하려 했다.
-    // 해당 문제를 통해 각 노드의 깊이를 구할 수 잇다. 기본적인 bfs에서 큐의 크기만큼
-    // 도는 for문을 추가한다.
-
-    // findChain은 그래프에서 서로 연결된 노드를 구하는 로직이다.
-    // 어떤 노드마다 해당 노드와 연결된 노드가 무엇인지를 구한다.
-    // bfs로 독립된 그래프 모양에서 연결된 다른 노드들을 함께 구한다.
-
-    static int n = 8;
-    static int[][] graph;
-    static int level = 0;
+    // L사 코딩테스트 1번 문제
+    // 1번문제면 가장 쉬운 문제였을 텐데 예상보다 시간을 많이 썼던 문제라서 다시 한 번 체크해보려 한다.
+    // 문제 자체는 심플했다. 주어진 로그 문자열에 대해서 조건에 맞는 입력인지 파악해서 알맞지 않은 로그의 수를 반환한다.
+    // 조건은 여러가지가 있다.
+    // 1. 특정 이름을 포함하지 않는경우
+    // 2. 공백으로 시작하는 경우
+    // 3. 로그의 길이가 100을 넘는 경우
+    // 4. 특정 이름에 대한 내용에 공백이 있는 경우(indexOf를 활용한 위치를 기준으로 substring으로 잘라서 구별했다)
+    // 5. 특수문자나 숫자를 포함하는 경우
+    // 이렇게 5가지 조건을 봐야 하는데 4번에서 substring으로 자르는 건 그리 어렵지 않았는데 5번에서 처음엔 정규표현식을
+    // 잘못 표현해서 특수문자나 숫자를 포함하지 않을 때를 체크한 것 같다.
 
     public static void main(String[] args) throws IOException {
 
-        graph = new int[n+1][n+1];
 
-        // 참조하는 데 사용한 블로그에 있는 예시 그래프
-        addLineWeight(1,2,3);
-        addLineWeight(1,5,4);
-        addLineWeight(1,4,4);
-        addLineWeight(2,3,2);
-        addLineWeight(3,4,1);
-        addLineWeight(4,5,2);
-        addLineWeight(5,6,4);
-        addLineWeight(4,7,6);
-        addLineWeight(7,6,3);
-        addLineWeight(3,8,3);
-        addLineWeight(6,8,2);
+        String[] logs = {"team_name : MyTeam application_name : YourApp error_level : info messag : IndexOutOfRange", "no such file or directory", "team_name : recommend application_name : recommend error_level : info message : RecommendSucces11", "team_name : recommend application_name : recommend error_level : info message : Success!", "   team_name : db application_name : dbtest error_level : info message : test", "team_name     : db application_name : dbtest error_level : info message : test", "team_name : TeamTest application_name : TestApplication error_level : info message : ThereIsNoError"};
 
-        dijkstra(1);
+        int answer = 0;
 
+        String teamName = "";
+        String applicationName = "";
+        String errorLevel = "";
+        String Message = "";
 
+        for(String str : logs){
+            System.out.print(str + " ");
 
-
-//        addLine(0,1);
-//        addLine(0,2);
-//        addLine(1,3);
-//        addLine(1,4);
-
-        /*
-        for(int i=0;i<n;i++){
-
-            System.out.print(i + " 의 연결 : ");
-            findChain(i,visited);
-            System.out.println();
-        }
-         */
-
-        // boolean[] visited = new boolean[n];
-
-        // findLevel(0,visited);
-
-
-    }
-
-    private static void dijkstra(int v){
-        int[] distance = new int[n+1];
-        boolean[] check = new boolean[n+1];
-
-        Arrays.fill(distance,Integer.MAX_VALUE);
-
-        distance[v] = 0;
-        check[v] = true;
-
-        for(int i=1;i<n+1;i++){
-            if(!check[i] && graph[v][i] != 0){
-                distance[i] = graph[v][i];
+            if(!(str.contains("team_name") && str.contains("application_name") && str.contains("error_level") && str.contains("message")) || (str.charAt(0)==' ') || (str.length() >= 100)){
+                System.out.println(" 4가지 중 하나가 없다");
+                answer++;
             }
-        } // 직접적으로 연결된 노드의 거리 계산
 
-        for(int a=0;a<n-1;a++){
-            // 모든 노드가 true일 때까지 반복문을 도는 부분을
-            // n개의 노드 중에서 n-1개의 노드를 본다와 같은 의미로 볼 수 있다.
-            int min = Integer.MAX_VALUE;
-            int minIdx = -1;
+            else {
+                //System.out.println(str +  " "+str.indexOf("team_name") + " " + str.indexOf("application_name") + " " +str.indexOf("error_level") + " "+str.indexOf("message") + " ");
 
-            for(int i=1;i<n+1;i++){
-                if(!check[i] && distance[i] != Integer.MAX_VALUE){
-                    if(distance[i] < min){
-                        min = distance[i];
-                        minIdx = i;
+                teamName = str.substring(12,str.indexOf("application_name")-1);
+                applicationName = str.substring(str.indexOf("application_name")+19,str.indexOf("error_level")-1);
+                errorLevel = str.substring(str.indexOf("error_level")+14,str.indexOf("message")-1);
+                Message = str.substring(str.indexOf("message")+10);
+
+                // System.out.println("teamName = " + teamName + " applicationName = " + applicationName + " errorLevel = " + errorLevel + " Message = " + Message);
+
+                if(teamName.contains(" ") || applicationName.contains(" ") || errorLevel.contains(" ") || Message.contains(" ")){
+                    answer++;
+                    System.out.println(" 자른거에 공백을 포함합니다");
+
+                }else{
+                    teamName = teamName.replaceAll("[^a-zA-Z]","&");
+                    applicationName = applicationName.replaceAll("[^a-zA-Z]","&");
+                    errorLevel = errorLevel.replaceAll("[^a-zA-Z]","&");
+                    Message = Message.replaceAll("[^a-zA-Z]","&");
+
+
+                    if(teamName.contains("&") || applicationName.contains("&") || errorLevel.contains("&") || Message.contains("&")){
+                        answer++;
+                        System.out.println(" 특수문자나 숫자가 포함되네요 ");
+
                     }
                 }
-            } // 방문하지 않은 노드 중 distance가 최소인 것을 찾는다.
 
-            check[minIdx] = true; // distance가 최소인 check를 true로 변경
-            for(int i=1;i<n+1;i++){
-                if(!check[i] && graph[minIdx][i] != 0){
-                    // distance가 최소인 idx와 연결되고 방문하지 않은 노드를 거치는 거리 비교
-                    if(distance[i] > distance[minIdx] + graph[minIdx][i]){
-                        distance[i] = distance[minIdx] + graph[minIdx][i];
-                    }
-                }
             }
         }
 
-        for(int i=1;i<n+1;i++){
-            System.out.println(distance[i]);
-        }
+        System.out.println(answer);
 
 
 
-    }
-    private static void findLevel(int start, boolean[] visited){
-        Queue<Integer> que = new LinkedList<>();
-        visited[start] = true;
-        que.add(start);
 
-
-        while(!que.isEmpty()){
-
-            System.out.println(" level = " + level + " -------------- " );
-
-            int qsize = que.size();
-            for(int i=0;i<qsize;i++){
-                int v = que.poll();
-                System.out.println(v + " ");
-
-                for(int j=0;j<n;j++){
-                    if(graph[v][j] == 1 && !visited[j]){
-                        que.add(j);
-                        visited[j] = true;
-                    }
-                }
-            }
-
-            level++;
-        }
-
-
-    }
-
-    private static void findChain(int start,boolean[] visited){
-        Queue<Integer> que = new LinkedList<>();
-        visited[start] = true;
-        que.add(start);
-
-        while(!que.isEmpty()){
-            int v = que.poll();
-            System.out.print(v +  " ");
-
-            for(int i=0;i<n;i++){
-                if(graph[v][i] == 1 &&!visited[i]){
-                    que.add(i);
-                    visited[i] = true;
-                }
-            }
-        }
-    }
-
-    private static void addLine(int a, int b){
-        graph[a][b] = 1;
-        graph[b][a] = 1;
-    }
-
-    private static void addLineWeight(int a,int b,int w){
-        graph[a][b] = w;
-        graph[b][a] = w;
     }
 }

@@ -13,92 +13,60 @@ public class Main {
     // 4. 입력에서 처리되지 않은 다음 글자가 남아있다면(c), w+c에 해당하는 단어를 사전에 등록한다.
     // 5. 단계 2로 돌아간다.
 
-    // 문제를 잘못 이해하고 접근한 것이 문제가 되는 것 같다.
-    // 처음에 이해한 건 첫번째 예시에 집중해서 그 다음 글자까지를 묶은 2개의 길이만을
-    // 사전에 포함되었는지 확인하는 식으로 했는데 그렇게 되는 것이 아니라
-    // 그 뒤쪽으로 사전에 포함된다면 가장 긴 문자열을 찾아야 하는 문제였다
-    // 그리고 그 과정에서 현재 시작 지점과 그 뒤쪽으로 사전에 포함되는 문자열을 찾는
-    // 인덱스를 찾는 과정에서 변수가 헷갈려서 시간이 조금 걸렸다
-    // 나머지에 대해 내일 구현해 봐야 겠다.
-    // 문제 이해하다가 시간이 많이 흘러서 ;;
+    // 결국 풀이하는 데 다른 분의 생각을 참조하고 말았다
+    // 현재 문자열의 인덱스를 기준으로 인덱스를 하나씩 늘려가며 string을 만들고
+    // 해당하는 string이 사전에 있는지 확인한다.
+    // 그리고 해당 string이 없으면 그때 idx와 i를 초기화하는 식으로 하면서
+    // 진행하는데 내가 애먹었던 부분인 idx와 i의 관계나 증감을 이런 식으로 표현하는 구나
+    // 하면서 반복문과 초기화를 활용한 부분에서 왜 놓쳤는지를 위주로 많이 보았다.
 
     public static void main(String[] args) throws IOException {
-
         String msg = "KAKAO";
 
-        HashMap<String,Integer> map = new HashMap<String,Integer>();
+        HashMap<String,Integer> map = new HashMap<>();
+
         int num = 1;
-        map.put("A",num++);
-        map.put("B",num++);
-        map.put("C",num++);
-        map.put("D",num++);
-        map.put("E",num++);
-        map.put("F",num++);
-        map.put("G",num++);
-        map.put("H",num++);
-        map.put("I",num++);
-        map.put("J",num++);
-        map.put("K",num++);
-        map.put("L",num++);
-        map.put("M",num++);
-        map.put("N",num++);
-        map.put("O",num++);
-        map.put("P",num++);
-        map.put("Q",num++);
-        map.put("R",num++);
-        map.put("S",num++);
-        map.put("T",num++);
-        map.put("U",num++);
-        map.put("V",num++);
-        map.put("W",num++);
-        map.put("X",num++);
-        map.put("Y",num++);
-        map.put("Z",num++);
+        char ch = 'A';
 
-        int idx = 0;
-        for(int i=0;i<msg.length();i++){
-            StringBuffer sb = new StringBuffer();
-
-            sb.append(msg.charAt(i));
-
-
+        while(ch != 'Z'){
+            map.put(ch + "",num++);
+            ch += 1;
         }
-
-        /*
-        int idx = 0;
-        int pos = 0;
-        while(idx <= msg.length()-1){
-            StringBuffer sb = new StringBuffer();
-
-            for(int i=pos; ;){
-                sb.append(msg.charAt(i));
-
-                String str = sb.toString();
-                System.out.println(str);
-
-                if(map.containsKey(str)){
-                    list.add(map.get(str));
-                }
-                else{
-                    map.put(str,num++);
-                    break;
-                }
-
-                i++;
-                pos = i;
-
-            }
-            idx += pos;
-
-        }
-
-         */
+        map.put(ch + "",num++); // A ~ Z 까지 map에 저장(map은 사전과 같이 사용)
+        // 아스키 코드를 이용해서 반복문으로 저장
 
         ArrayList<Integer> list = new ArrayList<>();
 
-        for(int i=0;i<list.size();i++){
-            System.out.println(list.get(i));
+        int idx = 0;
+        for(int i=0;i<msg.length();i++){
+            String key = msg.charAt(i) + "";
+            idx = i + 1;
+
+            while( idx <= msg.length()){ //단어의 마지막까지 확인
+                if(idx == msg.length()){ //단어의 마지막까지온 경우
+                    list.add(map.get(msg.substring(i))); //i부터 마지막 단어까지 글자에 대응되는 색인 번호를 출력
+                    i = idx; //i값을 index값으로 설정
+                    break;
+                }
+
+                String nextKey = msg.substring(i,idx+1);
+
+                if(map.containsKey(nextKey)){
+                    idx++;
+                }else{ //다음 글자가 사전에 없음
+                    key = msg.substring(i, idx);
+                    list.add(map.get(key)); //그 때의 key값에 대응되는 색인번호 출력
+                    map.put(nextKey, num++); //w+c 사전에 추가
+                    i = idx-1; //다음 글자의 index부터 다시 LZW
+                    break;
+                }
+            }
         }
 
+        int[] answer = new int[list.size()];
+        for(int i = 0; i < list.size(); i++) {
+            answer[i] = list.get(i);
+// System.out.println(answer[i]);
+        }
     }
 }

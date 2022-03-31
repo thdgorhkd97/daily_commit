@@ -7,9 +7,18 @@ import java.util.*;
 public class Main {
 
     // JAVA - BOJ 거리
-    // B O J가 반복되기 때문에 B -> O, O->J, J->B 해당 구문을 반복하면서
-    // 이전 인덱스의 위치 차이를 제곱해서 더해나가면 될 줄 알았는데..
-    // 풀리지 않았다..
+
+    // 어제부터 고민해보다가 결국 방법을 조금 알아보게 되었다 ㅠㅠ
+    // 처음부터 2중 for문은 고려하지 않았는데 N이 1000이하라는 점 시간 제한이 엄격하지 않다는 점에서
+    // 2중 for문을 사용하는 것이 괜찮다는 걸 보았고 min으로 dp를 채워나갔다
+    // 근데 애초에 dp 배열을 Integer.MAX_VALUE로 채워서 dp를 채워나가다가
+    // dp[N-1]이 Integer.MAX 면 -1 해당 인덱스에 거쳐가지 않았다는 것이므로 -1을 반환하면 되겠다
+    // 싶었는데 전체를 출력해보니까 일단 dp가 초기화된 인덱스 이후로 이상한 값이 들어갔다..
+    // 분명 dp[i]에 진입하지 않는데 dp[i]가 그대로 Integer.MAX가 아니라 절댓값이 크게 차이나지 않는
+    // 음수값이 들어갔다.. 아마도 int범위를 넘어가서 뭔가 문제가 생겼나 싶은데
+    // 그 과정에서 어떤 문제인지 까지는 도저히 모르겠다 ㅠㅠ
+    // 그래서 MAX_VALUE가 아닌 비슷한 큰수를 넣음으로써 해결했다.
+
 
     public static void main(String[] args) throws IOException {
 
@@ -17,130 +26,57 @@ public class Main {
 
         int N = Integer.parseInt(br.readLine());
 
-        char[] ch = new char[N+1];
+        char[] ch = new char[N];
 
         String str = br.readLine();
-        for(int i=0;i<=N-1;i++){
-            ch[i+1] = str.charAt(i);
-        }
 
-        int[] dp = new int[N+1];
-        Arrays.fill(dp,-1);
+        ch = str.toCharArray();
+
+        int[] dp = new int[N];
+        Arrays.fill(dp,2100000000);
         dp[0] = 0;
-        dp[1] = 1;
 
-        int pos = 0;
-        int idx = 0;
-        String[] next = {"B","O","J"};
-        int min = 0;
-        int lastB = 0;
-        int lastO = 0;
-        int lastJ = 0;
 
-        while(pos < N){
+        for(int i=0;i<N-1;i++){
+            int pos = i;
+            char c = ch[pos];
 
-            switch (next[idx]){
-                case "B" :
-                    for(int i=pos;i<str.length();i++){
-                        if(str.charAt(i) == 'O'){
-                            lastO = i;
-                            pos = i;
-                            min += (i-lastB) * (i-lastB);
-                            dp[i] = min;
+            switch(c){
+                case 'B' :
+                    for(int j=i+1;j<N;j++){
+                        int nextIdx = j;
+                        char next = ch[j];
+                        if(next == 'O'){
+                            dp[nextIdx] = Math.min(dp[nextIdx], dp[pos] + (nextIdx-pos) * (nextIdx-pos));
                         }
-                        else if(str.charAt(i) == 'J') break;
                     }
                     break;
-                case "O" :
-                    for(int i=pos;i<str.length();i++){
-                        if(str.charAt(i) == 'J'){
-                            lastJ = i;
-                            pos = i;
-
-                            min += (i-lastO) * (i-lastO);
-                            dp[i] = min;
+                case 'O' :
+                    for(int j=i+1;j<str.length();j++){
+                        int nextIdx = j;
+                        char next = ch[j];
+                        if(next == 'J'){
+                            dp[nextIdx] = Math.min(dp[nextIdx], dp[pos] + (nextIdx-pos) * (nextIdx-pos));
                         }
-                        else if(str.charAt(i) == 'B') break;
                     }
                     break;
-                case "J" :
-                    for(int i=pos;i<str.length();i++){
-                        if(str.charAt(i) == 'B'){
-                            lastB = i;
-                            pos = i;
-
-                            min += (i-lastJ) * (i-lastJ);
-                            dp[i] = min;
+                case 'J' :
+                    for(int j=i+1;j<str.length();j++){
+                        int nextIdx = j;
+                        char next = ch[j];
+                        if(next == 'B'){
+                            dp[nextIdx] = Math.min(dp[nextIdx], dp[pos] + (nextIdx-pos) * (nextIdx-pos));
                         }
-                        else if(str.charAt(i) == 'O') break;
                     }
                     break;
             }
-            idx++;
-            idx = idx % 3;
-
-            System.out.println(pos);
         }
 
-        System.out.println(dp[N]);
-        /*
-        int lastB = 0;
-        int lastO = 0;
-        int lastJ = 0;
-        String[] next = {"B","O","J"};
-        int idx = 0;
-        int min = 0;
-        int pos = 0;
-
-        int a = 0;
-        while(pos != N-1){
-
-            boolean flag = true;
-            switch (next[idx]){
-                case "B" :
-                    for(int i=pos;i<str.length();i++){
-                        if(str.charAt(i) == 'O'){
-                            lastO = i;
-                            pos = i;
-                            flag = false;
-                        }
-                        if(str.charAt(i) =='J') break;
-                    }
-                    min += Math.pow(lastO-lastB,2);
-                    break;
-
-                case "O" :
-                    for(int i=pos;i<str.length();i++){
-                        if(str.charAt(i) == 'J'){
-                            lastJ = i;
-                            pos = i;
-                            flag = false;
-                        }
-                        if(str.charAt(i) =='B') break;
-                    }
-
-                    min += Math.pow(lastJ-lastO,2);
-                    break;
-                case "J" :
-                    for(int i=pos;i<str.length();i++){
-                        if(str.charAt(i) == 'B'){
-                            lastB = i;
-                            pos = i;
-                            flag = false;
-                        }
-                        if(str.charAt(i) =='O') break;
-                    }
-                    min += Math.pow(lastB-lastJ,2);
-                    break;
-            }
-            idx++;
-            idx = idx % 3;
-
-            System.out.println(pos);
-
+        if(dp[N-1] != 2100000000){
+            System.out.println(dp[N-1]);
         }
+        else System.out.println("-1");
 
-        System.out.println(min);*/
 
 
 

@@ -37,11 +37,8 @@ public class Main {
             if(grade[i-1] == 0){
                 int sum = 0;
                 for(int j=0;j<list.size();j++){
-                    sum = grade[list.get(j)-1];
-//                    System.out.println(list.get(j));
+                    sum += grade[list.get(j)-1];
                 }
-                System.out.println(sum);
-                System.out.println();
                 grade[i-1] = sum / (list.size()-1);
             }
 

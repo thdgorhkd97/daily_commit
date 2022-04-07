@@ -6,165 +6,60 @@ import java.util.*;
 
 public class Main {
 
-    // 알고리즘 스터디 공부 내용 bfs & 그래프
+    // java 줄 서는 방법
+    // 사전 순으로 순열을 표현하는 방법으로 해서 쭉 모든 케이스를 표현한 후에
+    // k번째를 구하려고 했는데 그렇게 하니 몇몇 케이스에서 시간과 메모리 초과가 발생한다
+    // 그래서 다른 방법을 찾아야만했다.
 
-    static ArrayList<Integer> list = new ArrayList<>();
+    // n = 4, k = 7인 경우를 생각해보면
+//            1, 2, 3, 4
+//            1, 2, 4, 3
+//            1, 3, 2, 4
+//            1, 3, 4, 2
+//            1, 4, 2, 3
+//            1, 4, 3, 2
+//            2, 1, 3, 4
+//            2, 1, 4, 3
+//            2, 3, 1, 4
+//            2, 3, 4, 1
+//            2, 4, 1, 3
+//            2, 4, 3, 1
+//            3, 1, 2, 4
+//            …
+    // 이렇게 되는 건데 즉 맨 앞자리는 (n-1)! 만큼 반복되므로 맨 앞자리를 유추할 수 있다.
+    // 그 후에는 2를 제외한 [1,3,4] 중에 k = (k-1) % (n-1)!을 통해 구할 수 있다고 한다
 
     public static void main(String[] args) throws IOException {
 
-        int[][] friends = {{1, 2}, {2, 3}, {4, 5}};
-        int[] grade = {3, 0, 5, 4, 0};
+        int n = 3;
+        long k = 5;
 
-        int n = 5;
-        int[][] map = new int[n+1][n+1];
+        ArrayList<Integer> list = new ArrayList<>();
 
-        for(int i=0;i<friends.length;i++){
-            map[friends[i][0]][friends[i][1]] = 1;
-            map[friends[i][1]][friends[i][0]] = 1;
+        long factorial = 1;
+        for(int i=1;i<=n;i++){
+            list.add(i);
+            factorial *= i;
         }
 
-//        for(int i=1;i<=map.length-1;i++){
-//            for(int j=1;j<=map.length-1;j++){
-//                System.out.print(map[i][j] + " ");
-//            }
-//            System.out.println();
-//        }
+        long remain = k-1;
+        int[] answer = new int[n];
 
-        for(int i=1;i<=n;i++) {
-            boolean[] visited = new boolean[n + 1];
-            whoFriend(i,map,visited);
+        int i = 0;
+        while(i < n){
+            factorial = factorial / (n-i); // n-i = 3 2 1 factorial = 2 1 1
+            long value = remain / factorial; // value = 2 4 4
+            answer[i++] = list.get((int) value);
+            list.remove((int)value);
+            remain = remain % factorial;
 
-            if(grade[i-1] == 0){
-                int sum = 0;
-                for(int j=0;j<list.size();j++){
-                    sum += grade[list.get(j)-1];
-                }
-                grade[i-1] = sum / (list.size()-1);
-            }
-
-            list.clear();
-
+            System.out.println("factorial = " + factorial + " value = " + value + " remain = " + remain);
         }
 
-        for(int i=0;i<grade.length;i++){
-            System.out.println((i+1) + " 번의 평점 : " + grade[i]);
-        }
-    }
 
-    private static void whoFriend(int start,int[][] map,boolean[] visited){
-        Queue<Integer> que = new LinkedList<>();
-        visited[start] = true;
-        que.add(start);
-        while(!que.isEmpty()){
-            int v = que.poll();
-            list.add(v);
 
-            for(int i=1;i<=map.length-1;i++){
-                if(map[v][i] == 1 && !visited[i]){
-                    que.add(i);
-                    visited[i] = true;
-                }
-            }
-        }
+
+
 
     }
 }
-
-        /*
-        int[] priorities = {1,1,9,1,1,1};
-        int location = 0;
-
-        Queue<int[]> que = new LinkedList<>();
-        ArrayList<Integer> list = new ArrayList<>();
-
-        for(int i=0;i<priorities.length;i++){
-            int[] add = new int[2];
-            list.add(priorities[i]);
-            add[0] = priorities[i];
-            if(i== location){
-                add[1] = 1;
-            }
-            else{
-                add[1] = 0;
-            }
-            que.add(add);
-        }
-
-        int answer = 0;
-
-        while(true){
-
-            int[] arr = new int[2];
-            arr = que.poll();
-
-            boolean isMax = true;
-            for(int i=0;i<list.size();i++){
-                if(arr[0] < list.get(i)){
-                    isMax = false;
-                    break;
-                }
-            }
-
-            if(!isMax){
-                que.add(arr);
-            }
-            else{
-                answer++;
-                list.remove(new Integer(arr[0]));
-                if(arr[1] == 1){
-                    break;
-                }
-            }
-        }
-
-        System.out.println(answer);
-
-         */
-
-        /*
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-        int N = Integer.parseInt(br.readLine());
-
-        Queue<Integer> que = new LinkedList<>();
-        int old = 0;
-        ArrayList<Integer> list = new ArrayList<>();
-
-        for(int i=0;i<N;i++){
-            String str = br.readLine();
-            String[] operator = str.split(" ");
-            if(!operator[0].equals("push")){
-                switch (operator[0]){
-                    case "pop" :
-                        if(que.isEmpty()) list.add(-1);
-                        else list.add(que.poll());
-
-                        if(que.isEmpty()) old = 0;
-                        break;
-                    case "size" :
-                        list.add(que.size());
-                        break;
-                    case "empty" :
-                        if(que.isEmpty()) list.add(1);
-                        else list.add(0);
-                        break;
-                    case "front" :
-                        if(que.isEmpty()) list.add(-1);
-                        else list.add(que.peek());
-                        break;
-                    case "back" :
-                        if(que.isEmpty()) {
-                            list.add(-1);
-                        }
-                        else list.add(old);
-                        break;
-                }
-            }
-            else{
-                if(old == 0) old = Integer.parseInt(operator[1]);
-                que.offer(Integer.parseInt(operator[1]));
-
-            }
-        }
-         */
-

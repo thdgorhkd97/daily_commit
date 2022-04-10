@@ -1,56 +1,96 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Main {
 
-    // java 파괴되지 않은 건물
 
-    // 누적합을 활용해야 활용성을 통과할 수 있는 문제다
-    // 누적합으로 문제를 해결하는 방법에 대해서 잘 알고 있지 않아서 시간이 상당히 걸렸다
-    // 풀이 방법에 대해서는 이해가 가는 것 같은데 막상 array의 범위를 벗어나게 되는데 이게
-    // 정확한 풀이 방법을 아직 이해하지 못한 것 같다.
-    // 해당 문제를 마무리하고 누적합의 개념에 대해 제대로 파악해야 할 필요가 있을 것 같다..
+// java programmers 모의고사
+// first , second , third 사람들의 정답과 주어진 정답을 비교해서 누가 가장 많은 문제를 맞혔는지 구하는 문제
+// 정해진 패턴에 맞게 모든 사람들의 정답을 모두 구하고 정답 배열과 비교하면서 각 사람이 얼마나
+// 정답을 맞췄는지를 사람과 정답수로 map에 넣은 다음에 가장 많은 정답수를 가지는 사람을 구한다.
 
 
     public static void main(String[] args) throws IOException {
 
-        int[][] board = {{5,5,5,5,5},{5,5,5,5,5},{5,5,5,5,5},{5,5,5,5,5}};
-        int[][] skill = {{1,0,0,3,4,4},{1,2,0,2,3,2},{2,1,0,3,1,2},{1,0,1,3,3,1}};
+        int[] answers = {1,2,3,4,5};
 
-        int[][] prefix = new int[board.length][board[0].length];
+        int[] first = new int[10001];
+        int[] second = new int[10001];
+        int[] third = new int[10001];
 
-        for(int[] row : skill){
-            int r1 = row[1];
-            int c1 = row[2];
-            int r2 = row[3];
-            int c2 = row[4];
-            int degree = 0;
-            if(row[0] == 1){
-                degree = -row[5];
+
+        for(int i=0;i<first.length;i++){
+            int idx = i % 5;
+            switch (idx){
+                case 0 : first[i] = 1; break;
+                case 1 : first[i] = 2; break;
+                case 2 : first[i] = 3; break;
+                case 3 : first[i] = 4; break;
+                case 4 : first[i] = 5; break;
+            }
+        }
+
+        int idx = 1;
+        for(int i=0;i<second.length;i++){
+            if(i%2 == 0){
+                second[i] = 2;
             }
             else{
-                degree = row[5];
-            }
-
-            for(int i=r1;i<r2;++i){
-                prefix[i][c1] += degree;
-                prefix[i][c2] += degree;
+                second[i] = idx++;
+                if(idx == 2) idx++;
+                if(idx == 6) idx = 1;
             }
         }
 
-        int answer = 0;
-        for(int i=0;i<board.length;i++){
-            for(int j=0;j<board[0].length;j++){
-                if(j!=0) prefix[i][j] += prefix[i][j-1];
-                board[i][j] += prefix[i][j];
-                if(board[i][j] > 0) answer++;
+        idx = 1;
+        for(int i=0;i<third.length-1;i = i+2){
+            switch (idx){
+                case 1 : third[i] = 3; third[i+1] = 3; idx++; break;
+                case 2 : third[i] = 1; third[i+1] = 1; idx++; break;
+                case 3 : third[i] = 2; third[i+1] = 2; idx++; break;
+                case 4 : third[i] = 4; third[i+1] = 4; idx++; break;
+                case 5 : third[i] = 5; third[i+1] = 5; idx++; break;
+            }
+            if(idx == 6) idx = 1;
+
+        }
+
+        HashMap<Integer,Integer> map = new HashMap<>();
+
+        int[] value = new int[3];
+        for(int i=0;i<answers.length;i++){
+            if(answers[i] == first[i]) value[0]++;
+            if(answers[i] == second[i]) value[1]++;
+            if(answers[i] == third[i]) value[2]++;
+        }
+
+        int max = 0;
+
+        for(int i=0;i<3;i++){
+            max = Math.max(max,value[i]);
+            map.put(i+1,value[i]);
+        }
+
+        ArrayList<Integer> list = new ArrayList<>();
+
+        for(int i=0;i<map.size();i++){
+            if(map.get(i+1) == max){
+                list.add(i+1);
             }
         }
 
-        System.out.println(answer);
+        int[] answer = new int[list.size()];
+
+        for(int i=0;i<list.size();i++){
+            answer[i] = list.get(i);
+        }
+
+
+
+
+
     }
-
 }

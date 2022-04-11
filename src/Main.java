@@ -3,94 +3,77 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.StringTokenizer;
 
 public class Main {
 
+    // java 누적합의 개념
 
-// java programmers 모의고사
-// first , second , third 사람들의 정답과 주어진 정답을 비교해서 누가 가장 많은 문제를 맞혔는지 구하는 문제
-// 정해진 패턴에 맞게 모든 사람들의 정답을 모두 구하고 정답 배열과 비교하면서 각 사람이 얼마나
-// 정답을 맞췄는지를 사람과 정답수로 map에 넣은 다음에 가장 많은 정답수를 가지는 사람을 구한다.
+//    1. S(n) = 배열 a의 1번째 요소 부터 n번째 요소까지의 누적합
+//    2. S(1) = a(1)
+//    3. S(i) = S(i-1) + a(i)
+//    4. a(i) + a(i+1) + ... + a(j-1) + a(j) = S(j) - S(i-1) // 누적합을 활용한 빠른 구간합 계산
 
+    // 누적합의 성질에 대해서 알아보았고 카카오 코테에 나왔던 2중 for문을 활용한 방법보다 누적합이 빠른
+    // 방법을 생각해서 for문과 누적합의 시간을 알아보고자 함수를 만들어보았다.
+    // 구현과정에서 누적합의 index를 헷갈리면서 시간이 조금 오래 걸리긴 했다.
+    // 누적합이란 배열에 대해서 배열의 각 인덱스까지의 모든 합을 구해서 정해진 구간의 합을 구할때
+    // 누적합으로 만들어진 배열에서 조회를 통해서 합을 구하는 방식이고 나는 누적합으로 구하는 시간이
+    // 훨씬 짧을 것이라 예상했는데 꼭 그렇지만은 않았다.
+
+    // 1. n=100000 일때 For : 3 VS Prefix : 1 누적합이 더 빨랐다.
+    // 2. n=1000000 일때 For : 12 VS Prefix : 5 누적합이 빠르다
+    // 3. n=100000000 이면 For:129 VS Prefix:154로 그냥 반복문이 더 빠르다.
+    // 아마도 구간에 따라서 장단점과 시간의 차이가 있는 듯 하다.
 
     public static void main(String[] args) throws IOException {
 
-        int[] answers = {1,2,3,4,5};
+        int[] num = new int[100000000];
 
-        int[] first = new int[10001];
-        int[] second = new int[10001];
-        int[] third = new int[10001];
-
-
-        for(int i=0;i<first.length;i++){
-            int idx = i % 5;
-            switch (idx){
-                case 0 : first[i] = 1; break;
-                case 1 : first[i] = 2; break;
-                case 2 : first[i] = 3; break;
-                case 3 : first[i] = 4; break;
-                case 4 : first[i] = 5; break;
-            }
+        for(int i=0;i<num.length;i++){
+            num[i] = i;
+            // 0 1 2 3 4 5 6 7 8 9
         }
 
-        int idx = 1;
-        for(int i=0;i<second.length;i++){
-            if(i%2 == 0){
-                second[i] = 2;
-            }
-            else{
-                second[i] = idx++;
-                if(idx == 2) idx++;
-                if(idx == 6) idx = 1;
-            }
-        }
+        long a = System.currentTimeMillis();
+        System.out.println(sumByFor(num,num.length/2, num.length));
+        System.out.println(sumByFor(num,num.length/3, num.length));
+        System.out.println(sumByFor(num,num.length/4, num.length));
+        long b = System.currentTimeMillis();
+        System.out.println("sumByFor : " + (b-a));
 
-        idx = 1;
-        for(int i=0;i<third.length-1;i = i+2){
-            switch (idx){
-                case 1 : third[i] = 3; third[i+1] = 3; idx++; break;
-                case 2 : third[i] = 1; third[i+1] = 1; idx++; break;
-                case 3 : third[i] = 2; third[i+1] = 2; idx++; break;
-                case 4 : third[i] = 4; third[i+1] = 4; idx++; break;
-                case 5 : third[i] = 5; third[i+1] = 5; idx++; break;
-            }
-            if(idx == 6) idx = 1;
+        int[] prefixArr = new int[num.length];
+        long c = System.currentTimeMillis();
+        prefixArr[0] = num[0];
+        makePrefixArr(num,prefixArr);
+        System.out.println(sumByPrefix(prefixArr,num.length/2,num.length));
+        System.out.println(sumByPrefix(prefixArr,num.length/3,num.length));
+        System.out.println(sumByPrefix(prefixArr,num.length/4,num.length));
+        long d =System.currentTimeMillis();
 
-        }
-
-        HashMap<Integer,Integer> map = new HashMap<>();
-
-        int[] value = new int[3];
-        for(int i=0;i<answers.length;i++){
-            if(answers[i] == first[i]) value[0]++;
-            if(answers[i] == second[i]) value[1]++;
-            if(answers[i] == third[i]) value[2]++;
-        }
-
-        int max = 0;
-
-        for(int i=0;i<3;i++){
-            max = Math.max(max,value[i]);
-            map.put(i+1,value[i]);
-        }
-
-        ArrayList<Integer> list = new ArrayList<>();
-
-        for(int i=0;i<map.size();i++){
-            if(map.get(i+1) == max){
-                list.add(i+1);
-            }
-        }
-
-        int[] answer = new int[list.size()];
-
-        for(int i=0;i<list.size();i++){
-            answer[i] = list.get(i);
-        }
-
-
-
-
+        System.out.println("sumByPrefix : " + (d-c));
 
     }
+    private static int sumByFor(int[] num,int start,int end){
+        int sum = 0;
+        for(int i=start;i<end;i++){
+            sum += num[i];
+        }
+        return sum;
+    }
+
+    private static void makePrefixArr(int[] num, int[] prefixArr){
+        for(int i=1;i<num.length;i++){
+            prefixArr[i] = prefixArr[i-1] + num[i];
+        }
+//        for(int i=0;i<num.length;i++){
+//            System.out.print(prefixArr[i] + " ");
+//        }
+//        System.out.println();
+    }
+    private static int sumByPrefix(int[] prefixArr,int start,int end){
+
+        return prefixArr[end-1] - prefixArr[start-1];
+    }
+
 }

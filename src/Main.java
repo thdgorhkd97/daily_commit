@@ -1,79 +1,68 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.StringTokenizer;
+import java.util.*;
 
 public class Main {
 
-    // java 누적합의 개념
+    // java 징검다리
 
-//    1. S(n) = 배열 a의 1번째 요소 부터 n번째 요소까지의 누적합
-//    2. S(1) = a(1)
-//    3. S(i) = S(i-1) + a(i)
-//    4. a(i) + a(i+1) + ... + a(j-1) + a(j) = S(j) - S(i-1) // 누적합을 활용한 빠른 구간합 계산
+    // 출발지점에서 distance의 도착지점 사이에 rocks[] 에 해당하는 바위가 있을 때
+    // n개의 돌을 제거했을 때 각 바위 사이 거리의 최소값들 중 가장 큰 값을 구하는 문제다
 
-    // 누적합의 성질에 대해서 알아보았고 카카오 코테에 나왔던 2중 for문을 활용한 방법보다 누적합이 빠른
-    // 방법을 생각해서 for문과 누적합의 시간을 알아보고자 함수를 만들어보았다.
-    // 구현과정에서 누적합의 index를 헷갈리면서 시간이 조금 오래 걸리긴 했다.
-    // 누적합이란 배열에 대해서 배열의 각 인덱스까지의 모든 합을 구해서 정해진 구간의 합을 구할때
-    // 누적합으로 만들어진 배열에서 조회를 통해서 합을 구하는 방식이고 나는 누적합으로 구하는 시간이
-    // 훨씬 짧을 것이라 예상했는데 꼭 그렇지만은 않았다.
+    // 우선 나는 n개의 돌을 제거한다는 것은 rocks.length-n 개의 돌을 남긴다는 것이므로
+    // 조합을 이용해 돌을 남기고 0이라는 출발점과 distance에 해당하는 도착점을 넣고
+    // 그 돌 사이의 거리를 구해 그 중 최소값을 우선순위 큐에 집어넣었다.
+    // 테스트 케이스도 통과하고 답도 정확히 나오는데 문제에서 해결을 원하는 방법은
+    // 따로 있는 것으로 보인다.(메모리 초과와 시간 초과가 발생한다.)
+    // 조합을 사용하는 방식 자체가 맞지 않는 방법으로 보인다.
+    // 다른 방법을 찾아봐야 할 것으로 보임...
 
-    // 1. n=100000 일때 For : 3 VS Prefix : 1 누적합이 더 빨랐다.
-    // 2. n=1000000 일때 For : 12 VS Prefix : 5 누적합이 빠르다
-    // 3. n=100000000 이면 For:129 VS Prefix:154로 그냥 반복문이 더 빠르다.
-    // 아마도 구간에 따라서 장단점과 시간의 차이가 있는 듯 하다.
+    static int answer = Integer.MAX_VALUE;
+    static int dist = 0;
+    static PriorityQueue<Integer> list = new PriorityQueue<>(Collections.reverseOrder());
 
     public static void main(String[] args) throws IOException {
 
-        int[] num = new int[100000000];
+        int distance = 25;
+        int[] rocks = {2,14,11,21,17};
+        int n = 2;
 
-        for(int i=0;i<num.length;i++){
-            num[i] = i;
-            // 0 1 2 3 4 5 6 7 8 9
-        }
+        dist = distance;
 
-        long a = System.currentTimeMillis();
-        System.out.println(sumByFor(num,num.length/2, num.length));
-        System.out.println(sumByFor(num,num.length/3, num.length));
-        System.out.println(sumByFor(num,num.length/4, num.length));
-        long b = System.currentTimeMillis();
-        System.out.println("sumByFor : " + (b-a));
+        Arrays.sort(rocks);
 
-        int[] prefixArr = new int[num.length];
-        long c = System.currentTimeMillis();
-        prefixArr[0] = num[0];
-        makePrefixArr(num,prefixArr);
-        System.out.println(sumByPrefix(prefixArr,num.length/2,num.length));
-        System.out.println(sumByPrefix(prefixArr,num.length/3,num.length));
-        System.out.println(sumByPrefix(prefixArr,num.length/4,num.length));
-        long d =System.currentTimeMillis();
+        int start = 0;
+        int[] result = new int[rocks.length-n];
+        int depth = 0;
+        combination(depth,start,rocks,result);
 
-        System.out.println("sumByPrefix : " + (d-c));
+        answer = list.poll();
+        System.out.println(answer);
 
     }
-    private static int sumByFor(int[] num,int start,int end){
-        int sum = 0;
-        for(int i=start;i<end;i++){
-            sum += num[i];
-        }
-        return sum;
-    }
+    private static void combination(int depth,int start,int[] rocks,int[] result){
+        if(depth == result.length){
 
-    private static void makePrefixArr(int[] num, int[] prefixArr){
-        for(int i=1;i<num.length;i++){
-            prefixArr[i] = prefixArr[i-1] + num[i];
-        }
-//        for(int i=0;i<num.length;i++){
-//            System.out.print(prefixArr[i] + " ");
-//        }
-//        System.out.println();
-    }
-    private static int sumByPrefix(int[] prefixArr,int start,int end){
+            int[] arr = new int[result.length + 2];
+            arr[0] = 0;
+            for(int i=1;i<result.length+1;i++){
+                arr[i] = result[i-1];
+            }
+            arr[result.length + 1] = dist;
 
-        return prefixArr[end-1] - prefixArr[start-1];
+            int min = Integer.MAX_VALUE;
+            for(int i=1;i<arr.length;i++){
+                min = Math.min(arr[i] - arr[i-1],min);
+            }
+            list.add(min);
+
+            return;
+        }
+        for(int i=start;i<rocks.length;i++){
+            result[depth] = rocks[i];
+            combination(depth+1,i+1,rocks,result);
+        }
     }
 
 }

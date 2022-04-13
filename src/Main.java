@@ -7,20 +7,16 @@ public class Main {
 
     // java 징검다리
 
-    // 출발지점에서 distance의 도착지점 사이에 rocks[] 에 해당하는 바위가 있을 때
-    // n개의 돌을 제거했을 때 각 바위 사이 거리의 최소값들 중 가장 큰 값을 구하는 문제다
-
-    // 우선 나는 n개의 돌을 제거한다는 것은 rocks.length-n 개의 돌을 남긴다는 것이므로
-    // 조합을 이용해 돌을 남기고 0이라는 출발점과 distance에 해당하는 도착점을 넣고
-    // 그 돌 사이의 거리를 구해 그 중 최소값을 우선순위 큐에 집어넣었다.
-    // 테스트 케이스도 통과하고 답도 정확히 나오는데 문제에서 해결을 원하는 방법은
-    // 따로 있는 것으로 보인다.(메모리 초과와 시간 초과가 발생한다.)
-    // 조합을 사용하는 방식 자체가 맞지 않는 방법으로 보인다.
-    // 다른 방법을 찾아봐야 할 것으로 보임...
-
-    static int answer = Integer.MAX_VALUE;
-    static int dist = 0;
-    static PriorityQueue<Integer> list = new PriorityQueue<>(Collections.reverseOrder());
+    // 이분탐색으로 분류된 문제이기에 이분탐색으로 해결해 보려고 했는데
+    // 정렬된 rocks[] 배열을 만들어서 이를 기준으로 이분탐색을 해야 할 것 같긴 했는데
+    // 이분탐색의 기준을 어떻게 처리해야 할 지 몰라서 알아보았다.
+    // 역시 이분탐색의 기준이 되는 건 가능한 최소값이었는데 이 최소값을 갱신하는 기준은
+    // 해당 거리를 가질 수 있는 바위간의 거리였다.
+    // 즉 어떤 거리를 기준으로 바위간의 거리가 이보다 작으면 해당 바위를 제거하는 식으로
+    // 진행하면서 어떤 거리가 n개의 바위를 제거해서 만들어 질 수 있는 거리인지를 보는 것이다.
+    // 코드 자체는 이분탐색 그 자체이기에 간단했는데
+    // 이 로직을 이해하는 게 상당히 힘들었다.
+    // 시간이 굉장히 오래걸렸고 level 4에 해당하는 문제답게...
 
     public static void main(String[] args) throws IOException {
 
@@ -28,41 +24,40 @@ public class Main {
         int[] rocks = {2,14,11,21,17};
         int n = 2;
 
-        dist = distance;
-
         Arrays.sort(rocks);
 
-        int start = 0;
-        int[] result = new int[rocks.length-n];
-        int depth = 0;
-        combination(depth,start,rocks,result);
+        int left = 0;
+        int right = distance;
+        int mid = 0;
 
-        answer = list.poll();
-        System.out.println(answer);
+        int answer = 0;
 
-    }
-    private static void combination(int depth,int start,int[] rocks,int[] result){
-        if(depth == result.length){
+        while(left <= right){
+            mid = (left + right) / 2;
+            int prev = 0;
+            int removeCnt = 0;
 
-            int[] arr = new int[result.length + 2];
-            arr[0] = 0;
-            for(int i=1;i<result.length+1;i++){
-                arr[i] = result[i-1];
+            for(int i=0;i<rocks.length;i++){
+                if(rocks[i] - prev < mid){ // 바위간의 거리가 mid보다 작으면 바위 제거
+                    removeCnt++; // 제거한 바위 수
+                    if(removeCnt > n) break; // n개까지 제거 가능
+                }
+                else{
+                    prev = rocks[i];
+                }
             }
-            arr[result.length + 1] = dist;
 
-            int min = Integer.MAX_VALUE;
-            for(int i=1;i<arr.length;i++){
-                min = Math.min(arr[i] - arr[i-1],min);
+            if(removeCnt > n){ // 만약 제거한 바위가 n개 이상이면 바위간의 거리가 너무 길다는 것이므로 수정
+                right = mid - 1;
             }
-            list.add(min);
+            else {
+                answer = Math.max(answer,mid);// mid이하의 거리를 가진 바위간의 거리가 적절하니까 answer 초기화
+                left = mid + 1;
+            }
+        }
 
-            return;
-        }
-        for(int i=start;i<rocks.length;i++){
-            result[depth] = rocks[i];
-            combination(depth+1,i+1,rocks,result);
-        }
+
+
     }
 
 }

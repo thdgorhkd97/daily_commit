@@ -5,69 +5,52 @@ import java.util.*;
 
 public class Main {
 
-    // java 숨바꼭질
-    // bfs를 활용한 문제라고 할 수 있다.
-    // 정해진 위치에서 해당 위치로 -1 +1 *2 의 위치로 움직이는 걸 선택하면서
-    // 최소횟수로 이동할 수 있는 경우를 구하는 것이다.
-    // 처음 위치인 N에서부터 -1 +1 *2를 bfs로 넣고 만약 그 수에 해당하는
-    // boolean 배열인 visited가 false 라면 해당 수에 처음 접근하는 것이므로
-    // 최소라는 소리가 되는 거니까 그 수를 만든 경우에서 +1을 해서 넣는다.
-    // ex) dp[10] = dp[5] + 1( visited[10] = false 라면)
+    // java baekjoon 2309 일곱 난쟁이
 
-    static int[] dp;
+//    왕비를 피해 일곱 난쟁이들과 함께 평화롭게 생활하고 있던 백설공주에게 위기가 찾아왔다.
+//    일과를 마치고 돌아온 난쟁이가 일곱 명이 아닌 아홉 명이었던 것이다.
+//    아홉 명의 난쟁이는 모두 자신이 "백설 공주와 일곱 난쟁이"의 주인공이라고 주장했다.
+//    뛰어난 수학적 직관력을 가지고 있던 백설공주는, 다행스럽게도 일곱 난쟁이의 키의 합이 100이 됨을 기억해 냈다.
+//    아홉 난쟁이의 키가 주어졌을 때, 백설공주를 도와 일곱 난쟁이를 찾는 프로그램을 작성하시오.
+
+    // 조합으로 9명 중에서 7명을 골라서 그 7명의 키 합이 100이면 출력한다.
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
-        int N = Integer.parseInt(stk.nextToken());
-        int K = Integer.parseInt(stk.nextToken());
+        int[] hobit = new int[9];
 
-        boolean[] visited = new boolean[100001];
-        dp = new int[100001];
+        for(int i=0;i<9;i++){
+            hobit[i] = Integer.parseInt(br.readLine());
+        }
 
-        dp[N] = 0;
-        System.out.println(bfs(N,K,visited));
-
+        Arrays.sort(hobit);
+        int[] result = new int[7];
+        int depth = 0;
+        int startIdx = 0;
+        combination(depth,startIdx,result,hobit);
 
     }
+    private static void combination(int depth,int startIdx,int[] result,int[] hobit){
+        if(depth == result.length){
+            int sum = 0;
+            for(int i=0;i<result.length;i++){
+                sum += result[i];
+            }
+            if(sum == 100){
 
-    private static int bfs(int N,int K,boolean[] visited){
-
-        Queue<Integer> que = new LinkedList<>();
-        que.add(N);
-        visited[N] = true;
-
-        while(!que.isEmpty()){
-            int v = que.poll();
-
-            int nextMove = 0;
-            for(int i=0;i<3;i++) {
-
-                switch (i){
-                    case 0 : nextMove = v-1; break;
-                    case 1 : nextMove = v+1; break;
-                    case 2 : nextMove = 2*v; break;
-                }
-
-
-
-                if (nextMove >= 0 && nextMove <= 100000) {
-                    if (!visited[nextMove]) {
-                        que.offer(nextMove);
-                        dp[nextMove] = dp[v] + 1;
-                        visited[nextMove] = true;
-//                        System.out.println(nextMove + " 는 " + dp[v]+ " 에서 1번 더 이동");
-                    }
-                }
-                if (nextMove == K) {
-                    return dp[nextMove];
+                for(int i=0;i<result.length;i++){
+                    System.out.println(result[i]);
                 }
             }
 
+            return ;
         }
-        return 0;
+        for(int i=startIdx;i<hobit.length;i++){
+            result[depth] = hobit[i];
+            combination(depth+1,i+1,result,hobit);
+        }
     }
 
 

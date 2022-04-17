@@ -5,24 +5,18 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 1748 수 이어쓰기 1
+    // java baekjoon 차이를 최대로
 
-    // 1부터 N까지의 수를 이어서 쓰면 다음과 같이 새로운 하나의 수를 얻을 수 있다.
-    // 1234567891011121314151617181920212223...
-    // 이렇게 만들어진 새로운 수는 몇 자리 수일까? 이 수의 자릿수를 구하는 프로그램을 작성하시오.
+//    N개의 정수로 이루어진 배열 A가 주어진다.
+//    이때, 배열에 들어있는 정수의 순서를 적절히 바꿔서 다음 식의 최댓값을 구하는 프로그램을 작성하시오.
+//    |A[0] - A[1]| + |A[1] - A[2]| + ... + |A[N-2] - A[N-1]|
 
-    // 처음에는 StringBuffer를 활용해서 N까지의 숫자를 string으로 바꿔서
-    // sb.append()를 해서 sb.toString().length를 return 했는데 메모리 초과가 발생한다..
+    // 배열 A를 순열로 순서를 바꿔가면서 가능한 경우의 수를 모두 구한 다음
+    // 최대값을 비교한다.
+    // 처음에 순열로 구해야 하는 것을 조합으로 구했다가 시간이 많이 걸렸다..
 
-    // 두번째 방법은 for문으로 해서 10 보다 작으면 1자리니까 answer에 1만 더하고
-    // 10 <= N < 100 이면 두자리수니까 answer에 2를 더하고 이런 식으로
-    // N까지의 for문 중 i의 자리수를 체크해서 더한다.
-    // 근데 이렇게 하면 O(N)이라 그런지 답이 잘 나오지 않는다.'
 
-    // 결국 풀이 방법에 대해서 알아보니까 단순히 if - else를 활용하는 것이 아니라
-    // 자릿수를 구하기 위해서 자릿수가 언제 바뀌는지만 확인해서 변경하는 식으로 한다.
-    // i를 10,100으로 나눴을 때 몫이 0이면 자릿수가 바뀐다.
-    // 즉, 자릿수가 바뀔때마다 다음 나눠야 하는 수는 10을 곱하고 다음에 더해줘야 할 자리수는 1을 더한다.
+    static int max = 0;
 
     public static void main(String[] args) throws IOException {
 
@@ -30,49 +24,39 @@ public class Main {
 
         int N = Integer.parseInt(br.readLine());
 
-
-        /*
-        StringBuffer sb = new StringBuffer();
-
-        for(int i=1;i<=N;i++){
-            sb.append(String.valueOf(i));
+        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+        int[] num = new int[N];
+        for(int i=0;i<N;i++){
+            num[i] = Integer.parseInt(stk.nextToken());
         }
 
-        System.out.println(sb.toString().length());
-         */
 
-        /*
-        long answer = 0;
-        for(int i=1;i<=N;i++){
-            if(i < 10) answer += 1;
-            else if(10 <= i && i<=99) answer+=2;
-            else if(100 <= i && i<=999) answer+=3;
-            else if(1000 <= i && i<=9999) answer+=4;
-            else if(10000 <= i && i<=99999) answer+=5;
-            else if(100000 <= i && i<=999999) answer+=6;
-            else if(1000000 <= i && i<=9999999) answer+=7;
-            else if(10000000 <= i && i<=99999999) answer+=7;
-            else if(i==100000000) answer += 8;
-        }
+        int[] result = new int[N];
+        boolean[] visited = new boolean[N];
+        int depth = 0;
+        combination(num,result,visited,depth);
 
-        System.out.println(answer);
-        */
-
-        int cnt = 0;
-        int plus = 1;
-        int num = 10;
-        for(int i=1;i<=N;i++){
-            if(i % num == 0){
-                plus++;
-                num *= 10;
-            }
-            cnt += plus;
-        }
-        System.out.println(cnt);
-
-
+        System.out.println(max);
 
     }
+    private static void combination(int[] num,int[] result,boolean[] visited,int depth){
+        if(depth == result.length){
+            int sum = 0;
+            for(int i=0;i< result.length-1 ;i++){
+                sum += Math.abs(result[i] - result[i+1]);
+            }
+            max = Math.max(max,sum);
 
+            return ;
+        }
 
+        for(int i=0;i<num.length;i++){
+            if(!visited[i]){
+                result[depth] = num[i];
+                visited[i] = true;
+                combination(num,result,visited,depth+1);
+                visited[i] = false;
+            }
+        }
+    }
 }

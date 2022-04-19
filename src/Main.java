@@ -5,82 +5,63 @@ import java.util.*;
 
 public class Main {
 
-    // java 1759 암호 만들기
-    // 주어지는 C 개의 알파벳을 이용해서 L개의 알파벳을 고른 후에 만들어지는 문자열 중에서
-    // 모음이 1개 이상이고 자음이 2개 이상인 것을 고르고
-    // 해당 문자열이 사전순으로 나열되어 있어야 하기 때문에 해당 문자열을 Chararray[]로 바꿔서
-    // 문자열 각각이 사전순으로 나열되어 있는지 확인한 다음
-    // 해당 조건을 만족하는 모든 문자열을 마지막으로 사전순 나열한다.
-    // 이렇게 하면 정확성은 맞는게 확실한 것 같은데 메모리 초과가 발생한다.
-    // 일단 모든 문자열을 확인해야 해서 순열로 문자열을 만드는 건 맞는 것 같은데
-    // 각각의 문자열이 사전순으로 배열되어 있는지를 확인하는 과정에서
-    // StringBuffer와 CharArray를 활용하는 게 메모리를 너무 많이 먹는 것 같다 ㅠㅠ
+    // java 1182 부분수열의 합
 
-    static ArrayList<String> list = new ArrayList<>();
+    // 부분수열의 의미를 잘못 생각해서 시간이 상당히 오래 걸렸다.
+    // 순서대로만이 아니라 하나 떨어지더라도 부분수열로 쳐야 하기 때문에 2중 for문으로
+    // 투포인터와 같이 부분수열을 구하는 건 옳지 않았다.
+    // 해당 방법이 왜 옳지 않은지 알아내는데 한참 걸렸다...
 
+    // dfs로 원소를 선택하거나 선택하지 않는 경우를 따져야 했다.
+    // 단 dfs로 부분수열을 구하는 경우 공집합도 포함되기 때문에 answer-1을 해줘야 했다.
+
+    // java 암호만들기 어제 문제 같은 경우는 따로 정렬을 해서 list를 다시 만드는 게 아니라
+    // 애초에 정렬을 하고 sb에 답이 되는 string을 추가해 나가는 식으로 하면 메모리가 초과되지 않는다
+    static int answer = 0 ;
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         StringTokenizer stk = new StringTokenizer(br.readLine()," ");
 
-        int L = Integer.parseInt(stk.nextToken());
-        int C = Integer.parseInt(stk.nextToken());
+        int N = Integer.parseInt(stk.nextToken());
+        int S = Integer.parseInt(stk.nextToken());
 
-        String[] str = new String[C];
+        int[] arr = new int[N];
 
-        stk = new StringTokenizer(br.readLine()," ");
-        for(int i=0;i<C;i++){
-            str[i] = stk.nextToken();
+        stk = new StringTokenizer(br.readLine(), " ");
+        for(int i=0;i<N;i++){
+            arr[i]  = Integer.parseInt(stk.nextToken());
         }
 
-        String[] result = new String[L];
-        boolean[] visited = new boolean[C];
-        int depth = 0;
-        combination(result,str,L,visited,depth);
+        /*
+        int answer = 0;
+        for(int i=0;i<arr.length;i++){
+            for(int j=i;j<arr.length;j++){
+                int sum = 0;
 
-        Collections.sort(list);
-
-        for(int i=0;i<list.size();i++){
-            System.out.println(list.get(i));
-        }
-
-    }
-
-    private static void combination(String[] result,String[] str,int L,boolean[] visited,int depth){
-        if(depth == L){
-            int mo = 0; // 모음 수
-            int ja = 0; // 자음 수
-            StringBuffer sb = new StringBuffer();
-            for(int i=0;i<result.length;i++){
-                if(result[i].equals("a") ||result[i].equals("e") ||result[i].equals("i") ||result[i].equals("o") ||result[i].equals("u") ){
-                    mo++;
+//                System.out.println(i + " 에서 " + j + " 까지 ");
+                for(int k=i;k<=j;k++){
+                    sum += arr[k];
                 }
-                else ja++;
-
-                sb.append(result[i]);
+                if(sum == S) answer++;
             }
+        }
 
-            char[] string = sb.toString().toCharArray();
-            Arrays.sort(string);
-            StringBuffer sb2 = new StringBuffer();
-            for(int i=0;i<string.length;i++){
-                sb2.append(string[i]);
-            }
+        System.out.println(answer);
+         */
 
-            if(mo>=1 && ja>=2 && sb.toString().equals(sb2.toString())) {
-                list.add(sb.toString());
-            }
-
+        dfs(0,0,N,S,arr);
+        if(S==0) System.out.println(answer-1);
+        else System.out.println(answer);
+    }
+    private static void dfs(int depth,int sum,int N,int S,int[] arr){
+        if(depth == N){
+            if(sum == S) answer++;
             return ;
         }
-        for(int i=0;i<str.length;i++){
-            if(!visited[i]){
-                result[depth] = str[i];
-                visited[i] = true;
-                combination(result,str,L,visited,depth+1);
-                visited[i] = false;
-            }
-        }
+
+        dfs(depth+1,sum+arr[depth],N,S,arr);
+        dfs(depth+1,sum,N,S,arr);
     }
 }

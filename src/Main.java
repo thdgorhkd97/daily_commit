@@ -1,67 +1,98 @@
+import com.sun.management.GarbageCollectionNotificationInfo;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringBufferInputStream;
 import java.util.*;
 
 public class Main {
 
-    // java 1182 부분수열의 합
+    // java 메뉴 리뉴얼
+    // int[] course에 해당하는 길이만큼 순열을 구해서
+    // 순열로 구해진 문자열을 orders에 포함되는지를 구했는데
+    // 문제가 원하는 조건과 다른 것인지 해답이 되지 않는다.
+    // 가능한 모든 조합을 구하는 것이라면 내가 한 방식이 맞을 텐데 아마 고객이 원하는
+    // 조건에 대해서 따로 생각해야 하는 게 있는 것 같다..
 
-    // 부분수열의 의미를 잘못 생각해서 시간이 상당히 오래 걸렸다.
-    // 순서대로만이 아니라 하나 떨어지더라도 부분수열로 쳐야 하기 때문에 2중 for문으로
-    // 투포인터와 같이 부분수열을 구하는 건 옳지 않았다.
-    // 해당 방법이 왜 옳지 않은지 알아내는데 한참 걸렸다...
+    static ArrayList<String> list = new ArrayList<>();
 
-    // dfs로 원소를 선택하거나 선택하지 않는 경우를 따져야 했다.
-    // 단 dfs로 부분수열을 구하는 경우 공집합도 포함되기 때문에 answer-1을 해줘야 했다.
-
-    // java 암호만들기 어제 문제 같은 경우는 따로 정렬을 해서 list를 다시 만드는 게 아니라
-    // 애초에 정렬을 하고 sb에 답이 되는 string을 추가해 나가는 식으로 하면 메모리가 초과되지 않는다
-    static int answer = 0 ;
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String[] orders = {"XYZ", "XWY", "WXA"};
+        int[] course = {2,3,4};
 
-        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+        Arrays.sort(orders,(Comparator.comparingInt(String::length)) );
 
-        int N = Integer.parseInt(stk.nextToken());
-        int S = Integer.parseInt(stk.nextToken());
+        Set<String> set = new HashSet<>();
+        ArrayList<String> arrayList = new ArrayList<>();
 
-        int[] arr = new int[N];
-
-        stk = new StringTokenizer(br.readLine(), " ");
-        for(int i=0;i<N;i++){
-            arr[i]  = Integer.parseInt(stk.nextToken());
-        }
-
-        /*
-        int answer = 0;
-        for(int i=0;i<arr.length;i++){
-            for(int j=i;j<arr.length;j++){
-                int sum = 0;
-
-//                System.out.println(i + " 에서 " + j + " 까지 ");
-                for(int k=i;k<=j;k++){
-                    sum += arr[k];
+        for(int i=0;i<orders.length;i++){
+            for(int j=0;j<orders[i].length();j++){
+                if(set.add(String.valueOf(orders[i].charAt(j)))){
+                    arrayList.add(String.valueOf(orders[i].charAt(j)));
                 }
-                if(sum == S) answer++;
             }
         }
 
-        System.out.println(answer);
-         */
+        Collections.sort(arrayList);
+        String[] str = new String[arrayList.size()];
+        for(int i=0;i< arrayList.size();i++){
+            str[i] = arrayList.get(i);
+        }
 
-        dfs(0,0,N,S,arr);
-        if(S==0) System.out.println(answer-1);
-        else System.out.println(answer);
+        ArrayList<String> answer = new ArrayList<>();
+
+        for(int i=0;i<course.length;i++){
+            int r = course[i];
+            String[] result = new String[r];
+            int depth = 0;
+            int startIdx = 0;
+            combination(str,result,depth,r,startIdx);
+
+            for(int j=0;j<list.size();j++){
+                String string = list.get(j);
+                int cnt = 0;
+
+                for(int a=0;a<orders.length;a++){
+                    boolean contain = true;
+
+                    for(int b=0;b<string.length();b++){
+                        if(!orders[a].contains(String.valueOf(string.charAt(b)))){
+                            contain = false;
+                            break;
+                        }
+                    }
+
+                    if(contain) cnt++;
+                }
+
+                if(cnt >= 2) answer.add(string);
+            }
+            list.clear();
+        }
+
+        String[] ans = new String[answer.size()];
+        for(int i=0;i<answer.size();i++){
+            ans[i] = answer.get(i);
+        }
+
     }
-    private static void dfs(int depth,int sum,int N,int S,int[] arr){
-        if(depth == N){
-            if(sum == S) answer++;
+    private static void combination(String[] str,String[] result,int depth,int r,int startIdx){
+        if(depth == r){
+            StringBuffer sb = new StringBuffer();
+            for(int i=0;i< result.length;i++){
+//                System.out.print(result[i] + " ");
+                sb.append(result[i]);
+            }
+//            System.out.println();
+            list.add(sb.toString());
             return ;
         }
 
-        dfs(depth+1,sum+arr[depth],N,S,arr);
-        dfs(depth+1,sum,N,S,arr);
+        for(int i=startIdx;i<str.length;i++){
+           result[depth] = str[i];
+           combination(str,result,depth+1,r,i+1);
+        }
     }
 }

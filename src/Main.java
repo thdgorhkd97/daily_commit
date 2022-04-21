@@ -8,91 +8,99 @@ import java.util.*;
 
 public class Main {
 
-    // java 메뉴 리뉴얼
-    // int[] course에 해당하는 길이만큼 순열을 구해서
-    // 순열로 구해진 문자열을 orders에 포함되는지를 구했는데
-    // 문제가 원하는 조건과 다른 것인지 해답이 되지 않는다.
-    // 가능한 모든 조합을 구하는 것이라면 내가 한 방식이 맞을 텐데 아마 고객이 원하는
-    // 조건에 대해서 따로 생각해야 하는 게 있는 것 같다..
+    // java 최솟값 만들기
+    // 처음에는 하나의 배열에 대해 가능한 모든 순열 조합을 만들어서 i번째 원소끼리
+    // 곱해서 최솟값을 구했는데 이러면 순열을 구하는게 시간이 상당히 상당히 오래 걸려서
+    // 시간 초과가 발생한다.
+    // 그래서 다른 방법을 찾다가 하나의 배열에서 가장 큰 원소가 다른 배열에서 가장 작은 원소와 곱해져야
+    // 가장 값이 작게 나온다는 것을 알고 하나의 배열은 오름차순으로 다른 하나는 내림차순으로 해서
+    // i번째 끼리 곱해서 더해가는 것이 최솟값이 된다.
 
-    static ArrayList<String> list = new ArrayList<>();
+    // n=11 정렬 : 0 순열 : 1
+    // n=12 정렬 : 0 순열 : 18
+    // n=13 정렬 : 0 순열 : 235
+
+    static int min = Integer.MAX_VALUE;
 
     public static void main(String[] args) throws IOException {
 
-        String[] orders = {"XYZ", "XWY", "WXA"};
-        int[] course = {2,3,4};
+        int n = 1000;
+        int[] A = new int[n];
+        int[] B = new int[n];
 
-        Arrays.sort(orders,(Comparator.comparingInt(String::length)) );
-
-        Set<String> set = new HashSet<>();
-        ArrayList<String> arrayList = new ArrayList<>();
-
-        for(int i=0;i<orders.length;i++){
-            for(int j=0;j<orders[i].length();j++){
-                if(set.add(String.valueOf(orders[i].charAt(j)))){
-                    arrayList.add(String.valueOf(orders[i].charAt(j)));
-                }
-            }
+        for(int i=0;i<n;i++){
+            A[i] = i;
+            B[i] = i;
         }
 
-        Collections.sort(arrayList);
-        String[] str = new String[arrayList.size()];
-        for(int i=0;i< arrayList.size();i++){
-            str[i] = arrayList.get(i);
+        long before = System.currentTimeMillis();
+        Arrays.sort(A);
+        Arrays.sort(B);
+
+        int[] reverse_B = new int[B.length];
+        for(int i=0;i<B.length;i++){
+            reverse_B[i] = B[B.length-i-1];
         }
 
-        ArrayList<String> answer = new ArrayList<>();
-
-        for(int i=0;i<course.length;i++){
-            int r = course[i];
-            String[] result = new String[r];
-            int depth = 0;
-            int startIdx = 0;
-            combination(str,result,depth,r,startIdx);
-
-            for(int j=0;j<list.size();j++){
-                String string = list.get(j);
-                int cnt = 0;
-
-                for(int a=0;a<orders.length;a++){
-                    boolean contain = true;
-
-                    for(int b=0;b<string.length();b++){
-                        if(!orders[a].contains(String.valueOf(string.charAt(b)))){
-                            contain = false;
-                            break;
-                        }
-                    }
-
-                    if(contain) cnt++;
-                }
-
-                if(cnt >= 2) answer.add(string);
-            }
-            list.clear();
+        int answer = 0;
+        for(int i=0;i<A.length;i++){
+            answer += A[i] * reverse_B[i];
         }
 
-        String[] ans = new String[answer.size()];
-        for(int i=0;i<answer.size();i++){
-            ans[i] = answer.get(i);
-        }
+        System.out.println(answer);
+        long after = System.currentTimeMillis();
+
+        System.out.println((after-before) / 1000);
+
+
+        before = System.currentTimeMillis();
+        int[] result = new int[B.length];
+        boolean[] visited = new boolean[B.length];
+        int depth = 0;
+        int r = B.length;
+        combination(result,A,B,visited,depth,r);
+        System.out.println(min);
+        after = System.currentTimeMillis();
+        System.out.println((after-before) / 1000);
 
     }
-    private static void combination(String[] str,String[] result,int depth,int r,int startIdx){
+
+    private static void combination(int[] result, int[] a,int[] b, boolean[] visited, int depth, int r) {
         if(depth == r){
-            StringBuffer sb = new StringBuffer();
-            for(int i=0;i< result.length;i++){
-//                System.out.print(result[i] + " ");
-                sb.append(result[i]);
+
+            int sum = 0;
+            for(int i=0;i<result.length;i++){
+                sum += result[i] * a[i];
             }
-//            System.out.println();
-            list.add(sb.toString());
+            min = Math.min(sum,min);
+
             return ;
         }
 
-        for(int i=startIdx;i<str.length;i++){
-           result[depth] = str[i];
-           combination(str,result,depth+1,r,i+1);
+        for(int i=0;i<b.length;i++){
+            if(!visited[i]){
+                result[depth] = b[i];
+                visited[i] = true;
+                combination(result,a,b,visited,depth+1,r);
+                visited[i] = false;
+            }
         }
     }
 }
+
+/*
+
+        Arrays.sort(A);
+        Arrays.sort(B);
+        int[] reverse_B = new int[B.length];
+        for(int i=0;i<B.length;i++){
+            reverse_B[i] = B[B.length-i-1];
+        }
+
+        int answer = 0;
+        for(int i=0;i<A.length;i++){
+            answer += A[i] * reverse_B[i];
+        }
+
+        System.out.println(answer);
+ */

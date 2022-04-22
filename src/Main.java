@@ -8,99 +8,65 @@ import java.util.*;
 
 public class Main {
 
-    // java 최솟값 만들기
-    // 처음에는 하나의 배열에 대해 가능한 모든 순열 조합을 만들어서 i번째 원소끼리
-    // 곱해서 최솟값을 구했는데 이러면 순열을 구하는게 시간이 상당히 상당히 오래 걸려서
-    // 시간 초과가 발생한다.
-    // 그래서 다른 방법을 찾다가 하나의 배열에서 가장 큰 원소가 다른 배열에서 가장 작은 원소와 곱해져야
-    // 가장 값이 작게 나온다는 것을 알고 하나의 배열은 오름차순으로 다른 하나는 내림차순으로 해서
-    // i번째 끼리 곱해서 더해가는 것이 최솟값이 된다.
-
-    // n=11 정렬 : 0 순열 : 1
-    // n=12 정렬 : 0 순열 : 18
-    // n=13 정렬 : 0 순열 : 235
-
-    static int min = Integer.MAX_VALUE;
+    // java programmers 순위 검색
+    // 효율성에서 문제가 생기는데 해당 방법에 대해 고민을 많이 해도 당장은 잘 모르겠다..
+    // query에 있는 string을 split하고 이를 info 배열과 비교하다 보니
+    // 3중 for문으로 구현하게 되었고 이 과정에서 마지막 점수를 쉽게 뽑기 위해
+    // split을 한 번더 활용한 것이 시간초과를 발생시킨 것 같다.
+    // 근데 이 과정도 index랑 다중 for문 사이에서 string 을 다루는 게 많이
+    // 복잡해서 정확성을 맞추는 것도 어려웠는데 효율성을 다시 따져 봐야 할 것 같다.
 
     public static void main(String[] args) throws IOException {
 
-        int n = 1000;
-        int[] A = new int[n];
-        int[] B = new int[n];
+        String[] info = {
+                "java backend junior pizza 150",
+                "python frontend senior chicken 210",
+                "python frontend senior chicken 150",
+                "cpp backend senior pizza 260",
+                "java backend junior chicken 80",
+                "python backend senior chicken 50"};
+        String[] query = {
+                "java and backend and junior and pizza 100",
+                "python and frontend and senior and chicken 200",
+                "cpp and - and senior and pizza 250",
+                "- and backend and senior and - 150",
+                "- and - and - and chicken 100",
+                "- and - and - and - 150"};
 
-        for(int i=0;i<n;i++){
-            A[i] = i;
-            B[i] = i;
+        int[] answer = new int[query.length];
+
+        for(int i=0;i< query.length;i++){
+            String str = query[i].replace("and","");
+            String[] condition = str.split(" ");
+            int cnt = 0;
+
+            for(int j=0;j<info.length;j++){
+                boolean flag = true;
+                for(int k=0;k<condition.length-1;k++){
+                    if(!condition[k].equals("-") && !info[j].contains(condition[k])){
+                        flag = false;
+                        break;
+                    }
+                }
+
+                if(flag){
+                    String[] sub_info = info[j].split(" ");
+                    if((Integer.parseInt(sub_info[4]) >= Integer.parseInt(condition[condition.length-1]))){
+                        cnt++;
+                    }
+                }
+
+            }
+            answer[i] = cnt;
+
         }
 
-        long before = System.currentTimeMillis();
-        Arrays.sort(A);
-        Arrays.sort(B);
-
-        int[] reverse_B = new int[B.length];
-        for(int i=0;i<B.length;i++){
-            reverse_B[i] = B[B.length-i-1];
+        for(int i=0;i<answer.length;i++){
+            System.out.print(answer[i] + " ");
         }
 
-        int answer = 0;
-        for(int i=0;i<A.length;i++){
-            answer += A[i] * reverse_B[i];
-        }
-
-        System.out.println(answer);
-        long after = System.currentTimeMillis();
-
-        System.out.println((after-before) / 1000);
-
-
-        before = System.currentTimeMillis();
-        int[] result = new int[B.length];
-        boolean[] visited = new boolean[B.length];
-        int depth = 0;
-        int r = B.length;
-        combination(result,A,B,visited,depth,r);
-        System.out.println(min);
-        after = System.currentTimeMillis();
-        System.out.println((after-before) / 1000);
 
     }
 
-    private static void combination(int[] result, int[] a,int[] b, boolean[] visited, int depth, int r) {
-        if(depth == r){
-
-            int sum = 0;
-            for(int i=0;i<result.length;i++){
-                sum += result[i] * a[i];
-            }
-            min = Math.min(sum,min);
-
-            return ;
-        }
-
-        for(int i=0;i<b.length;i++){
-            if(!visited[i]){
-                result[depth] = b[i];
-                visited[i] = true;
-                combination(result,a,b,visited,depth+1,r);
-                visited[i] = false;
-            }
-        }
-    }
 }
 
-/*
-
-        Arrays.sort(A);
-        Arrays.sort(B);
-        int[] reverse_B = new int[B.length];
-        for(int i=0;i<B.length;i++){
-            reverse_B[i] = B[B.length-i-1];
-        }
-
-        int answer = 0;
-        for(int i=0;i<A.length;i++){
-            answer += A[i] * reverse_B[i];
-        }
-
-        System.out.println(answer);
- */

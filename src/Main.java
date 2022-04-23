@@ -8,65 +8,48 @@ import java.util.*;
 
 public class Main {
 
-    // java programmers 순위 검색
-    // 효율성에서 문제가 생기는데 해당 방법에 대해 고민을 많이 해도 당장은 잘 모르겠다..
-    // query에 있는 string을 split하고 이를 info 배열과 비교하다 보니
-    // 3중 for문으로 구현하게 되었고 이 과정에서 마지막 점수를 쉽게 뽑기 위해
-    // split을 한 번더 활용한 것이 시간초과를 발생시킨 것 같다.
-    // 근데 이 과정도 index랑 다중 for문 사이에서 string 을 다루는 게 많이
-    // 복잡해서 정확성을 맞추는 것도 어려웠는데 효율성을 다시 따져 봐야 할 것 같다.
+    // line 코팅테스트 문제
+    // arr과 brr을 일치시키기 위한 과정을 거치면서 앞에서부터
+    // 길이를 맞추고 그 다음 인덱스에 그만큼을 더하거나 빼면서 끝까지 맞춰간다.
+    // 근데 이를 다 맞는지를 확인하는 과정에서 arr과 brr을 끝까지 확인하면서
+    // 모두 맞는지를 확인하는 과정이 오래걸린 것 같다ㅠㅠ
 
     public static void main(String[] args) throws IOException {
 
-        String[] info = {
-                "java backend junior pizza 150",
-                "python frontend senior chicken 210",
-                "python frontend senior chicken 150",
-                "cpp backend senior pizza 260",
-                "java backend junior chicken 80",
-                "python backend senior chicken 50"};
-        String[] query = {
-                "java and backend and junior and pizza 100",
-                "python and frontend and senior and chicken 200",
-                "cpp and - and senior and pizza 250",
-                "- and backend and senior and - 150",
-                "- and - and - and chicken 100",
-                "- and - and - and - 150"};
+        int[] arr = {3,7,2,4};
+        int[] brr = {4,5,5,2};
+        int answer = 0;
 
-        int[] answer = new int[query.length];
-
-        for(int i=0;i< query.length;i++){
-            String str = query[i].replace("and","");
-            String[] condition = str.split(" ");
-            int cnt = 0;
-
-            for(int j=0;j<info.length;j++){
-                boolean flag = true;
-                for(int k=0;k<condition.length-1;k++){
-                    if(!condition[k].equals("-") && !info[j].contains(condition[k])){
-                        flag = false;
-                        break;
-                    }
+        int idx = 0;
+        while(!arrEqaulbrr(arr,brr)){
+            for(int i=0;i<arr.length;i++){
+                if(arr[i] != brr[i]){
+                    idx = i;
+                    break;
                 }
-
-                if(flag){
-                    String[] sub_info = info[j].split(" ");
-                    if((Integer.parseInt(sub_info[4]) >= Integer.parseInt(condition[condition.length-1]))){
-                        cnt++;
-                    }
-                }
-
             }
-            answer[i] = cnt;
 
+            int change = Math.abs(arr[idx] - brr[idx]);
+            if(arr[idx] > brr[idx]){
+                arr[idx] -= change;
+                arr[idx+1] += change;
+            }else{
+                arr[idx] += change;
+                arr[idx+1] -= change;
+            }
+
+            answer++;
         }
 
-        for(int i=0;i<answer.length;i++){
-            System.out.print(answer[i] + " ");
-        }
-
+        System.out.println(answer);
 
     }
-
+    private static boolean arrEqaulbrr(int[] arr, int[] brr){
+        for(int i=0;i<arr.length;i++){
+            if(arr[i] != brr[i]){
+                return false;
+            }
+        }
+        return true;
+    }
 }
-

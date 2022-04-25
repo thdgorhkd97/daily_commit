@@ -9,11 +9,19 @@ import java.util.*;
 public class Main {
 
     // java 10973 이전 순열
-    // combination method에서 result를 출력했을 때는 사전순으로 잘 정렬되서 나오는데
-    // 왜 list.add(result)를 해서 list를 확인하면 제대로 나오지 않는지 모르겠다...
-    // list의 선언도 했고 static이고 int[]을 받는 데 왜...
+    // combination으로 순열을 받아서 해결하는 과정에 대한 문제는 해결했다.
+    // result를 list에 넣으니까 마지막으로 갱신한 result값만 들어갔는데
+    // 새로운 배열로 받아서 그 갱신되는 배열을 넣으니까 해결 가능했다.
+    // 근데 그렇게 순열을 모두 구해서 일치하는 바로 앞을 구하는 방식은
+    // 순열을 구하는 방식이 오래 걸리기 때문에 시간초과가 발생한다.
 
-    static ArrayList<int[]> list = new ArrayList<>();
+    // 그래서 해결방법을 보니
+
+//    1. A[i-1] > A[i]를 만족하는 카장 큰 i를 찾는다.
+//    2. j >= i 이면서 A[j] < A[i-1]을 만족하는 가장 큰 j를 찾는다.
+//    3. A[i-1]과 A[j]를 swap한다.
+//    4. A[i]부터 순열을 뒤집는다.
+//  사전순이기 때문에 해결할 수 있는 로직이 있었고 이를 알아보고 해결하는 데 도움을 받았다
 
     public static void main(String[] args) throws IOException {
 
@@ -27,76 +35,49 @@ public class Main {
             target[i] = Integer.parseInt(stk.nextToken());
         }
 
-        int[] arr = new int[N];
-        for(int i=1;i<=N;i++){
-            arr[i-1] = i;
-        }
-
-        boolean flag = true;
-        for(int i=0;i< target.length;i++){
-            if(target[i] != i+1){
-                flag = false;
-                break;
+        if (Previous(target)) {
+            for (int i=0; i<target.length; i++) {
+                System.out.print(target[i] + " ");
             }
         }
-        if(flag){
+        else {
             System.out.println("-1");
-            return ;
         }
-
-
-        boolean[] visited = new boolean[N];
-        int depth = 0;
-        int[] result = new int[N];
-        combination(visited,arr,depth,result);
-
-        for(int i=0;i<list.size();i++){
-            for(int j=0;j<list.get(i).length;j++){
-                System.out.print(list.get(i)[j] + " ");
-            }
-            System.out.println();
-        }
-
-        for(int i=1;i<list.size();i++){
-            flag = true;
-
-            for(int j=0;j<list.get(i).length;j++){
-                if(list.get(i)[j] != target[j]){
-                    flag = false;
-                    break;
-                }
-            }
-
-            if(flag) {
-                for (int j = 0; j < list.get(i-1).length; j++) {
-                    System.out.print(list.get(i - 1)[j] + " ");
-                }
-                return ;
-            }
-
-        }
-
-
 
     }
-    private static void combination(boolean[] visited,int[] arr,int depth,int[] result){
-        if(depth == result.length){
 
-//            for(int i=0;i< result.length;i++){
-//                System.out.print(result[i] + " ");
-//            }
-//            System.out.println();
-            list.add(result);
-            return ;
+    private static boolean Previous(int[] a) {
+        int i = a.length-1;
+        while (i > 0 && a[i-1] <= a[i]) {
+            i -= 1;
         }
 
-        for(int i=0;i<arr.length;i++){
-            if(!visited[i]){
-                result[depth] = arr[i];
-                visited[i] = true;
-                combination(visited,arr,depth+1,result);
-                visited[i] = false;
-            }
+        // 첫 번째 순열인 경우
+        if (i <= 0) {
+            return false;
         }
+        //2. a[i-1] > a[j]를 만족하는 첫 번째 수 찾기
+        int j = a.length-1;
+        while (a[j] >= a[i-1]) {
+            j -= 1;
+        }
+
+        //3. a[i-1]과 a[j] swap
+        swap(a, i-1, j);
+
+        //4 i부터 a.length-1까지 순열 뒤집기
+        j = a.length-1;
+        while (i < j) {
+            swap(a, i, j);
+            i += 1;
+            j -= 1;
+        }
+        return true;
     }
+    public static void swap(int [] a, int i, int j) {
+        int temp = a[i];
+        a[i] = a[j];
+        a[j] = temp;
+    }
+
 }

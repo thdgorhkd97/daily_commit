@@ -8,76 +8,58 @@ import java.util.*;
 
 public class Main {
 
-    // java 10973 이전 순열
-    // combination으로 순열을 받아서 해결하는 과정에 대한 문제는 해결했다.
-    // result를 list에 넣으니까 마지막으로 갱신한 result값만 들어갔는데
-    // 새로운 배열로 받아서 그 갱신되는 배열을 넣으니까 해결 가능했다.
-    // 근데 그렇게 순열을 모두 구해서 일치하는 바로 앞을 구하는 방식은
-    // 순열을 구하는 방식이 오래 걸리기 때문에 시간초과가 발생한다.
+    // java 6603 로또
+    // 주어진 숫자 목록 중에서 6개를 골라서 중복없이 사전순으로 출력하는 문제다.
+    // 중복이 없기 때문에 생각보다 많은 시간을 먹지는 않은 것으로 보이는데
+    // 처음에 모든 조합을 출력했다가 중복을 제외해야 한다는 조건 때문에 바꿔서
+    // 출력하였고 이때 출력형식 오류가 발생했는데
+    // 그냥 단순히 메서드 내에서 출력하는 게 아니라 StringBuffer를 받아서
+    // 한번에 출력하는 방법으로 바꿔서 실행하여 해결하였다.
 
-    // 그래서 해결방법을 보니
-
-//    1. A[i-1] > A[i]를 만족하는 카장 큰 i를 찾는다.
-//    2. j >= i 이면서 A[j] < A[i-1]을 만족하는 가장 큰 j를 찾는다.
-//    3. A[i-1]과 A[j]를 swap한다.
-//    4. A[i]부터 순열을 뒤집는다.
-//  사전순이기 때문에 해결할 수 있는 로직이 있었고 이를 알아보고 해결하는 데 도움을 받았다
+    static StringBuffer sb = new StringBuffer();
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br= new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int N = Integer.parseInt(br.readLine());
+        while(true){
+            StringTokenizer stk = new StringTokenizer(br.readLine()," ");
 
-        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
-        int[] target = new int[N];
-        for(int i=0;i<N;i++){
-            target[i] = Integer.parseInt(stk.nextToken());
-        }
+            int k = Integer.parseInt(stk.nextToken());
 
-        if (Previous(target)) {
-            for (int i=0; i<target.length; i++) {
-                System.out.print(target[i] + " ");
+            if(k==0) break;
+
+            int[] arr = new int[k];
+
+            for(int i=0;i<k;i++){
+                arr[i] = Integer.parseInt(stk.nextToken());
             }
+
+            int r = 6;
+            int depth = 0;
+            int[] result = new int[r];
+            int startIdx = 0;
+            permutation(arr,k,depth,r,result,startIdx);
+            sb.append("\n");
         }
-        else {
-            System.out.println("-1");
-        }
+        System.out.println(sb.toString());
 
     }
 
-    private static boolean Previous(int[] a) {
-        int i = a.length-1;
-        while (i > 0 && a[i-1] <= a[i]) {
-            i -= 1;
+    private static void permutation(int[] arr, int k, int depth, int r, int[] result,int startIdx) {
+        if(depth == result.length){
+            for(int i=0;i<result.length;i++){
+                sb.append(result[i]).append(" ");
+            }
+            sb.append("\n");
+
+            return ;
         }
 
-        // 첫 번째 순열인 경우
-        if (i <= 0) {
-            return false;
-        }
-        //2. a[i-1] > a[j]를 만족하는 첫 번째 수 찾기
-        int j = a.length-1;
-        while (a[j] >= a[i-1]) {
-            j -= 1;
+        for(int i=startIdx;i<arr.length;i++){
+            result[depth] = arr[i];
+            permutation(arr,k,depth+1,r,result,i+1);
         }
 
-        //3. a[i-1]과 a[j] swap
-        swap(a, i-1, j);
-
-        //4 i부터 a.length-1까지 순열 뒤집기
-        j = a.length-1;
-        while (i < j) {
-            swap(a, i, j);
-            i += 1;
-            j -= 1;
-        }
-        return true;
     }
-    public static void swap(int [] a, int i, int j) {
-        int temp = a[i];
-        a[i] = a[j];
-        a[j] = temp;
-    }
-
 }

@@ -8,58 +8,102 @@ import java.util.*;
 
 public class Main {
 
-    // java 6603 로또
-    // 주어진 숫자 목록 중에서 6개를 골라서 중복없이 사전순으로 출력하는 문제다.
-    // 중복이 없기 때문에 생각보다 많은 시간을 먹지는 않은 것으로 보이는데
-    // 처음에 모든 조합을 출력했다가 중복을 제외해야 한다는 조건 때문에 바꿔서
-    // 출력하였고 이때 출력형식 오류가 발생했는데
-    // 그냥 단순히 메서드 내에서 출력하는 게 아니라 StringBuffer를 받아서
-    // 한번에 출력하는 방법으로 바꿔서 실행하여 해결하였다.
+    // java 알고리즘 스터디
+    // java programmers 폰켓몬
 
-    static StringBuffer sb = new StringBuffer();
+    // set과 arraylist의 indexOf()를 활용하여 arraylist에 없는
+    // 원소를 구하는 과정에 대해서 시간복잡도를 비교해 보았다.
+
+    // nums배열에 있는 숫자들 중 nums.length / 2 인 숫자와 비교한 최대 종류를 구하는 문제
+    // 처음에는 set을 활용하여 중복되지 않은 종류수를 구하고 그를 통해 답을 도출
+    // 두번째는 for문을 돌면서 직접 종류를 구해서 종류와 최대값인 nums.length /2 를 비교
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int[] nums = {3,3,3,2,2,4};
 
+        ArrayList<Integer> list = new ArrayList<>();
+        for(int i=1;i<=100000;i++){
+            list.add(i);
+        }
+
+        long before = System.currentTimeMillis();
+        Set<Integer> set = new HashSet<>();
+        for(int i=0;i<list.size();i++){
+            set.add(list.get(i)); //O(1)
+        }
+
+        int answer = 1;
         while(true){
-            StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+            if(set.add(answer)){
+                break;
+            }
+            answer++;
+        }
 
-            int k = Integer.parseInt(stk.nextToken());
+        System.out.println(answer);
+        long after = System.currentTimeMillis();
+        System.out.println("Set 사용 시 : " + (after-before) / 1000);
 
-            if(k==0) break;
+        before = System.currentTimeMillis();
+        answer = 1;
+        while(true){
+            if(list.indexOf(answer) < 0){ // O(n)
+                break;
+            }
+            answer++;
+        }
+        System.out.println(answer);
+        after = System.currentTimeMillis();
+        System.out.println("indexOf 사용 시 : " + (after-before) / 1000);
 
-            int[] arr = new int[k];
 
-            for(int i=0;i<k;i++){
-                arr[i] = Integer.parseInt(stk.nextToken());
+        /*
+        int pocketmon = nums.length/2;
+        int prev = nums[0];
+        int species = 1;
+        for(int i=0;i<nums.length;i++){
+            if(prev != nums[i]){
+                species++;
+                prev = nums[i];
+            }
+        }
+
+        if(pocketmon > species){
+            System.out.println(species);
+        }
+        else{
+            System.out.println(pocketmon);
+        }
+         */
+
+        /*
+        Arrays.sort(nums);
+
+        int pocketmon = nums.length/2;
+
+        Set<Integer> set = new HashSet<>();
+        int pick = 0;
+        for(int i=0;i<nums.length;i++){
+            if(set.add(nums[i])){
+                pick++;
             }
 
-            int r = 6;
-            int depth = 0;
-            int[] result = new int[r];
-            int startIdx = 0;
-            permutation(arr,k,depth,r,result,startIdx);
-            sb.append("\n");
-        }
-        System.out.println(sb.toString());
-
-    }
-
-    private static void permutation(int[] arr, int k, int depth, int r, int[] result,int startIdx) {
-        if(depth == result.length){
-            for(int i=0;i<result.length;i++){
-                sb.append(result[i]).append(" ");
+            if(pick == pocketmon){
+                break;
             }
-            sb.append("\n");
-
-            return ;
         }
 
-        for(int i=startIdx;i<arr.length;i++){
-            result[depth] = arr[i];
-            permutation(arr,k,depth+1,r,result,i+1);
-        }
+        System.out.println(pick);
+        */
+
+
+
+
+
+
+
+
 
     }
 }

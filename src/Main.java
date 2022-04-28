@@ -9,95 +9,51 @@ import java.util.*;
 public class Main {
 
     // java 알고리즘 스터디
-    // java programmers 폰켓몬
+    // java programmers 가장 큰 정사각형 찾기
 
-    // set과 arraylist의 indexOf()를 활용하여 arraylist에 없는
-    // 원소를 구하는 과정에 대해서 시간복잡도를 비교해 보았다.
+    // 1로 이루어진 가장 큰 정사각형의 넓이를 찾는 문제다
+    // 처음에는 1인 board[i][j]에서 그 점을 시작으로 오른쪽으로 쭉 1인 부분과
+    // 아래로 쭉 1인 부분을 찾아서 그중 작은 값이 정사각형의 길이가 되니까
+    // 그렇게 구해지는 정사각형의 최대값을 구하려고 했는데
+    // 1인 지점을 찾을 때마다 오른쪽으로 아래로 길이를 구해서 다중 for문을 돌리고 하면
+    // 지나치게 오래 걸린다.
 
-    // nums배열에 있는 숫자들 중 nums.length / 2 인 숫자와 비교한 최대 종류를 구하는 문제
-    // 처음에는 set을 활용하여 중복되지 않은 종류수를 구하고 그를 통해 답을 도출
-    // 두번째는 for문을 돌면서 직접 종류를 구해서 종류와 최대값인 nums.length /2 를 비교
+    // 그래서 알아본 방법으로는 정사각형의 오른쪽 아래점을 기준으로 길이가 2인 정사각형을
+    // 계속해서 알아간다고 생각하면서
+    // 그런 정사각형이 어디까지 이어지는지 알아보는식으로 진행하면 된다고 한다.
+
 
     public static void main(String[] args) throws IOException {
 
-        int[] nums = {3,3,3,2,2,4};
+        int[][] board = {{0,1,1,1},{1,1,1,1},{1,1,1,1},{0,0,1,0}};
 
-        ArrayList<Integer> list = new ArrayList<>();
-        for(int i=1;i<=100000;i++){
-            list.add(i);
-        }
-
-        long before = System.currentTimeMillis();
-        Set<Integer> set = new HashSet<>();
-        for(int i=0;i<list.size();i++){
-            set.add(list.get(i)); //O(1)
-        }
-
-        int answer = 1;
-        while(true){
-            if(set.add(answer)){
-                break;
-            }
-            answer++;
-        }
-
-        System.out.println(answer);
-        long after = System.currentTimeMillis();
-        System.out.println("Set 사용 시 : " + (after-before) / 1000);
-
-        before = System.currentTimeMillis();
-        answer = 1;
-        while(true){
-            if(list.indexOf(answer) < 0){ // O(n)
-                break;
-            }
-            answer++;
-        }
-        System.out.println(answer);
-        after = System.currentTimeMillis();
-        System.out.println("indexOf 사용 시 : " + (after-before) / 1000);
-
-
-        /*
-        int pocketmon = nums.length/2;
-        int prev = nums[0];
-        int species = 1;
-        for(int i=0;i<nums.length;i++){
-            if(prev != nums[i]){
-                species++;
-                prev = nums[i];
+        int answer = 1234;
+        for(int i=1;i<board.length;i++){
+            for(int j=1;j<board[i].length;j++){
+                if(board[i][j] == 1&&board[i-1][j-1] > 0 && board[i-1][j] > 0 && board[i][j-1] > 0){
+                    board[i][j] = Math.min(Math.min(board[i-1][j-1],board[i-1][j]),board[i][j-1]);
+                    board[i][j] += 1;
+                }
             }
         }
 
-        if(pocketmon > species){
-            System.out.println(species);
-        }
-        else{
-            System.out.println(pocketmon);
-        }
-         */
-
-        /*
-        Arrays.sort(nums);
-
-        int pocketmon = nums.length/2;
-
-        Set<Integer> set = new HashSet<>();
-        int pick = 0;
-        for(int i=0;i<nums.length;i++){
-            if(set.add(nums[i])){
-                pick++;
-            }
-
-            if(pick == pocketmon){
-                break;
+        int max = 0;
+        for(int i=0;i<board.length;i++){
+            for(int j=0;j<board[i].length;j++) {
+                if (max < board[i][j]) {
+                    max = board[i][j];
+                }
             }
         }
 
-        System.out.println(pick);
-        */
+        for(int i=0;i<board.length;i++){
+            for(int j=0;j<board[i].length;j++){
+                System.out.print(board[i][j] + " ");
+            }
+            System.out.println();
+        }
 
-
+        answer = max * max;
 
 
 

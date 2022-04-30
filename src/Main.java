@@ -8,12 +8,13 @@ import java.util.*;
 
 public class Main {
 
-    // java 1476 날짜 계산
-    // E, S, M 이 정해진 범위가 있기 때문에 마치 시계처럼 가장 작은 단위가
-    // 정해진 범위를 벗어나면 다음 단위가 1씩 올라가는 식으로 구현을 하는데
-    // 특정한 시간이 주어지면 그에 해당하는 E S M을 구하는 게 아니라 반대로
-    // E S M이 주어지고 그에 해당하는 날짜를 구하는 것이기 때문에 1 1 1 로
-    // 세팅한 상태에서 주어진 시간이 될 때까지 하루하루 더해나간다.
+    // java 11048 이동하기
+    // 이렇게 이동하는 문제는 몇 번 풀어봤는데 만약 이 문제에서 오른쪽, 아래 , 오른쪽 아래
+    // 이렇게 3가지가 아니라 왼쪽으로 이동하는 경우도 포함해야 한다면 상당히 어려울 것 같다
+    // 일단 오른쪽, 아래, 오른쪽 아래 이렇게 3가지로만 이동하는 경우에는
+    // dp의 위, 왼쪽위, 왼쪽 중에서 가장 큰 것과 map의 해당 위치를 더한 것이 가장 큰 값이므로
+    // 해당 경로를 통해 오는 게 가장 많은 걸 챙길 수 있는 경로이다.
+    // 예를 들어, 위가 가장 크다면 해당 위치를 방문할때는 위에서 내려오는 게 가장 크다는 것이다.
 
     public static void main(String[] args) throws IOException {
 
@@ -21,33 +22,37 @@ public class Main {
 
         StringTokenizer stk = new StringTokenizer(br.readLine()," ");
 
-        int E = Integer.parseInt(stk.nextToken());
-        int S = Integer.parseInt(stk.nextToken());
+        int N = Integer.parseInt(stk.nextToken());
         int M = Integer.parseInt(stk.nextToken());
 
-        int e=1,s=1,m=1;
-        int year = 1;
-        while(true){
-            if(e==E && s==S && m==M) {
-                System.out.println(year);
-                break;
-            }
-            e+=1;
-            s+=1;
-            m+=1;
-            if(e==16) {
-                e=1;
-            }
-            if(s==29) {
-                s=1;
-            }
-            if(m==20) {
-                m=1;
-            }
+        int[][] map = new int[N+1][M+1];
 
-            year ++;
-
+        for(int i=1;i<=N;i++){
+            stk = new StringTokenizer(br.readLine()," ");
+            for(int j=1;j<=M;j++){
+                map[i][j] = Integer.parseInt(stk.nextToken());
+            }
         }
+
+        int[][] dp = new int[N+1][M+1];
+
+        for(int i=1;i<=N;i++){
+            for(int j=1;j<=M;j++){
+                dp[i][j] = Math.max(dp[i-1][j-1],Math.max(dp[i-1][j],dp[i][j-1])) + map[i][j];
+            }
+        }
+
+//        for(int i=1;i<=N;i++){
+//            for(int j=1;j<=M;j++){
+//                System.out.print(dp[i][j] + " ");
+//            }
+//            System.out.println();
+//        }
+
+        System.out.println(dp[N][M]);
+
+
+
 
     }
 }

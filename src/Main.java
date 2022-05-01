@@ -8,51 +8,53 @@ import java.util.*;
 
 public class Main {
 
-    // java 11048 이동하기
-    // 이렇게 이동하는 문제는 몇 번 풀어봤는데 만약 이 문제에서 오른쪽, 아래 , 오른쪽 아래
-    // 이렇게 3가지가 아니라 왼쪽으로 이동하는 경우도 포함해야 한다면 상당히 어려울 것 같다
-    // 일단 오른쪽, 아래, 오른쪽 아래 이렇게 3가지로만 이동하는 경우에는
-    // dp의 위, 왼쪽위, 왼쪽 중에서 가장 큰 것과 map의 해당 위치를 더한 것이 가장 큰 값이므로
-    // 해당 경로를 통해 오는 게 가장 많은 걸 챙길 수 있는 경로이다.
-    // 예를 들어, 위가 가장 크다면 해당 위치를 방문할때는 위에서 내려오는 게 가장 크다는 것이다.
+    // java 2529 부등호
+    // 순열로 하면 해결은 되는데 시간이 초과된다 ㅠㅠ
+    // 순열로 해서 모든 경우의 수를 확인하는 백트래킹은 잘 하는것 같은데
+    // 시간을 고려하면 dfs로 재귀를 활용해야 하는데 dfs로 재귀를 하는게 아직 잘
+    // 못하는 것 같다 ㅠㅠㅠ 해당 개념이 잘 이해가 되질 않는데
+    // 해당 파트를 뛰어넘는 이해가 있어야 할 것 같다 ㅠㅠ
+
+    // dfs로 재귀하는 건 꼭 봐야하는 것 같다 ...
+
+    private static int k; // 부등호 문자의 개수(2 ≤ k ≤ 9)
+    private static boolean[] isVisited = new boolean[10]; // 0~9 숫자방문여부 (중복숫자불가하므로)
+    private static char[] signs;
+    private static List<String> result = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-
-        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
-
-        int N = Integer.parseInt(stk.nextToken());
-        int M = Integer.parseInt(stk.nextToken());
-
-        int[][] map = new int[N+1][M+1];
-
-        for(int i=1;i<=N;i++){
-            stk = new StringTokenizer(br.readLine()," ");
-            for(int j=1;j<=M;j++){
-                map[i][j] = Integer.parseInt(stk.nextToken());
-            }
+        Scanner sc = new Scanner(System.in);
+        k = sc.nextInt();
+        signs = new char[k];
+        for (int i = 0; i < k; i++) {
+            signs[i] = sc.next().charAt(0);
         }
 
-        int[][] dp = new int[N+1][M+1];
-
-        for(int i=1;i<=N;i++){
-            for(int j=1;j<=M;j++){
-                dp[i][j] = Math.max(dp[i-1][j-1],Math.max(dp[i-1][j],dp[i][j-1])) + map[i][j];
-            }
-        }
-
-//        for(int i=1;i<=N;i++){
-//            for(int j=1;j<=M;j++){
-//                System.out.print(dp[i][j] + " ");
-//            }
-//            System.out.println();
-//        }
-
-        System.out.println(dp[N][M]);
-
-
+        dfs("", 0);
+        Collections.sort(result);
+        System.out.println(result.get(result.size() - 1)); //최댓값
+        System.out.println(result.get(0)); //최솟값
 
 
     }
+    private static void dfs(String num, int depth) { //처음 nums를 int[]로 접근했는데 String으로 하는게 간단해진다.
+        if (depth == k + 1) {
+            result.add(num);
+            return;
+        }
+        for (int i = 0; i <= 9; i++) {
+            if (depth == 0 || !isVisited[i] && compare(num.charAt(num.length() - 1) - '0', i, signs[depth - 1])) { //처음건 비교할게없으므로 통과 || 방문안한숫자 && 비교
+                isVisited[i] = true;
+                dfs(num + i, depth + 1);
+                isVisited[i] = false;
+            }
+        }
+    }
+
+    private static boolean compare(int a, int b, char c) {
+        if (c == '<') return a < b;
+        else return a > b;
+    }
+
 }

@@ -8,53 +8,102 @@ import java.util.*;
 
 public class Main {
 
-    // java 2529 부등호
-    // 순열로 하면 해결은 되는데 시간이 초과된다 ㅠㅠ
-    // 순열로 해서 모든 경우의 수를 확인하는 백트래킹은 잘 하는것 같은데
-    // 시간을 고려하면 dfs로 재귀를 활용해야 하는데 dfs로 재귀를 하는게 아직 잘
-    // 못하는 것 같다 ㅠㅠㅠ 해당 개념이 잘 이해가 되질 않는데
-    // 해당 파트를 뛰어넘는 이해가 있어야 할 것 같다 ㅠㅠ
+    // java
+    // 코딩 테스트 문제 中 하나
+    // 수직선에서 거리를 계산하여 가능한 경우의 수를 구해야 하는데
+    // 0을 기준으로 설정하기로 했다. 거리가 주어지기 때문에 0을 기준으로 하면 -와 + 2가지 경우가 있는 것이기 대문에
+    // 이렇게 생각했는데 끝나고 생각해보니 가장 큰 값을 기준으로 하는 게 맞는 것 같다.
+    // 가장 큰 값을 기준으로 한다면 그 두 index가 최대최소 혹은 최소최대 이게 맞는 것이기 때문에
+    // 훨씬 더 직관적이고 깔끔한 기준이 될 것 같다.
 
-    // dfs로 재귀하는 건 꼭 봐야하는 것 같다 ...
-
-    private static int k; // 부등호 문자의 개수(2 ≤ k ≤ 9)
-    private static boolean[] isVisited = new boolean[10]; // 0~9 숫자방문여부 (중복숫자불가하므로)
-    private static char[] signs;
-    private static List<String> result = new ArrayList<>();
+    static ArrayList<int[]> list = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
 
-        Scanner sc = new Scanner(System.in);
-        k = sc.nextInt();
-        signs = new char[k];
-        for (int i = 0; i < k; i++) {
-            signs[i] = sc.next().charAt(0);
-        }
+        int[][] dist = {{0,5,2,4,1},{5,0,3,9,6},{2,3,0,6,3},{4,9,6,0,3},{1,6,3,3,0}};
 
-        dfs("", 0);
-        Collections.sort(result);
-        System.out.println(result.get(result.size() - 1)); //최댓값
-        System.out.println(result.get(0)); //최솟값
+        char[] ch = {'+','-'};
 
+        char[] result = new char[dist.length-1];
+        int depth = 0;
+        combination(ch,result,depth,dist); // 어떻게 배열하던지 0은 안 변하기 때문에 0을 기준으로 +와 -를 나누어서 수직선에 둔다는 개념
 
-    }
-    private static void dfs(String num, int depth) { //처음 nums를 int[]로 접근했는데 String으로 하는게 간단해진다.
-        if (depth == k + 1) {
-            result.add(num);
-            return;
-        }
-        for (int i = 0; i <= 9; i++) {
-            if (depth == 0 || !isVisited[i] && compare(num.charAt(num.length() - 1) - '0', i, signs[depth - 1])) { //처음건 비교할게없으므로 통과 || 방문안한숫자 && 비교
-                isVisited[i] = true;
-                dfs(num + i, depth + 1);
-                isVisited[i] = false;
+        Collections.sort(list, (o1, o2) -> o1[0] - o2[0]);
+
+// for(int i=0;i<list.size();i++){
+// for(int j=0;j<list.get(i).length;j++){
+// System.out.print(list.get(i)[j] + " ");
+// }
+// System.out.println();
+// }
+
+        int[][] answer = new int[list.size()][dist.length];
+
+        for(int i=0;i<answer.length;i++){
+            for(int j=0;j<dist.length;j++){
+                answer[i][j] = list.get(i)[j];
             }
         }
+
+
+    }
+    private static void combination(char[] ch,char[] result,int depth,int[][] dist){
+        if(depth == result.length){
+
+            HashMap<Integer,Integer> map = new HashMap<>();
+
+            int idx = 0;
+
+            for(int i=1;i<dist[0].length;i++){
+                if(result[idx] == '+'){
+                    map.put(i,dist[0][i]);
+                }
+                else{
+                    map.put(i,dist[0][i] * (-1));
+                }
+                idx++;
+            }
+
+            if(isPossible(map,dist)) {
+                map.put(0,0);
+
+                int[][] arr4sort = new int[map.size()][2];
+
+                idx = 0;
+                for(Integer key : map.keySet()){
+                    arr4sort[idx][0] = key;
+                    arr4sort[idx++][1] = map.get(key);
+                }
+
+                Arrays.sort(arr4sort, (o1, o2) -> o1[1] - o2[1]);
+
+                int[] res = new int[arr4sort.length];
+                for(int i=0;i<arr4sort.length;i++){
+                    res[i] = arr4sort[i][0];
+                }
+
+                list.add(res);
+
+            }
+
+            return ;
+        }
+
+        for(int i=0;i<ch.length;i++){
+            result[depth] = ch[i];
+            combination(ch,result,depth+1,dist);
+        }
     }
 
-    private static boolean compare(int a, int b, char c) {
-        if (c == '<') return a < b;
-        else return a > b;
-    }
+    private static boolean isPossible(HashMap<Integer,Integer> map,int[][] dist){
 
+        for(Integer key : map.keySet()){
+            for(int j=key+1;j<dist[0].length;j++){
+                if(dist[key][j] != Math.abs(map.get(key) - map.get(j))){
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
 }

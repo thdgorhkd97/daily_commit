@@ -1,109 +1,70 @@
-import com.sun.management.GarbageCollectionNotificationInfo;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.StringBufferInputStream;
 import java.util.*;
 
 public class Main {
 
-    // java
-    // 코딩 테스트 문제 中 하나
-    // 수직선에서 거리를 계산하여 가능한 경우의 수를 구해야 하는데
-    // 0을 기준으로 설정하기로 했다. 거리가 주어지기 때문에 0을 기준으로 하면 -와 + 2가지 경우가 있는 것이기 대문에
-    // 이렇게 생각했는데 끝나고 생각해보니 가장 큰 값을 기준으로 하는 게 맞는 것 같다.
-    // 가장 큰 값을 기준으로 한다면 그 두 index가 최대최소 혹은 최소최대 이게 맞는 것이기 때문에
-    // 훨씬 더 직관적이고 깔끔한 기준이 될 것 같다.
-
-    static ArrayList<int[]> list = new ArrayList<>();
+    // java baekjoon 2003 수들의 합 2
+    // 배열의 부분수열 중 합이 M이 되는 경우의 수를 리턴하는 문제
+    // 시간초과가 발생하는 것 같아서 조치를 취했다. 합이 M을 넘으면 그 뒤로는
+    // 양수만 더해지므로 M이 넘기 때문에 절대 경우의 수에 포함되지 않으므로 바로 그 순간
+    // break를 걸어준다.
+    // 근데 이것만으로는 시간초과를 막기 힘들었다.
+    // 그래서 이중 for문과 비슷한 투포인터를 활용하여 문제를 다시 해결했다.
+    // start와 end를 처음에 0에 위치시키고 대상숫자를 넘어설때까지 end를 뒤로 이동시키며
+    // 더하고 대상숫자를 넘어서면 start를 이동시키면서 빼주면서
+    // 총 몇번의 대상 숫자와 같은 합계가 나오는지 확인한다.
+    // 투 포인터를 활용하면 이중 for문과 같은 효과를 구현하다
+    // 시간적으로 O(n^2) -> O(n)의 시간에 구현할 수 있다.
 
     public static void main(String[] args) throws IOException {
 
-        int[][] dist = {{0,5,2,4,1},{5,0,3,9,6},{2,3,0,6,3},{4,9,6,0,3},{1,6,3,3,0}};
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        char[] ch = {'+','-'};
+        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
 
-        char[] result = new char[dist.length-1];
-        int depth = 0;
-        combination(ch,result,depth,dist); // 어떻게 배열하던지 0은 안 변하기 때문에 0을 기준으로 +와 -를 나누어서 수직선에 둔다는 개념
+        int N = Integer.parseInt(stk.nextToken());
+        int M = Integer.parseInt(stk.nextToken());
 
-        Collections.sort(list, (o1, o2) -> o1[0] - o2[0]);
+        int[] arr = new int[N];
 
-// for(int i=0;i<list.size();i++){
-// for(int j=0;j<list.get(i).length;j++){
-// System.out.print(list.get(i)[j] + " ");
-// }
-// System.out.println();
-// }
-
-        int[][] answer = new int[list.size()][dist.length];
-
-        for(int i=0;i<answer.length;i++){
-            for(int j=0;j<dist.length;j++){
-                answer[i][j] = list.get(i)[j];
-            }
+        stk = new StringTokenizer(br.readLine()," ");
+        for(int i=0;i<N;i++){
+            arr[i] = Integer.parseInt(stk.nextToken());
         }
 
+        System.out.println(two_pointer(arr,M));
 
     }
-    private static void combination(char[] ch,char[] result,int depth,int[][] dist){
-        if(depth == result.length){
 
-            HashMap<Integer,Integer> map = new HashMap<>();
+    private static int two_pointer(int[] arr,int M) {
+        int cnt = 0;
 
-            int idx = 0;
+        int start = 0;
+        int end = 0;
+        int sum = 0;
+        while(true){
 
-            for(int i=1;i<dist[0].length;i++){
-                if(result[idx] == '+'){
-                    map.put(i,dist[0][i]);
-                }
-                else{
-                    map.put(i,dist[0][i] * (-1));
-                }
-                idx++;
+            if(sum >= M){
+                sum -= arr[start++];
+            }
+            else if(end >= arr.length){
+                break;
+            }
+            else {
+                sum += arr[end++];
             }
 
-            if(isPossible(map,dist)) {
-                map.put(0,0);
-
-                int[][] arr4sort = new int[map.size()][2];
-
-                idx = 0;
-                for(Integer key : map.keySet()){
-                    arr4sort[idx][0] = key;
-                    arr4sort[idx++][1] = map.get(key);
-                }
-
-                Arrays.sort(arr4sort, (o1, o2) -> o1[1] - o2[1]);
-
-                int[] res = new int[arr4sort.length];
-                for(int i=0;i<arr4sort.length;i++){
-                    res[i] = arr4sort[i][0];
-                }
-
-                list.add(res);
-
-            }
-
-            return ;
+            if(sum == M) cnt++;
+//            System.out.println("start = " + start + " end = " + end + " sum = " + sum);
         }
 
-        for(int i=0;i<ch.length;i++){
-            result[depth] = ch[i];
-            combination(ch,result,depth+1,dist);
-        }
+
+
+
+
+        return cnt;
     }
 
-    private static boolean isPossible(HashMap<Integer,Integer> map,int[][] dist){
-
-        for(Integer key : map.keySet()){
-            for(int j=key+1;j<dist[0].length;j++){
-                if(dist[key][j] != Math.abs(map.get(key) - map.get(j))){
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
 }

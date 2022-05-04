@@ -5,66 +5,73 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 2003 수들의 합 2
-    // 배열의 부분수열 중 합이 M이 되는 경우의 수를 리턴하는 문제
-    // 시간초과가 발생하는 것 같아서 조치를 취했다. 합이 M을 넘으면 그 뒤로는
-    // 양수만 더해지므로 M이 넘기 때문에 절대 경우의 수에 포함되지 않으므로 바로 그 순간
-    // break를 걸어준다.
-    // 근데 이것만으로는 시간초과를 막기 힘들었다.
-    // 그래서 이중 for문과 비슷한 투포인터를 활용하여 문제를 다시 해결했다.
-    // start와 end를 처음에 0에 위치시키고 대상숫자를 넘어설때까지 end를 뒤로 이동시키며
-    // 더하고 대상숫자를 넘어서면 start를 이동시키면서 빼주면서
-    // 총 몇번의 대상 숫자와 같은 합계가 나오는지 확인한다.
-    // 투 포인터를 활용하면 이중 for문과 같은 효과를 구현하다
-    // 시간적으로 O(n^2) -> O(n)의 시간에 구현할 수 있다.
+    // java 17413 단어 뒤집기 2
+    // < > 사이에 있는 단어는 그대로 놔두고 <> 밖에 있는 단어들만
+    // 거꾸로 뒤집어 출력한다.
+    // < > 사이에 있는지에 대한 여부는 boolean 을 활용해서 체크했는데
+    // 이걸 체크하는 과정에서 조금 혼돈이 있어서 그런가 시간이 상당히 오래걸렸다 ㅠㅠ.
+    // 근데 뒤집을 때 stack에서 pop하면서 넣으려고 했는데 이럴 때 왜 boolean이 걸리는 가
+    // 의아 했는데 알아보니까 < > 를 만났을 때 단순히 상태를 변화시키고 끝나는 게 아니라
+    // 변화가 생겼을 때 stack이 비어있는지를 확인해서 추가 작업을 해야 했다....
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+        String str = br.readLine();
 
-        int N = Integer.parseInt(stk.nextToken());
-        int M = Integer.parseInt(stk.nextToken());
+        StringBuilder sb = new StringBuilder();
 
-        int[] arr = new int[N];
+        // 열린 꺽새와 닫힌 꺽새를 판별하기 위한 flag
+        boolean flag = false;
 
-        stk = new StringTokenizer(br.readLine()," ");
-        for(int i=0;i<N;i++){
-            arr[i] = Integer.parseInt(stk.nextToken());
+        Stack <Character> stack = new Stack<>();
+
+        for (int i = 0; i < str.length(); i++) {
+
+            if (str.charAt(i) == '<') {
+                while (!stack.isEmpty()) { // < > 바깥의 단어가 있다면
+                    sb.append(stack.pop());
+                }
+                flag = true;
+            }
+            // 닫힌 꺽새를 만났을 경우, flag를 false로 입력 후 '>'저장
+            else if (str.charAt(i) == '>') {
+                flag = false; // 이제부터 괄호 바깥의 단어라는 의미
+                sb.append('>'); // '>' 넣는다
+                continue;
+            }
+
+            // flag가 true일 경우, '>'를 만나기 전까지 그대로 입력
+            if (flag) {
+                sb.append(str.charAt(i));
+            }
+            // flag가 false일 경우, 괄호 이외의 문자를 처리
+            else if (!flag) {
+                // 해당 인덱스의 i번째 문자가 공백일 경우, 모든 원소를 POP수행 후 공백 추가
+                if (str.charAt(i) == ' ') {
+                    while (!stack.isEmpty()) {
+                        sb.append(stack.pop());
+                    }
+                    sb.append(' ');
+                    continue;
+                } else {
+                    // 그외의 경우, Stack에 문자 추가
+                    stack.push(str.charAt(i));
+                }
+            }
+
+            // 반복문이 마지막 횟수일 때, 스택이 비어있지 않다면 원소 추가
+            if (i == str.length() - 1) {
+                while (!stack.isEmpty()) {
+                    sb.append(stack.pop());
+                }
+            }
         }
 
-        System.out.println(two_pointer(arr,M));
+        // 결과문 출력
+        System.out.println(sb);
 
-    }
-
-    private static int two_pointer(int[] arr,int M) {
-        int cnt = 0;
-
-        int start = 0;
-        int end = 0;
-        int sum = 0;
-        while(true){
-
-            if(sum >= M){
-                sum -= arr[start++];
-            }
-            else if(end >= arr.length){
-                break;
-            }
-            else {
-                sum += arr[end++];
-            }
-
-            if(sum == M) cnt++;
-//            System.out.println("start = " + start + " end = " + end + " sum = " + sum);
-        }
-
-
-
-
-
-        return cnt;
     }
 
 }

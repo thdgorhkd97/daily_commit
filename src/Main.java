@@ -5,117 +5,90 @@ import java.util.*;
 
 public class Main {
 
-    // java 배열 돌리기 3
-    // 배열에 대한 여러 작업을 진행한다.
-    // 1번 연산 -> 상하반전 -> 절반까지만 for문을 돌면서 직접 바꾸는 연산을 진행한다.
-    // 2번 연산 -> 좌우반전 -> 좌우에 대해서 상하와 똑같은 작업을 한다
-    // 3번 연산 -> 오른쪽으로 90도 회전
-    // 4번 연산 -> 왼쪽으로 90도 회전
-    // 회전 연산 -> 각 열이나 행에 대해서 저장해가면서 바꾸는 연산을 취하려 했는데
-    // 그렇게 하면 상당히 복잡하고 내부에 대해서도 for문을 돌려야 하기 때문에
-    // 다중 for문에다가 index에 대한 작업도 상당히 불편하게 진행해야 한다.
-    // 그래서 알아보니 회전이라는 것은 일단 원래의 배열과 행렬이 바뀌어야 하고
-    // i와 j에 대한 2중 for문에서 ( 원래배열크기 - 1 - i )를 적절히 활용하여
-    // 연산식을 활용해 구현 가능하다.
+    // java programmers 최소직사각형 & 전력망을 둘로 나누기
+    // 최소 직사각형 : 배열의 최대값과 배열의 i번째 원소의 작은 값중 최대값을 곱해서 리턴
+    // 전력망을 둘로 나누기 : 각각의 연결선을 하나씩 지워나가면서 양쪽 정점을 기준으로
+    // bfs 를 통해 연결된 정점의 개수를 구해서 min 값을 구한다.
+
+    static int min = Integer.MAX_VALUE;
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br=  new BufferedReader(new InputStreamReader(System.in));
+        int n = 9;
+        int[][] wires = {{1,3},{2,3},{3,4},{4,5},{4,6},{4,7},{7,8},{7,9}};
 
-        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+        int answer = -1;
 
-        int N = Integer.parseInt(stk.nextToken());
-        int M = Integer.parseInt(stk.nextToken());
-        int R = Integer.parseInt(stk.nextToken());
+        int[][] sizes = {{60,50},{30,70},{60,30},{80,40}};
 
-        int[][] arr = new int[N][M];
+        /*
+        int max = 0;
+        int maxAmongMin = 0;
+        for(int i=0;i<sizes.length;i++){
+            max = Math.max(max,Math.max(sizes[i][0],sizes[i][1]));
+            maxAmongMin = Math.max(maxAmongMin
+                    ,Math.min(sizes[i][0],sizes[i][1]));
+        }
+        System.out.println(max + " " + maxAmongMin);
+         */
 
-        for(int i=0;i<N;i++){
-            stk = new StringTokenizer(br.readLine()," ");
-            for(int j=0;j<M;j++){
-                arr[i][j] = Integer.parseInt(stk.nextToken());
-            }
+
+
+
+
+        int[][] tree = new int[n+1][n+1];
+
+        for(int i=0;i<wires.length;i++){
+            addLine(tree,wires[i][0],wires[i][1]);
         }
 
-        int operator = Integer.parseInt(br.readLine());
+        int[][] clone = tree;
+        for(int i=0;i<wires.length;i++){
 
-        for(int i=0;i<R;i++){
-            switch (operator){
-                case 1 : rotate_ReverseUpDown(arr);break;
-                case 2 : rotate_ReverseLeftRight(arr); break;
-                case 3 : rotate_90Right(arr); break;
-                case 4 : rotate_90Left(arr); break;
-            }
+            clone[wires[i][0]][wires[i][1]] = 0;
+            clone[wires[i][1]][wires[i][0]] = 0;
+
+            withoutOneLine(clone,wires[i][0],wires[i][1]);
+
+            clone[wires[i][0]][wires[i][1]] = 1;
+            clone[wires[i][1]][wires[i][0]] = 1;
+
         }
 
-
+        answer = min;
+        System.out.println(answer);
     }
 
-    private static void rotate_90Left(int[][] arr) {
-        int[][] rotate = new int[arr[0].length][arr.length];
-
-        for(int i=0;i<arr[0].length;++i){
-            for(int j=0;j<arr.length;++j){
-                rotate[i][j] = arr[j][rotate.length -1 -i];
-            }
-        }
-
-        for(int i=0;i<rotate.length;i++){
-            for(int j=0;j<rotate[0].length;j++){
-                System.out.print(rotate[i][j] + " ");
-            }
-            System.out.println();
-        }
+    private static void withoutOneLine(int[][] clone, int left, int right) {
+        min = Math.min(min,Math.abs(bfs(left,clone) - bfs(right,clone)));
     }
 
-    private static void rotate_90Right(int[][] arr) {
-        int[][] rotate = new int[arr[0].length][arr.length];
+    private static int bfs(int n,int[][] clone) {
+        Queue<Integer> que = new LinkedList<>();
+        boolean[] visited = new boolean[clone.length];
 
-        for(int i=0;i<arr.length;i++){
-            for(int j=0;j<arr[0].length;j++){
-                rotate[j][arr.length-1-i] = arr[i][j];
+        que.add(n);
+
+        int cnt = 1;
+
+        while(!que.isEmpty()){
+            int v = que.poll();
+            visited[v] = true;
+
+            for(int i=1;i<=clone.length-1;i++){
+                if(clone[v][i] == 1 && !visited[i]){
+                    que.add(i);
+                    cnt++;
+                }
             }
         }
 
-        for(int i=0;i<rotate.length;i++){
-            for(int j=0;j<rotate[0].length;j++){
-                System.out.print(rotate[i][j] + " ");
-            }
-            System.out.println();
-        }
+        return cnt;
     }
 
-    private static void rotate_ReverseLeftRight(int[][] arr) {
-        for(int i=0;i<arr.length;i++){
-            for(int j=0;j<arr[0].length/2;j++){
-                int tmp = arr[i][j];
-                arr[i][j] = arr[i][arr[0].length-1-j];
-                arr[i][arr[0].length-1-j] = tmp;
-            }
-        }
-
-        for(int i=0;i<arr.length;i++){
-            for(int j=0;j<arr[0].length;j++){
-                System.out.print(arr[i][j] + " ");
-            }
-            System.out.println();
-        }
+    private static void addLine(int[][] tree, int a,int b) {
+        tree[a][b] = 1;
+        tree[b][a] = 1;
     }
 
-    private static void rotate_ReverseUpDown(int[][] arr) {
-        for(int i=0; i<arr.length/2;i++){
-            for(int j=0;j<arr[0].length;j++){
-                int tmp = arr[i][j];
-                arr[i][j] = arr[arr.length-i-1][j];
-                arr[arr.length-i-1][j] = tmp;
-            }
-        }
-
-        for(int i=0;i<arr.length;i++){
-            for(int j=0;j<arr[0].length;j++){
-                System.out.print(arr[i][j] + " ");
-            }
-            System.out.println();
-        }
-    }
 }

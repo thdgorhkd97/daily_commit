@@ -5,90 +5,51 @@ import java.util.*;
 
 public class Main {
 
-    // java programmers 최소직사각형 & 전력망을 둘로 나누기
-    // 최소 직사각형 : 배열의 최대값과 배열의 i번째 원소의 작은 값중 최대값을 곱해서 리턴
-    // 전력망을 둘로 나누기 : 각각의 연결선을 하나씩 지워나가면서 양쪽 정점을 기준으로
-    // bfs 를 통해 연결된 정점의 개수를 구해서 min 값을 구한다.
-
-    static int min = Integer.MAX_VALUE;
+    // java baekjoon 15650
+    // 전체 길이와 구하고자 하는 순열의 크기가 주어지면 중복을 제외한
+    // 구하고자 하는 순열의 조합을 출력한다.
+    // startIndex와 depth를 +1 해가면서 재귀호출하는 식으로 구현할 수 있고
+    // 이제 순열이나 조합에 대해서는 상황에 맞게 활용할 수 있다고 생각한다.
+    // 다만 순열이나 조합은 재귀호출을 통해서 구현하기 때문에 n이 10이상일 때는
+    // 결코 사용하면 안 된다.
 
     public static void main(String[] args) throws IOException {
 
-        int n = 9;
-        int[][] wires = {{1,3},{2,3},{3,4},{4,5},{4,6},{4,7},{7,8},{7,9}};
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int answer = -1;
+        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
 
-        int[][] sizes = {{60,50},{30,70},{60,30},{80,40}};
+        int N = Integer.parseInt(stk.nextToken());
+        int M = Integer.parseInt(stk.nextToken());
 
-        /*
-        int max = 0;
-        int maxAmongMin = 0;
-        for(int i=0;i<sizes.length;i++){
-            max = Math.max(max,Math.max(sizes[i][0],sizes[i][1]));
-            maxAmongMin = Math.max(maxAmongMin
-                    ,Math.min(sizes[i][0],sizes[i][1]));
-        }
-        System.out.println(max + " " + maxAmongMin);
-         */
+        int[] arr = new int[N];
 
-
-
-
-
-        int[][] tree = new int[n+1][n+1];
-
-        for(int i=0;i<wires.length;i++){
-            addLine(tree,wires[i][0],wires[i][1]);
+        for(int i=0;i<N;i++){
+            arr[i] = i+1;
         }
 
-        int[][] clone = tree;
-        for(int i=0;i<wires.length;i++){
+        int r = M;
+        int depth = 0;
+        int[] result = new int[r];
+        int start = 0;
+        combination(arr,result,r,depth,start);
 
-            clone[wires[i][0]][wires[i][1]] = 0;
-            clone[wires[i][1]][wires[i][0]] = 0;
-
-            withoutOneLine(clone,wires[i][0],wires[i][1]);
-
-            clone[wires[i][0]][wires[i][1]] = 1;
-            clone[wires[i][1]][wires[i][0]] = 1;
-
-        }
-
-        answer = min;
-        System.out.println(answer);
     }
 
-    private static void withoutOneLine(int[][] clone, int left, int right) {
-        min = Math.min(min,Math.abs(bfs(left,clone) - bfs(right,clone)));
-    }
-
-    private static int bfs(int n,int[][] clone) {
-        Queue<Integer> que = new LinkedList<>();
-        boolean[] visited = new boolean[clone.length];
-
-        que.add(n);
-
-        int cnt = 1;
-
-        while(!que.isEmpty()){
-            int v = que.poll();
-            visited[v] = true;
-
-            for(int i=1;i<=clone.length-1;i++){
-                if(clone[v][i] == 1 && !visited[i]){
-                    que.add(i);
-                    cnt++;
-                }
+    private static void combination(int[] arr,int[] result,int r, int depth, int start){
+        if(depth == result.length){
+            for(int i=0;i<result.length;i++){
+                System.out.print(result[i] + " ");
             }
+            System.out.println();
+            return ;
         }
 
-        return cnt;
-    }
+        for(int i=start;i<arr.length;i++){
+               result[depth] = arr[i];
+               combination(arr,result,r,depth+1,i+1);
 
-    private static void addLine(int[][] tree, int a,int b) {
-        tree[a][b] = 1;
-        tree[b][a] = 1;
+        }
     }
 
 }

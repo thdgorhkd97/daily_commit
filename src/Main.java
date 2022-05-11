@@ -1,6 +1,19 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+<<<<<<< HEAD
+import java.util.*;
+import java.util.stream.Stream;
+
+public class Main {
+
+    public static void main(String[] args) throws IOException {
+
+        
+
+    }
+}
+=======
 import java.nio.Buffer;
 import java.util.*;
 
@@ -57,4 +70,15 @@ public class Main {
         }
     }
 
+<<<<<<< HEAD
 }
+=======
+    private static void goldbache(int n,boolean[] isPrime) {
+
+        // 처음은 for(int i=0;i<n;i++)
+        // 시간이 너무 많이 걸려서 boolean[] isPrime을 봤는데...
+
+    }
+}
+>>>>>>> c333b76a8814613870c0a54d49af117618a785f5
+>>>>>>> 0a81f91ccc4241088cc48e943f6f993b147daef0

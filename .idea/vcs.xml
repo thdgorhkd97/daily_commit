@@ -2,6 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+<<<<<<< HEAD
     <mapping directory="$PROJECT_DIR$/backend-spring" vcs="Git" />
+=======
+>>>>>>> c333b76a8814613870c0a54d49af117618a785f5
   </component>
 </project>

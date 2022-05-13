@@ -8,87 +8,53 @@ import java.util.*;
 
 public class Main {
 
-    // java 모음사전
-    // 처음에는 순열로 r을 1씩 늘려가면서 길이가 1~5인 순열을 구해서 구하려 했는데 그런 문제가 아니었다 ㅠㅠ
-    // 순열이나 조합처럼 모든 경우의 수를 구하는 건 못할 거 같아서 규칙이 있나 찾아보려 했다.
-    // 직접 써보면서 4번째와 5번째 자리수의 규칙은 찾았는데 그 앞자리는 도저히 일일이 세볼 수 없어서
-    // 규칙을 찾으려 했는데 처음에는 그냥 남는 자릿수에 올 수 있는 5가지를 곱했는데 숫자가 맞지 않았다.
-    // 그래서 찾은 규칙을 활용해서 3번째 자리를 찾을 때는 4번째 자리가 6개씩 차이나니까 6 * 5에서 +1을 해서
-    // 자릿수의 규칙을 찾아나갔다.
+    // java baekjoon 1806 부분합
+    // 10,000 이하의 자연수로 이루어진 길이 N짜리 수열이 주어진다.
+    // 이 수열에서 연속된 수들의 부분합 중에 그 합이 S 이상이 되는 것 중, 가장 짧은 것의 길이를 구하는 프로그램을 작성하시오.
+
+    // len을 1부터 시작해서 arr.length까지 되도록 + 해가면서
+    // 2중 for문을 통해 어디부터 어디까지 더하는 구역을 구해서 더했는데
+    // 로직자체가 문제인지 구현과정이 문제인지 잘 해결되지는 못했다....
 
     public static void main(String[] args) throws IOException {
 
-        String word = "AAAAE";
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int answer = 0;
+        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+        int N = Integer.parseInt(stk.nextToken());
+        int S = Integer.parseInt(stk.nextToken());
 
-        char[] mo = {'A','E','I','O','U'};
-        HashMap<Character,Integer> map = new HashMap<>();
-        map.put('A',0);
-        map.put('E',1);
-        map.put('I',2);
-        map.put('O',3);
-        map.put('U',4);
+        int[] arr = new int[N];
 
-        answer = word.length(); // 기본적으로 A만으로 이루어진 사전 순서로 세팅
-
-        int[] diffByDigit = {781,156,31,6,1};
-
-        for(int i=0;i<word.length();i++){
-            answer += map.get(word.charAt(i)) * diffByDigit[i];
+        stk = new StringTokenizer(br.readLine()," ");
+        for(int i=0;i<arr.length;i++){
+            arr[i] = Integer.parseInt(stk.nextToken());
         }
-        System.out.println(answer);
+
+        int len = 1;
+
+        while(len < arr.length){
+            int left = 0;
+            int right = left + len;
+
+            boolean flag = true;
+            for(int i=0;i<arr.length-len;i++){
+                int sum = 0;
+                for(int j=i;j<right;j++){
+                    sum += arr[j];
+                }
+                if(sum >= S){
+                    flag = false;
+                    break;
+                }
+            }
+
+            if(!flag) break;
+
+            len++;
+        }
+
+        System.out.println(len);
+
     }
 }
-
-/*
-
-    static ArrayList<String> list = new ArrayList<>();
-
-        char[] mo = {'A','E','I','O','U'};
-        String word = "AAAAE";
-
-        for(int i=1;i<=5;i++){
-            int r = i;
-            int depth = 0;
-            boolean[] visited = new boolean[mo.length];
-            char[] result = new char[r];
-            combination(mo,r,depth,result,visited);
-        }
-
-        int answer= 0;
-        for(int i=0;i<list.size();i++){
-            System.out.println(list.get(i));
-//            if(list.get(i).equals(word)){
-//                answer = i+1;
-//                break;
-//            }
-        }
-
-        System.out.println(answer);
-
-    }
-
-    private static void combination(char[] mo, int r, int depth,char[] result,boolean[] visited) {
-        if(depth == r){
-            StringBuffer sb = new StringBuffer();
-
-            for(int i=0;i<result.length;i++){
-                sb.append(result[i]);
-            }
-            list.add(sb.toString());
-
-            return ;
-        }
-
-        for(int i=0;i<mo.length;i++){
-            if(!visited[i]){
-                result[depth] = mo[i];
-                visited[i] = true;
-                combination(mo,r,depth+1,result,visited);
-                visited[i] = false;
-            }
-
-        }
-
- */

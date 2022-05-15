@@ -8,44 +8,52 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 1806 부분합
-    // 10,000 이하의 자연수로 이루어진 길이 N짜리 수열이 주어진다.
-    // 이 수열에서 연속된 수들의 부분합 중에 그 합이 S 이상이 되는 것 중, 가장 짧은 것의 길이를 구하는 프로그램을 작성하시오.
+    // java baekjoon 11726 2xn 타일링
+    // 2×n 크기의 직사각형을 1×2, 2×1 타일로 채우는 방법의 수를 구하는 프로그램을 작성하시오
 
-    // for문으로 구현하면 시간초과가 나는 걸 보면 맞는 지 모르겠지만 투포인터로 구현해야 시간에 대한 부분이 해결될 것 같다
-    // 근데 if(total >= s && min > end - start) min = end - start; 이 부분을 안 넣어서 계속 실패했다 ㅠㅠ
-    // 해당부분을 보면 total이 주어진 s보다 커야할 것 && 현재 min보다 최소값으로 갱신가능할 것이라는 조건 인데
-    // 이를 추가했어야 min을 계속해서 갱신가능하며 나는 그냥 투포인터로 합계만 확인하는 과정만 본것 같다..
-
+    // 일단 감이 안 잡혀서 n=2,n=3,n=4 일때를 직접 구해봤다
+    // n = 5일때까지는 값을 구할 수 있었는데 n=6 부터는 값을 구한 게 확실히 다른 경우가
+    // 없는건지 확신을 할 수 없었다.
+    // 근데 테스트케이스를 보면 n=9일때가 있어서 n=5일때까지의 규칙과
+    // n=9 일때를 인위적으로 비교해보았다
+    // 그래서 솔직히 dp[i] = dp[i-1] + dp[n-2] 라는 규칙을 100% 확신하고 사용하지 못했다 ㅠㅠ
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
-        int n = Integer.parseInt(stk.nextToken());
-        int s = Integer.parseInt(stk.nextToken());
+        int N = Integer.parseInt(br.readLine());
 
-        int[] arr = new int[n];
+        // n = 2 -> 2
+        // n = 3 -> 3
+        // n = 4 -> 5
+        // n = 5 -> 8
 
-        stk = new StringTokenizer(br.readLine()," ");
-        for(int i=0;i<arr.length;i++){
-            arr[i] = Integer.parseInt(stk.nextToken());
+        // n = 6 -> ? 13?
+        // n = 7 -> ? 21?
+        // n = 8 -> ? 34?
+
+        // n = 9 -> 55
+
+        if(N == 1) {
+            System.out.print("1");
         }
-
-        int min = Integer.MAX_VALUE;
-        int start = 0;
-        int end = 0;
-        int total = 0;
-        while(start <= n && end <= n) {
-            if(total >= s && min > end - start) min = end - start;
-
-            if(total < s) total += arr[end++];
-            else total -= arr[start++];
+        else if(N==2){
+            System.out.print("2");
         }
+        else {
 
-        if(min == Integer.MAX_VALUE) System.out.println("0");
-        else System.out.println(min);
+            int[] dp = new int[N + 1];
+
+            dp[1] = 1;
+            dp[2] = 2;
+            dp[3] = 3;
+            for (int i = 3; i <= N; i++) {
+                dp[i] = (dp[i - 1] + dp[i - 2]) % 10007;
+            }
+
+            System.out.print(dp[N] % 10007);
+        }
 
     }
 }

@@ -8,52 +8,63 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 11726 2xn 타일링
-    // 2×n 크기의 직사각형을 1×2, 2×1 타일로 채우는 방법의 수를 구하는 프로그램을 작성하시오
+    // bfs 문제
+    // 주어지는 matrix 2차원 배열에 대해서 연결된 1의 개수를 오름차순으로 반환
 
-    // 일단 감이 안 잡혀서 n=2,n=3,n=4 일때를 직접 구해봤다
-    // n = 5일때까지는 값을 구할 수 있었는데 n=6 부터는 값을 구한 게 확실히 다른 경우가
-    // 없는건지 확신을 할 수 없었다.
-    // 근데 테스트케이스를 보면 n=9일때가 있어서 n=5일때까지의 규칙과
-    // n=9 일때를 인위적으로 비교해보았다
-    // 그래서 솔직히 dp[i] = dp[i-1] + dp[n-2] 라는 규칙을 100% 확신하고 사용하지 못했다 ㅠㅠ
+    static ArrayList<Integer> list = new ArrayList<>();
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int[][] matrix = {
+                {1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0}
+        };
 
-        int N = Integer.parseInt(br.readLine());
+        boolean[][] visited = new boolean[matrix.length][matrix[0].length];
 
-        // n = 2 -> 2
-        // n = 3 -> 3
-        // n = 4 -> 5
-        // n = 5 -> 8
-
-        // n = 6 -> ? 13?
-        // n = 7 -> ? 21?
-        // n = 8 -> ? 34?
-
-        // n = 9 -> 55
-
-        if(N == 1) {
-            System.out.print("1");
+        for(int i=0;i<matrix.length;i++) {
+            for(int j=0;j<matrix[0].length;j++){
+                if(matrix[i][j] == 1 && !visited[i][j]){
+                    bfs(matrix,visited,i,j);
+                }
+            }
         }
-        else if(N==2){
-            System.out.print("2");
+
+        Collections.sort(list);
+
+        for(int i=0;i<list.size();i++){
+            System.out.print(list.get(i) + " ");
         }
-        else {
+        System.out.println();
+    }
+    private static void bfs(int[][] matrix,boolean[][] visited,int row, int column){
+        int cnt = 0;
+        visited[row][column] = true;
+        Queue<int[]> que = new LinkedList<>();
+        int[] add = {row,column};
+        que.add(add);
 
-            int[] dp = new int[N + 1];
+        int[] dy = {0,0,-1,1}; // 상하좌우
+        int[] dx = {-1,1,0,0}; // 상하좌우
 
-            dp[1] = 1;
-            dp[2] = 2;
-            dp[3] = 3;
-            for (int i = 3; i <= N; i++) {
-                dp[i] = (dp[i - 1] + dp[i - 2]) % 10007;
+        while(!que.isEmpty()){
+            add = que.poll();
+            cnt++;
+
+//            System.out.println(add[0] + " " + add[1] + " 에서 시작");
+            for(int i=0;i<4;i++){
+                int moveX = add[0] + dx[i];
+                int moveY = add[1] + dy[i];
+                if(moveX >=0 && moveX < matrix.length && moveY >=0 && moveY < matrix[0].length && !visited[moveX][moveY] && matrix[moveX][moveY]==1){
+
+                    int[] riverLocate = new int[2];
+                    riverLocate[0] = moveX;
+                    riverLocate[1] = moveY;
+                    visited[moveX][moveY] = true;
+                    que.add(riverLocate);
+                }
             }
 
-            System.out.print(dp[N] % 10007);
         }
-
+        list.add(cnt);
     }
 }

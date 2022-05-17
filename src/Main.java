@@ -8,63 +8,67 @@ import java.util.*;
 
 public class Main {
 
-    // bfs 문제
-    // 주어지는 matrix 2차원 배열에 대해서 연결된 1의 개수를 오름차순으로 반환
-
-    static ArrayList<Integer> list = new ArrayList<>();
+    // algoexpert easy 1
+    // sequence가 array의 부분집합에 해당하는 걸 묻는 문제다
+    // index를 구해서 오름차순인지 확인하면 되는 문제라고 생각했는데 생각보다 예외조건이 상당히 많았다
+    // 문제에 예외조건이 주어지는 게 아니라 테스트 케이스를 보면서 하나씩 해결해야 하는 게 algoexpert
+    // 의 특징이라고 생각된다.( 생길 수 있는 예외조건을 미리 파악해야 하며 테스트 케이스를 통해 이를 알아내야 하는것)
+    // 1. sequence가 array보다 클 경우 -> size 확인해서 false 리턴
+    // 2. sequence에 array에 없는 원소가 있을 경우 -> flag를 통해 있는지 없는지 확인
+    // 3. sequence나 array에 중복되는 원소가 있을 경우 -> 마지막 확인 조건을 arr[i] >= arr[i+1]로 하여 중복되는 경우를 포함하도록 한다.
+    // 근데 마지막 하나의 테스트 케이스에 대해 이해가 잘 가지 않는다. [1,1,1,1,1]에 [1,1,1]이 부분집합이 되냐 안되냐는 건데
+    // false를 리턴하기를 바라는데 나는 이게 true로 반환되어야 하지 않냐는 생각때문에 이 테스트 케이스를 해결하지 못하겠다..
 
     public static void main(String[] args) throws IOException {
 
-        int[][] matrix = {
-                {1, 1, 1, 0, 1, 1, 0, 0, 0, 1, 0}
-        };
+        List<Integer> array = new ArrayList<>();
+        List<Integer> sequence = new ArrayList<>();
 
-        boolean[][] visited = new boolean[matrix.length][matrix[0].length];
+        int[] arrayValue = {1,1,1,1,1};
+        int[] sequenceValue = {1,1,1};
 
-        for(int i=0;i<matrix.length;i++) {
-            for(int j=0;j<matrix[0].length;j++){
-                if(matrix[i][j] == 1 && !visited[i][j]){
-                    bfs(matrix,visited,i,j);
-                }
-            }
+        for(int i=0;i< arrayValue.length;i++){
+            array.add(arrayValue[i]);
+        }
+        for(int j=0;j< sequenceValue.length;j++){
+            sequence.add(sequenceValue[j]);
         }
 
-        Collections.sort(list);
 
-        for(int i=0;i<list.size();i++){
-            System.out.print(list.get(i) + " ");
-        }
-        System.out.println();
-    }
-    private static void bfs(int[][] matrix,boolean[][] visited,int row, int column){
-        int cnt = 0;
-        visited[row][column] = true;
-        Queue<int[]> que = new LinkedList<>();
-        int[] add = {row,column};
-        que.add(add);
+        if(sequence.size() > array.size()) System.out.println("false 1");
 
-        int[] dy = {0,0,-1,1}; // 상하좌우
-        int[] dx = {-1,1,0,0}; // 상하좌우
 
-        while(!que.isEmpty()){
-            add = que.poll();
-            cnt++;
+        int[] arr = new int[sequenceValue.length];
 
-//            System.out.println(add[0] + " " + add[1] + " 에서 시작");
-            for(int i=0;i<4;i++){
-                int moveX = add[0] + dx[i];
-                int moveY = add[1] + dy[i];
-                if(moveX >=0 && moveX < matrix.length && moveY >=0 && moveY < matrix[0].length && !visited[moveX][moveY] && matrix[moveX][moveY]==1){
+        boolean[] check = new boolean[sequenceValue.length];
 
-                    int[] riverLocate = new int[2];
-                    riverLocate[0] = moveX;
-                    riverLocate[1] = moveY;
-                    visited[moveX][moveY] = true;
-                    que.add(riverLocate);
+        for(int i=0;i< sequenceValue.length;i++){
+            int value = sequenceValue[i];
+            boolean flag = false;
+            for(int j=0;j< arrayValue.length;j++){
+                if(value == arrayValue[j] && !check[i]){
+                    arr[i] = j;
+                    check[i] = true;
+                    flag = true;
+                    break;
                 }
             }
 
+//            if(!flag) return false;
         }
-        list.add(cnt);
+
+        for(int i=0;i<arr.length;i++){
+            System.out.print(arr[i] + " ");
+        }
+        for(int i=0;i< arr.length-1;i++){
+            if(arr[i] > arr[i+1]){
+//                return false;
+                System.out.println("false3");
+            }
+        }
+
+//        return true;
+
+        System.out.println("true4");
     }
 }

@@ -8,67 +8,61 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 2644 촌수계산
-    // 처음에는 tree를 구현해서 depth 차이를 계산해야 하나 싶었는데 생각해보니
-    // 부모 자식 관계만 파악하면 되기 때문에 tree를 구현할 필요까진 없을 것으로 보였다.
-    // 그래서 부모 자식 관계만 넣은 일차원 배열(d)을 만든 다음에
-    // bfs를 통해 첫 지점에서부터 출발해서 2차원 배열 map[][] 의 map[v][i]가 1이면
-    // 연결된 것이기 때문에 거리를 입력한다는 의미에서 d[i] = d[v] + 1을 해준다.
-    // 그러다가 원하는 도착지점에 도달하면 로직을 끝내고 만약 bfs로 타고타고 가더라도
-    // 해당 정점을 거치지 않았다면 연결되어 있지 않다는 것이므로 -1을 리턴한다.
+    // java baekjoon 16917 양념 반 후라이드 반
+    // 반반치킨을 2배 한 가격과 양념 + 후라이드 가격만을 비교한 게 패착이었다
+    // 양념이나 후라이드를 사더라도 반반이 싸다면 최소비용이 더 적어진다는 것을 고려해야 했다 ㅠㅠ
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int n = Integer.parseInt(br.readLine());
-
         StringTokenizer stk = new StringTokenizer(br.readLine()," ");
 
-        int one = Integer.parseInt(stk.nextToken());
-        int two = Integer.parseInt(stk.nextToken());
+        int A = Integer.parseInt(stk.nextToken()); // 양념치킨 가격
+        int B = Integer.parseInt(stk.nextToken()); // 후라이드치킨 가격
+        int C = Integer.parseInt(stk.nextToken()); // 반반 가격
+        int X = Integer.parseInt(stk.nextToken()); // 양념 치킨 마리수
+        int Y = Integer.parseInt(stk.nextToken()); // 후라이드 치킨 마리수
 
-        int m = Integer.parseInt(br.readLine());
+        /*
+        int min = Integer.MAX_VALUE;
 
-        int[][] map = new int[n+1][n+1];
+        int halfChicken = Math.min(X,Y) * 2;
 
-        for(int i=0;i<m;i++){
-            stk = new StringTokenizer(br.readLine()," ");
-            int x = Integer.parseInt(stk.nextToken());
-            int y = Integer.parseInt(stk.nextToken());
+        for(int i = 2; i<=halfChicken; i+=2){
 
-            map[y][x] = 1;
-            map[x][y] = 1;
+            int chicken = i/2;
+            min = Math.min(min, i*C + A *(X-chicken) + B*(Y-chicken));
+
+            System.out.println(i*C + A *(X-chicken) + B*(Y-chicken));
         }
 
-        int[] d = new int[n+1];
+        min = Math.min(min, X*A + B*Y);
+        System.out.println(X*A + B*Y);
 
+        System.out.println(min);
+         */
 
-        bfs(one, two,d,map);
-
-        if(d[two] == 0){
-            System.out.println("-1");
-        }
-        else System.out.println(d[two]);
-    }
-
-    private static void bfs(int one, int two,int[] d,int[][] map) {
-
-        Queue<Integer> que = new LinkedList<>();
-        que.add(one);
-
-        while(!que.isEmpty()){
-            int v = que.poll();
-
-            if(v == two) break;
-
-            for(int i=1;i<=map.length-1;i++){
-                if(map[v][i] == 1 && d[i] == 0){
-                    d[i] = d[v] + 1;
-                    que.add(i);
-                }
+        long sum = 0;
+        if(A + B > 2 * C){ // 양념 + 후라이드 > 반반 2마리 (반반을 사는 게 이득)
+            int halfChicken = Math.min(X,Y);
+            if(halfChicken < X){ // 반반에다가 양념치킨을 더해야
+                sum += Y * C*2;
+                sum += Math.min((X-Y) * A, (X-Y) * 2 * C);
             }
+            else{
+                sum += X * C * 2;
+                sum += Math.min( (Y-X) * B, (Y-X) * 2 * C);
+            }
+
         }
+        else{
+            sum = X*A + B*Y;
+        }
+
+        System.out.println(sum);
+
+
 
     }
 }

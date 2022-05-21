@@ -8,58 +8,91 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 16968 차량 번호판 1
-    // 처음에는 길이가 4라는 부분을 보고 2^4 = 16 가지 경우라서 브루트 포스를 생각했다가
-    // 길이가 4 "이하"라는 걸 체크하고서는 완전탐색은 아니라고 생각했다.
-    // 같은 문자나 숫자가 연속으로 오면 안 되는 거니까 문자-문자면 26이 아닌 25를 곱하고
-    // 숫자-숫자면 10이 아닌 9를 곱하면서 string을 끝까지 간다.
-    // 이때 i번째가 숫자인지 문자인지는 flag를 true나 false로 바꿔가면서 한다.
+    // java programmers 방문 길이
+    // 좌표에서 이미 방문한 선분을 체크하는 게 쉽지 않았다
+    // 나는그냥 4차원 boolean 배열로 어디서 어디로 이동 이렇게 체크했는데
+    // 해당 부분을 구현하는 과정에서 중복체크가 안 되는 부분이 있는 것 같은데...
+    // 오류를 찾기가 쉽지 않다ㅠㅠ
+
+    static int answer = 0;
+
+    static int x = 5;
+    static int y = 5;
+
+    static int nextX = 5;
+    static int nextY = 5;
+
+    static boolean[][][][] check = new boolean[11][11][11][11];
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        String dirs = "ULURRDLLU";
 
-        String str = br.readLine();
+        check[x][y][nextX][nextY] = true;
 
-        // cccc dddd
-        // cccd dddc
-        // ccdc ddcd
-        // ccdd ddcc
-        // cdcc dcdd
-        // cdcd dcdc
-        // cddc dccd
-        // cddd dccc
+        for(int i=0;i<dirs.length();i++){
+            char ch = dirs.charAt(i);
 
-        int answer = 1;
-        boolean flag = true;
-        if(str.charAt(0)=='c'){
-            flag = true;
-            answer = 26;
-        }
-        else{ // 처음이 d
-            flag = false;
-            answer = 10;
-        }
-
-        for(int i=1;i<str.length();i++){
-            if(flag && str.charAt(i) == 'c'){ // c뒤에 c가 또 오는 경우
-                answer *= 25;
-                flag = true;
-            }
-            else if(flag && str.charAt(i) == 'd'){ // c뒤에 d가 오는 경우
-                answer *= 10;
-                flag = false;
-            }
-            else if(!flag && str.charAt(i) == 'c'){ // d뒤에 c가 오는 겨웅
-                answer *= 26;
-                flag = true;
-            }
-            else {
-                flag = false;
-                answer *= 9;
+            switch (ch){
+                case 'U' : moveUp(); break;
+                case 'D' : moveDown(); break;
+                case 'R' : moveRight(); break;
+                case 'L' : moveLeft(); break;
             }
         }
 
         System.out.println(answer);
+    }
+    private static void moveUp(){
+        if(x!=0) {
+
+            nextX = x - 1;
+
+            if (!check[x][y][nextX][nextY]) {
+                answer++;
+                check[x][y][nextX][nextY] = true;
+                check[nextX][nextY][x][y] = true;
+                x = nextX;
+
+            }
+        }
+    }
+    private static void moveDown(){
+        if(x!=10) {
+
+            nextX = x + 1;
+            if (!check[x][y][nextX][nextY]) {
+                answer++;
+                check[x][y][nextX][nextY] = true;
+                check[nextX][nextY][x][y] = true;
+
+                x = nextX;
+            }
+        }
+    }
+    private static void moveRight(){
+        if(y!=10) {
+
+            nextY = y + 1;
+            if (!check[x][y][nextX][nextY]) {
+                answer++;
+                check[x][y][nextX][nextY] = true;
+                check[nextX][nextY][x][y] = true;
+
+                y = nextY;
+            }
+        }
+    }
+    private static void moveLeft(){
+        if(y!=0) {
+            nextY = y - 1;
+            if (!check[x][y][nextX][nextY]) {
+                answer++;
+                check[x][y][nextX][nextY] = true;
+                check[nextX][nextY][x][y] = true;
+
+                y = nextY;
+            }
+        }
     }
 }

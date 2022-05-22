@@ -8,91 +8,53 @@ import java.util.*;
 
 public class Main {
 
-    // java programmers 방문 길이
-    // 좌표에서 이미 방문한 선분을 체크하는 게 쉽지 않았다
-    // 나는그냥 4차원 boolean 배열로 어디서 어디로 이동 이렇게 체크했는데
-    // 해당 부분을 구현하는 과정에서 중복체크가 안 되는 부분이 있는 것 같은데...
-    // 오류를 찾기가 쉽지 않다ㅠㅠ
-
-    static int answer = 0;
-
-    static int x = 5;
-    static int y = 5;
-
-    static int nextX = 5;
-    static int nextY = 5;
-
-    static boolean[][][][] check = new boolean[11][11][11][11];
+    // java baekjoon 14467 소가 길을 건너간 이유 1
+    // 소의 위치 변화가 발생한 횟수를 구하는 문제.
+    // 2가지 실수를 했다
+    // 1. 소의 위치가 주어지는 경우가 소의 위치가 변할 때 일 줄 알아서 set 자료구조에
+    //    있는지 여부만 확인해서 있을 때마다 answer+1 했는데 소의 위치가 그대로인 경우도 있기에
+    //    해당 방법은 옳은 방법이 아니었다.
+    // 2. 주어지는 N의 크기로 int형 배열을 선언했는데 N의 크기는 위치변화의 개수이고 소는 10마리라고
+    //    나와있기 때문에 11로 선언하여 문제를 해결했다
+    // 추가로 cow배열을 cow[몇번째 소인지][소의 위치] 이렇게 해서 2차원 배열로 선언하려고 했는데
+    // 생각해보니 2차원배열을 1차원배열로 하는방법을 통해서 cow[소의위치] 이렇게만 선언해서
+    // cow의 i번째를 몇번째 소인지 판단하는 식으로 2차원배열이 아닌 1차원배열로 메모리를 고려했다
 
     public static void main(String[] args) throws IOException {
 
-        String dirs = "ULURRDLLU";
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        check[x][y][nextX][nextY] = true;
+        int N = Integer.parseInt(br.readLine());
 
-        for(int i=0;i<dirs.length();i++){
-            char ch = dirs.charAt(i);
+        int[] cow = new int[11];
+        Arrays.fill(cow,-1);
 
-            switch (ch){
-                case 'U' : moveUp(); break;
-                case 'D' : moveDown(); break;
-                case 'R' : moveRight(); break;
-                case 'L' : moveLeft(); break;
+        int answer = 0;
+
+        for(int i=0;i<N;i++){
+            StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+
+            int cowNumber = Integer.parseInt(stk.nextToken());
+            int cowLocation = Integer.parseInt(stk.nextToken());
+
+            /* 소에 대한 위치의 변화가 있을때만 주어지는 줄 알았는데 위치의 변화가 없는
+               경우도 주어진다는 걸 알고 이 방법은 취소
+            if(set.add(cow)){
+                answer++;
             }
+             */
+
+            if(cow[cowNumber] != -1 && cow[cowNumber] != cowLocation){
+                answer++;
+            }
+
+            cow[cowNumber] = cowLocation;
+
         }
 
         System.out.println(answer);
-    }
-    private static void moveUp(){
-        if(x!=0) {
 
-            nextX = x - 1;
 
-            if (!check[x][y][nextX][nextY]) {
-                answer++;
-                check[x][y][nextX][nextY] = true;
-                check[nextX][nextY][x][y] = true;
-                x = nextX;
 
-            }
-        }
-    }
-    private static void moveDown(){
-        if(x!=10) {
-
-            nextX = x + 1;
-            if (!check[x][y][nextX][nextY]) {
-                answer++;
-                check[x][y][nextX][nextY] = true;
-                check[nextX][nextY][x][y] = true;
-
-                x = nextX;
-            }
-        }
-    }
-    private static void moveRight(){
-        if(y!=10) {
-
-            nextY = y + 1;
-            if (!check[x][y][nextX][nextY]) {
-                answer++;
-                check[x][y][nextX][nextY] = true;
-                check[nextX][nextY][x][y] = true;
-
-                y = nextY;
-            }
-        }
-    }
-    private static void moveLeft(){
-        if(y!=0) {
-            nextY = y - 1;
-            if (!check[x][y][nextX][nextY]) {
-                answer++;
-                check[x][y][nextX][nextY] = true;
-                check[nextX][nextY][x][y] = true;
-
-                y = nextY;
-            }
-        }
     }
 }

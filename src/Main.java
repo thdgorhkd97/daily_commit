@@ -1,6 +1,5 @@
 package src; // daily 폴더를 source root로 인식시켰기 때문에
 
-import jdk.swing.interop.SwingInterOpUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,89 +9,65 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 14468 소가 길을 건너간 이유 2
-    // 처음에는 연속된 2개의 같은 문자를 계속 지워나가면서 엇갈린 문자만 놔두고 string을
-    // 바꿔나가면서 최종적으로 엇갈린 문자들만 남아있는 문자열이 남아있다면 해당 문자열의 길이를 4로 나눠서
-    // 쌍을 리턴하려고 생각했다.
-    // 근데 해당 로직이 틀린 걸 보니 삭제해나가다 보면 홀수로 남아있는 경우가 있는 게 아닐까 싶다..
-    // 그래서 로직을 바꿔서 해당하는 문자의 첫 등장과 두번째 등장을 first[]와 second[]에 넣어서
-    // if(first[i] < first[j] && second[i] > first[j] && second[i] < second[j])
-    // 이 조건을 만족하면 엇갈린 것이기 때문에 answer+1 을 해간다.
+    // java baekjoon 18429 근손실
+    // 운동 키트 적용순서의 모든 경우의 수에 대해서 K만큼 빼고 키트를 더했을 때 500을 모두 넘는
+    // 운동 키트 적용순서의 경우의 수를 구하는 문제
+    // 순열을 활용하기로 생각한 건 N이 8이하라는 조건이 있기 때문이다.
+    // 순열을 이용해 모든 경우의 수를 구하는 과정에서 N이 8이하라면 빠른 시간에 처리할 수 있다는
+    // 확신이 있는 것이므로 순열을 구해서 키트의 모든 경우의 수를 구하고
+    // 해당하는 키트의 중량을 더하고 K만큼 빼는 것이 모두 500을 넘도록 구하는 것이다.
+
+    static int answer = 0;
+    static int minus = 0;
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        String str = br.readLine();
+        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
 
-        // ABCCABDDEEFFGGHHIIJJKKLLMMNNOOPPQQRRSSTTUUVVWWXXYYZZ
+        int N = Integer.parseInt(stk.nextToken());
+        int K = Integer.parseInt(stk.nextToken());
+        minus = K;
 
-        /*
-        boolean flag = true;
-
-        while(flag){
-            boolean[] check = new boolean[str.length()];
-            flag = false;
-            for(int i=0;i<str.length()-1;i++){
-                if(str.charAt(i) == str.charAt(i+1)){
-                    check[i] = true;
-                    check[i+1] = true;
-                    flag = true;
-                }
-            }
-
-            StringBuffer sb = new StringBuffer();
-            for(int i=0;i<str.length();i++){
-                if(!check[i]) sb.append(str.charAt(i));
-            }
-
-            str = sb.toString();
-            System.out.println(str);
+        int[] kit = new int[N];
+        stk = new StringTokenizer(br.readLine()," ");
+        for(int i=0;i<N;i++){
+            kit[i] = Integer.parseInt(stk.nextToken());
         }
 
-        System.out.println(str.length()/4);
-         */
+        int depth = 0;
+        int[] result = new int[N];
+        boolean[] visited = new boolean[N];
+        combination(kit,result,depth,visited);
 
+        System.out.println(answer);
+    }
 
-        int[] first = new int[26];
-        int[] second = new int[26];
-
-        int idx = 0;
-
-        Character[] alphabet = {'A','B','C','D','E','F','G','H','I','J',
-        'K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
-        for(int i=0;i<alphabet.length;i++){
-            char ch = alphabet[i];
-
+    private static void combination(int[] kit, int[] result, int depth, boolean[] visited) {
+        if(depth == result.length){
+            int weight = 500;
             boolean flag = true;
-            for(int j=0;j<str.length();j++){
-                if(str.charAt(j) == ch && flag){
-                    first[idx] = j;
+            for(int i=0;i<result.length;i++){
+                if(weight - minus + result[i] < 500){
                     flag = false;
-                }
-                else if(str.charAt(j) == ch && !flag){
-                    second[idx] = j;
-                    idx += 1;
                     break;
                 }
 
+                weight = weight - minus + result[i];
             }
 
+            if(flag) answer++;
+
+            return ;
         }
-
-        int answer = 0;
-
-        for(int i=0;i<26;i++){
-            for(int j=0;j<26;j++){
-                if(first[i] < first[j] && second[i] > first[j] && second[i] < second[j]) {
-//                    System.out.println(alphabet[i] + " " + alphabet[j] + " 가 만나네");
-                    answer++;
-                }
+        for(int i=0;i<kit.length;i++){
+            if(!visited[i]){
+                result[depth] = kit[i];
+                visited[i] = true;
+                combination(kit,result,depth+1,visited);
+                visited[i] = false;
             }
         }
-        System.out.println(answer);
-
-
     }
-
 }

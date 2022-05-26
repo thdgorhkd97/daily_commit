@@ -9,65 +9,46 @@ import java.util.*;
 
 public class Main {
 
-    // java baekjoon 18429 근손실
-    // 운동 키트 적용순서의 모든 경우의 수에 대해서 K만큼 빼고 키트를 더했을 때 500을 모두 넘는
-    // 운동 키트 적용순서의 경우의 수를 구하는 문제
-    // 순열을 활용하기로 생각한 건 N이 8이하라는 조건이 있기 때문이다.
-    // 순열을 이용해 모든 경우의 수를 구하는 과정에서 N이 8이하라면 빠른 시간에 처리할 수 있다는
-    // 확신이 있는 것이므로 순열을 구해서 키트의 모든 경우의 수를 구하고
-    // 해당하는 키트의 중량을 더하고 K만큼 빼는 것이 모두 500을 넘도록 구하는 것이다.
+    // java 17427 약수의 합 2
+    // N이하의 정수에 대해서 약수의 합을 더하는 프로그램
+    // 처음에는 N이하의 모든 정수에 대해서 1부터 for문을 돌면서 약수면 더해나가면서
+    // Math.sqrt(N) 까지만 확인하기 때문에 시간이 괜찮을 줄 알았는데 시간초과가 반드시
+    // 발생하게 된다.(N이 십만까지 가능하기 때문에)
+    // 도저히 dp같은 시간을 줄일 수 있는 방법에 대해 모르겠어서 알아봤는데
+    // for문을 돌면서 직접 계산하는 건 시간초과가 발생하기 때문에 약수의 합을 구하는 방식보다
+    // 배수를 구하는 식으로 가야한다.
+    // 즉, N이하의 정수들을 배수로 가지는 게 몇번인지 구해보자
+    // ex) N = 7이면 1~7의 수가 1부터 7까지를 배수로 가지는 게 몇 번인지 구하면 된다.
 
-    static int answer = 0;
-    static int minus = 0;
+    static long answer = 0;
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+        int N = Integer.parseInt(br.readLine());
 
-        int N = Integer.parseInt(stk.nextToken());
-        int K = Integer.parseInt(stk.nextToken());
-        minus = K;
 
-        int[] kit = new int[N];
-        stk = new StringTokenizer(br.readLine()," ");
-        for(int i=0;i<N;i++){
-            kit[i] = Integer.parseInt(stk.nextToken());
+        /*
+        for(int i=2;i<=N;i++){
+            for(int j=1;j<=Math.sqrt(i);j++){
+                if(i % j == 0){
+                    answer += j;
+                    if(i/j != Math.sqrt(i)) answer += i/j;
+                }
+            }
+//            System.out.println(i + " 까지의 " + answer);
         }
 
-        int depth = 0;
-        int[] result = new int[N];
-        boolean[] visited = new boolean[N];
-        combination(kit,result,depth,visited);
+         */
 
+        for(int i=1;i<=N;i++){
+            answer += i * (N/i);
+        }
         System.out.println(answer);
     }
 
-    private static void combination(int[] kit, int[] result, int depth, boolean[] visited) {
-        if(depth == result.length){
-            int weight = 500;
-            boolean flag = true;
-            for(int i=0;i<result.length;i++){
-                if(weight - minus + result[i] < 500){
-                    flag = false;
-                    break;
-                }
 
-                weight = weight - minus + result[i];
-            }
 
-            if(flag) answer++;
 
-            return ;
-        }
-        for(int i=0;i<kit.length;i++){
-            if(!visited[i]){
-                result[depth] = kit[i];
-                visited[i] = true;
-                combination(kit,result,depth+1,visited);
-                visited[i] = false;
-            }
-        }
-    }
 }

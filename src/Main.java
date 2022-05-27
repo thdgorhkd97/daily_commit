@@ -4,51 +4,75 @@ package src; // daily 폴더를 source root로 인식시켰기 때문에
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.Buffer;
-import java.util.*;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
 public class Main {
 
-    // java 17427 약수의 합 2
-    // N이하의 정수에 대해서 약수의 합을 더하는 프로그램
-    // 처음에는 N이하의 모든 정수에 대해서 1부터 for문을 돌면서 약수면 더해나가면서
-    // Math.sqrt(N) 까지만 확인하기 때문에 시간이 괜찮을 줄 알았는데 시간초과가 반드시
-    // 발생하게 된다.(N이 십만까지 가능하기 때문에)
-    // 도저히 dp같은 시간을 줄일 수 있는 방법에 대해 모르겠어서 알아봤는데
-    // for문을 돌면서 직접 계산하는 건 시간초과가 발생하기 때문에 약수의 합을 구하는 방식보다
-    // 배수를 구하는 식으로 가야한다.
-    // 즉, N이하의 정수들을 배수로 가지는 게 몇번인지 구해보자
-    // ex) N = 7이면 1~7의 수가 1부터 7까지를 배수로 가지는 게 몇 번인지 구하면 된다.
+    // java baekjoon 15904 UCPC는 무엇의 약자일까?
+    // 주어진 문자열에 대해서 UCPC로 축약이 가능하냐를 묻는 문제다
+    // UCPC라는 대문자가 포함되있는지를 확인하기 위해서 처음에는 contains로 'U','C','P'를
+    // 확인하려 했는데 C가 2번 포함되기 때문에 단순 포함여부가 아니라 순서를 알아야 했다
+    // 그래서 char[] ucpc = {'U','C','P','C'}; 에서 index를 통해 UCPC를 순서대로
+    // 충족하는 지 확인하기로 했다.
 
-    static long answer = 0;
+    // java baekjoon 1026 보물
+    // A배열과 B배열이 주어질 때 S = A[0] × B[0] + ... + A[N-1] × B[N-1]가
+    // 최소가 되기 위해서는 A배열의 최대값과 B배열의 최소값이 곱해져야 한다.
+    // 그렇기 때문에 배열을 정렬한 후에 A[i]와 B[N-1-i]가 곱해져야 한다.
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int N = Integer.parseInt(br.readLine());
+        /* java baekjoon 15904 UCPC는 무엇의 약자일까?
+        String str = br.readLine();
 
+        char[] ch = str.trim().toCharArray();
 
-        /*
-        for(int i=2;i<=N;i++){
-            for(int j=1;j<=Math.sqrt(i);j++){
-                if(i % j == 0){
-                    answer += j;
-                    if(i/j != Math.sqrt(i)) answer += i/j;
+        int idx = 0;
+        boolean flag = true;
+        char[] ucpc = {'U','C','P','C'};
+        for(int i=0;i<str.length();i++){
+            if(ch[i] == ucpc[idx]){
+                idx++;
+                if(idx == 4){
+                    flag = false;
+                    break;
                 }
             }
-//            System.out.println(i + " 까지의 " + answer);
         }
 
+        if(!flag) System.out.println("I love UCPC");
+        else System.out.println("I hate UCPC");
          */
 
-        for(int i=1;i<=N;i++){
-            answer += i * (N/i);
+        int N = Integer.parseInt(br.readLine());
+
+        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+
+        int[] A = new int[N];
+        int[] B = new int[N];
+
+        for(int i=0;i<N;i++){
+            A[i] = Integer.parseInt(stk.nextToken());
+        }
+
+        stk = new StringTokenizer(br.readLine()," ");
+        for(int i=0;i<N;i++){
+            B[i] = Integer.parseInt(stk.nextToken());
+        }
+
+        Arrays.sort(A);
+        Arrays.sort(B);
+
+        int answer = 0;
+        for(int i=0;i<N;i++){
+            answer += A[i] * B[N-i-1];
         }
         System.out.println(answer);
+
+
+
     }
-
-
-
-
 }

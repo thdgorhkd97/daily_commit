@@ -9,70 +9,117 @@ import java.util.StringTokenizer;
 
 public class Main {
 
-    // java baekjoon 15904 UCPC는 무엇의 약자일까?
-    // 주어진 문자열에 대해서 UCPC로 축약이 가능하냐를 묻는 문제다
-    // UCPC라는 대문자가 포함되있는지를 확인하기 위해서 처음에는 contains로 'U','C','P'를
-    // 확인하려 했는데 C가 2번 포함되기 때문에 단순 포함여부가 아니라 순서를 알아야 했다
-    // 그래서 char[] ucpc = {'U','C','P','C'}; 에서 index를 통해 UCPC를 순서대로
-    // 충족하는 지 확인하기로 했다.
+    // java baekjoon 3085 사탕 게임
+    // 인접한 두칸을 바꿨을 때 행이나 열에 가장 많은 같은 색의 사탕 수를 반환
+    // 구현하는 과정에서 실수를 많이 했는지 시간을 꽤 들였는데 성공하지 못했다...
+    // 내가 생각한 건 가로로 먼저 바꿔가면서 바꾼 map[i][j]를 기준으로 행과 열을
+    // 비교하는 식으로 생각했는데 아예 끝까지 로직을 짜고 세로를 짜려다 보니
+    // i와 j를 헷갈려서 중간에 무너진 것 같다 ㅠㅠ
+    // 내일은 가로로 바꾸는 것과 세로로 바꾸는 걸 먼저 확인하고 바꾼 i,j에 대해서
+    // 개수를 세보는 식으로 해야겠다.
+    // 그리고 코드도 생각보다 중복된 부분이 많아서 좀 더 함수화 해야 할 것 같다.
 
-    // java baekjoon 1026 보물
-    // A배열과 B배열이 주어질 때 S = A[0] × B[0] + ... + A[N-1] × B[N-1]가
-    // 최소가 되기 위해서는 A배열의 최대값과 B배열의 최소값이 곱해져야 한다.
-    // 그렇기 때문에 배열을 정렬한 후에 A[i]와 B[N-1-i]가 곱해져야 한다.
+    static int answer = 0;
+    static int red = 0;
+    static int blue = 0;
+    static int green = 0;
+    static int yellow = 0;
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        /* java baekjoon 15904 UCPC는 무엇의 약자일까?
-        String str = br.readLine();
+        int N = Integer.parseInt(br.readLine());
 
-        char[] ch = str.trim().toCharArray();
+        char[][] map = new char[N][N];
 
-        int idx = 0;
-        boolean flag = true;
-        char[] ucpc = {'U','C','P','C'};
-        for(int i=0;i<str.length();i++){
-            if(ch[i] == ucpc[idx]){
-                idx++;
-                if(idx == 4){
-                    flag = false;
-                    break;
+        for(int i=0;i<N;i++){
+            map[i] = br.readLine().toCharArray();
+        }
+
+        for(int i=0;i<N;i++){
+            for(int j=0;j<N-1;j++){
+                if(map[i][j] != map[i][j+1]) {
+
+                    char tmp = map[i][j];
+                    map[i][j] = map[i][j+1];
+                    map[i][j+1] = tmp;
+
+                    answer = Math.max(answer,checkGaro(map, i, j));
+
+
+                    tmp = map[i][j];
+                    map[i][j] = map[i][j+1];
+                    map[i][j+1] = tmp;
                 }
             }
         }
 
-        if(!flag) System.out.println("I love UCPC");
-        else System.out.println("I hate UCPC");
-         */
+        for(int i=0;i<N-1;i++){
+            for(int j=0;j<N;j++){
+                if(map[i][j] != map[i+1][j]) {
 
-        int N = Integer.parseInt(br.readLine());
+                    char tmp = map[i][j];
+                    map[i][j] = map[i+1][j];
+                    map[i+1][j] = tmp;
 
-        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+                    answer = Math.max(answer,checkSero(map, i, j));
 
-        int[] A = new int[N];
-        int[] B = new int[N];
 
-        for(int i=0;i<N;i++){
-            A[i] = Integer.parseInt(stk.nextToken());
+                    tmp = map[i][j];
+                    map[i][j] = map[i+1][j];
+                    map[i+1][j] = tmp;
+
+                }
+            }
         }
 
-        stk = new StringTokenizer(br.readLine()," ");
-        for(int i=0;i<N;i++){
-            B[i] = Integer.parseInt(stk.nextToken());
-        }
-
-        Arrays.sort(A);
-        Arrays.sort(B);
-
-        int answer = 0;
-        for(int i=0;i<N;i++){
-            answer += A[i] * B[N-i-1];
-        }
         System.out.println(answer);
+    }
 
+    private static int checkSero(char[][] map, int row, int column) {
+        red = 0; blue=0; green=0; yellow = 0;
 
+        for(int j=0;j<map.length;j++){
+            switch (map[row][j]){
+                case 'C' : red++; break;
+                case 'P' : blue++; break;
+                case 'Z' : green++; break;
+                case 'Y' : yellow++; break;
+            }
+        }
+
+        return Math.max(Math.max(red,blue),Math.max(green,yellow));
+    }
+
+    private static int checkGaro(char[][] map, int row, int column){
+
+        red = 0; blue=0; green=0; yellow = 0;
+
+        for(int j=0;j<map.length;j++){
+            switch (map[row][j]){
+                case 'C' : red++; break;
+                case 'P' : blue++; break;
+                case 'Z' : green++; break;
+                case 'Y' : yellow++; break;
+            }
+        }
+
+        int max = Math.max(Math.max(red,blue),Math.max(green,yellow));
+
+        red = 0; blue=0; green=0; yellow = 0;
+
+        for(int i=0;i<map.length;i++){
+            switch (map[i][column]){
+                case 'C' : red++; break;
+                case 'P' : blue++; break;
+                case 'Z' : green++; break;
+                case 'Y' : yellow++; break;
+            }
+        }
+
+        max = Math.max(max,Math.max(Math.max(red,blue),Math.max(green,yellow)));
+        return max;
 
     }
 }

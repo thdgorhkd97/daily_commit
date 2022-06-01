@@ -5,101 +5,48 @@ import java.util.*;
 
 public class Main {
 
-    // java programmers level 2 방문 길이
-    // visited[][][][] 를 visited[원래 X 좌표][원래 Y 좌표][이동한 X 좌표][이동한 Y 좌표]
-    // 이렇게 해서 처음 간 길인지를 확인하는 식으로 생각했다.
-    // U D R L 에 따라 이동한 좌표가 맵 안에 있다면 visited가 false인지 확인하고
-    // answer+1 해준다
-    // cf ) 선분에 이동했는지를 확인하는 것이기 때문에 출발점과 도착점을 바꿔서
-//          visited[curentX][curentY][nextX][nextY] = true;
-//          visited[nextX][nextY][curentX][curentY] = true;
-    //      이렇게 true로 바꿔준다
+    // java programmers level 2 - 2 x n 타일링
+    // 가로 길이가 2이고 세로의 길이가 1인 직사각형모양의 타일이 있습니다.
+    // 이 직사각형 타일을 이용하여 세로의 길이가 2이고 가로의 길이가 n인 바닥을 가득 채우려고 합니다.
 
-    static boolean[][][][] visited = new boolean[11][11][11][11];
-    static int curentX = 0;
-    static int curentY = 0;
-    static int nextX = 0;
-    static int nextY = 0;
-    static int answer = 0;
+    // 일단 n=1 일 때부터 직접 구해나가면서 규칙이 나오길 기대했다
+    // n=1 일때부터 n=5 일 때까지를 구했는데 n = 3부터 n번째는 n-1 번째 + n-2 번째
+    // 라는 규칙이 보였다.
+    // 근데 5번째까지의 규칙만 눈으로 보이기 때문에 이를 기반으로 6만 이하의 n에 대해서
+    // 반드시 일치한다고 확신하기는 어려웠다. 이를 어떻게 확신할 수 있을까 했는데
+
+    //더 이상 분리될 수 없는 단위가 [세로 긴 것 1개]와 [가로 긴 것 2개를 상하로 붙인 것] 이렇게 2개 있으므로,
+    // 가로가 n일 때 가능한 경우의 수는 [끝 단위가 첫 번째 단위 경우의 수] + [끝 단위가 두 번째 단위 경우의 수]입니다.
+    // 가로 길이를 맞춰 생각하면 첫 번째 단위에서는 가로가 n-1일 때 각각의 조합에 붙인 것이고, 두 번째 단위일 때는 가로가 n-2일 때 각각의 조합에 단위를 붙인 것입니다
+
+    // 라는 해석이 있었는데 이런 식으로 더 이상 쪼개지지 않는 최소 단위를 고려하면서 다음에 오는 규칙과의 연계성을 생각하면서
+    // 규칙을 도출해내야 한다는 생각을 했다.
 
     public static void main(String[] args) throws IOException {
 
-        String dirs = "LULLLLLLU";
+        int n = 4;
 
-        curentX = 5;
-        curentY = 5;
-        visited[5][5][5][5] = true;
+        // n    result
+        // 1    1
+        // 2    2
+        // 3    3
+        // 4    5
+        // 5    1 + 3 + 4 = 8
 
-        for(int i=0;i<dirs.length();i++){
-            switch (dirs.charAt(i)){
-                case 'U' : GoUp(); break;
-                case 'D' : GoDown(); break;
-                case 'L' : GoLeft(); break;
-                case 'R' : GoRight(); break;
+        if(n <= 2){
+//            return n;
+        }
+
+        else{
+            int[] dp = new int[n+1];
+            dp[1] = 1;
+            dp[2] = 2;
+            for(int i=3;i<=n;i++){
+                dp[i] = dp[i-1] % 1000000007 + dp[i-2] % 1000000007;
             }
+//            return dp[n] % 1000000007;
         }
 
-        System.out.println(answer);
-
-    }
-
-    private static void GoUp(){
-        if(curentX - 1 < 0) return;
-        nextX = curentX - 1;
-        nextY = curentY;
-
-        if(!visited[curentX][curentY][nextX][nextY]){
-            answer++;
-        }
-        visited[curentX][curentY][nextX][nextY] = true;
-        visited[nextX][nextY][curentX][curentY] = true;
-        curentX = nextX;
-        curentY = nextY;
-
-    }
-    private static void GoDown(){
-        if(curentX + 1 > 10) return;
-        nextX = curentX + 1;
-        nextY = curentY;
-
-
-        if(!visited[curentX][curentY][nextX][nextY]){
-            answer++;
-        }
-        visited[curentX][curentY][nextX][nextY] = true;
-        visited[nextX][nextY][curentX][curentY] = true;
-        curentX = nextX;
-        curentY = nextY;
-
-
-    }
-    private static void GoLeft(){
-        if(curentY - 1 < 0) return;
-        nextX = curentX ;
-        nextY = curentY - 1;
-
-
-        if(!visited[curentX][curentY][nextX][nextY]){
-            answer++;
-        }
-        visited[curentX][curentY][nextX][nextY] = true;
-        visited[nextX][nextY][curentX][curentY] = true;
-        curentX = nextX;
-        curentY = nextY;
-
-    }
-    private static void GoRight(){
-        if(curentY + 1 > 10) return;
-        nextX = curentX;
-        nextY = curentY + 1;
-
-        if(!visited[curentX][curentY][nextX][nextY]){
-            answer++;
-        }
-        visited[curentX][curentY][nextX][nextY] = true;
-        visited[nextX][nextY][curentX][curentY] = true;
-        curentX = nextX;
-        curentY = nextY;
 
     }
 }

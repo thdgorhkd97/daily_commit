@@ -3,92 +3,84 @@ package src; // daily 폴더를 source root로 인식시켰기 때문에
 import java.io.IOException;
 import java.util.*;
 
+/*
+2022 - 06 - 04 < 송해광 >
+열심히 주석달고 최대한 메소드로 빼서 코드 자체를 직관적으로 이해할 수 있게 했습니다.
+다만 이게 좋은가 싶은 부분이 꽤 있었습니다.
+1. 처음에 season을 month에 의해 구별해야 했는데 이렇게 구한 season을 가지고 if-else로
+   봄/여름 인지 가을/겨울인지 확인하는 식으로 했는데 이 방법과 아예 month를 받아서 GetSeason
+   함수를 부르는 방법 중 어떤게 나을까요?
+
+2. main의 for문을 돌면서 어느 날 어떤 과일이 나오는지 직관적으로 알기 위해 메소드로 따로 구현했는데
+   이렇게 하니 메소드 내부의 로직이 겹치는 것 같은데 그냥 for문 자체에서 출력하는 게 나을지 여쭤보고 싶습니다.
+ */
+
 public class Main {
-
-    // java programmers level 2 - 교점에 별 만들기
-    // 주어지는 직선끼리의 모든 교점 중 정수인 교점만 취해서 최소범위에 대한
-    // string 배열을 반환한다
-    // 주어지는 직선끼리의 교점을 구하는 공식을 직접 구해서 그랬는데 문제에 주어져 있었다 ㅠㅠ(잘 읽어야지)
-    // 그리고 교점을 Math.round(x * 100) / 100.0; 로 해서 소수 2째 자리까지 반올림해서 구했고
-    // 그 수가 정수인지 아닌지를 확인하는 방법으로는 그 수를 Math.floor()한 것과 (int)로 형변환한게
-    // 일치하면 정수라고 판단하였다.
-    // 그렇게 정수인 교점을 다 찾았는데 거기서 어떻게 좌표표현을 해야 할지 모르겠다 ㅠㅠ
-
-    static List<int[]> list = new ArrayList<>();
-    static Set<int[]> set = new HashSet<>();
 
     public static void main(String[] args) throws IOException {
 
-        int[][] line = {{2,-1,4},{-2,-1,4},{0,-1,1},{5,-8,-12},{5,8,12}};
-//        int[][] line = {{0,1,-1},{1,0,-1},{1,0,1}};
-//          int[][] line = {{1,-1,0},{2,-1,0}};
-//          int[][] line = {{1,-1,0},{2,-1,0},{4,-1,0}};
+        int month = 3; // 디저트 구매요청 월
+        int numOfSoldier = 70; // 군인 수
 
-        for(int i=0;i<line.length-1;i++){
-            for(int j=i+1;j<line.length;j++){
-                whereMeet(line[i],line[j]);
-            }
-        }
+        String season = ""; // 계절 ( 봄/여름? or 가을/겨울? )
+        season = GetSeason(month); // 월에 따른 계절 확인
 
-        int minX = Integer.MAX_VALUE;
-        int minY = Integer.MAX_VALUE;
+        int[] howManyFruitRequire = new int[2]; // 군인 수에 따른 필요 과일 수
+        howManyFruitRequire = calculateFruitCnt(season,numOfSoldier); // 계절과 군인 수에 따른 과일 필요 수량 계산
 
-        int maxX = Integer.MIN_VALUE;
-        int maxY = Integer.MIN_VALUE;
+        System.out.println(month + "월 디저트 구매내역서 (총 " + numOfSoldier + "명)");
 
-        for(int i=0;i<list.size();i++){
-            System.out.println(list.get(i)[0] + " " + list.get(i)[1]);
-            minX = Math.min(minX,list.get(i)[0]);
-            minY = Math.min(minY,list.get(i)[0]);
-            maxX = Math.max(maxX,list.get(i)[1]);
-            maxY = Math.max(maxY,list.get(i)[1]);
-        }
-
-        System.out.println();
-        System.out.println(minX + " " + minY + " " + maxX + " " + maxY);
-        System.out.println();
-
-        Collections.sort(list, new Comparator<int[]>() {
-            @Override
-            public int compare(int[] o1, int[] o2) {
-                return o2[0] - o1[0];
-            }
-        });
-
-        for(int i=0;i<list.size();i++){
-            System.out.println(list.get(i)[0] + " " + list.get(i)[1]);
-        }
-
-        String[] answer = new String[maxY - minY + 1];
-
-        int idx = 0;
-        for(int i=0;i<answer.length;i++){
-
-        }
-
-
-    }
-
-    private static void whereMeet(int[] line1, int[] line2) {
-
-        if(line1[0] * line2[1] - line1[1] * line2[0] == 0){
-            return ;
-        }
-
-        double x = ((line1[1] * line2[2]) - (line1[2] * line2[1])) / (double)((line1[0] * line2[1]) - (line1[1]*line2[0]));
-        double y = ((line1[2] * line2[0]) - (line1[0] * line2[2])) / (double)((line1[0] * line2[1]) - (line1[1]*line2[0]));
-
-        x = Math.round(x * 100) / 100.0;
-        y = Math.round(y * 100) / 100.0;
-
-        if(Math.round(x) == x && Math.round(y) == y){            // 정수인지 확인
-            int[] add = new int[2];
-            add[0] = (int)x;
-            add[1] = (int)y;
-            if(set.add(add)){
-                list.add(add);
+        int daysPerMonth = 30; // 월은 30일까지만 있는 것으로 가정
+        for(int i=1;i<=daysPerMonth;i++){
+            int endDays = i % 10; // 일의 일의 자리수 ( ex 10일 -> 0, 15일 -> 5)
+            switch (endDays){
+                case 1,5 : provideStrawberryOrApple(howManyFruitRequire[0],season,month,i); break;
+                case 3,7 : provideWatermelonOrPear(howManyFruitRequire[1],season,month,i); break;
+                default:
+                    System.out.println(month +"월 " + i+"일 : -");
+                    break;
             }
         }
 
     }
+
+    private static void provideWatermelonOrPear(int numberOfFruit,String season,int month,int day) {
+        if(season.equals("Spring/Summer")){
+            System.out.println((month +"월 " + day+"일 : 수박 " + numberOfFruit +"개"));
+        }
+        else{
+            System.out.println((month +"월 " + day+"일 : 배 " + numberOfFruit +"개"));
+        }
+    }
+
+    private static void provideStrawberryOrApple(int numberOfFruit,String season,int month,int day) {
+        if(season.equals("Spring/Summer")){
+            System.out.println((month +"월 " + day+"일 : 딸기 " + numberOfFruit +"개"));
+        }
+        else{
+            System.out.println((month +"월 " + day+"일 : 사과 " + numberOfFruit +"개"));
+        }
+    }
+
+    private static int[] calculateFruitCnt(String season, int numOfSoldier) {
+        int[] fruitCnt = new int[2]; // 반환할 변수( fruitCnt[0] = 딸기 or 사과의 개수, fruitCnt[1] = 수박 or 배의 개수)
+        if(season.equals("Spring/Summer")){ // 봄/여름 계절이라면 딸기/수박
+            fruitCnt[0] = 5 * numOfSoldier; // 딸기는 1명당 5개 제공
+            fruitCnt[1] = (int) Math.ceil(numOfSoldier / 10.0); // 수박은 11명에게는 2개 제공해야 하므로 ceil로 올림처리하여 계산
+
+        }
+        else{ //season.equals("Fall/Winter") 가을/겨울 계절은 사과/배
+            fruitCnt[0] = numOfSoldier; // 사과는 1명당 1개 제공
+            fruitCnt[1] = numOfSoldier / 2; // 배는 2인에 하나 제공
+        }
+        return fruitCnt;
+    }
+
+    private static String GetSeason(int month) {
+        if(3<=month && month <= 8){ // 3~8 월은 봄/여름
+            return "Spring/Summer";
+        }
+        else return "Fall/Winter"; // 9~2월은 가을/겨울
+    }
+
 }

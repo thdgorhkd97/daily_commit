@@ -1,94 +1,70 @@
 package src;
 
+import javax.swing.text.View;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Stack;
+import java.util.StringTokenizer;
 
 /*
-문제 : java baekjoon 3085 사탕 게임
-작성자 : 송해광 ( 2022 - 06 - 16 )
-문제 접근 : 위치를 확인하면서 다음 변수와 같지 않다면 2개의 위치를 바꾸고 바꾼 상태에서 최대 개수를 구한다.
-         로직은 맞는 거 같은데 계속 뭔가 핀트가 어긋난 것 같다...
-         결국 풀이를 확인하고 해당 코드를 이해하긴 했는데 이 역시 로직은 나와 같은 것 같은데 ㅠㅠ
-         아무래도 최대 개수를 확인하고 초기화하는 과정에서 나는 한번에 한것을 조금 나눠서 해야 했을 것 같다
+작성자 : 송해광 ( 2022 - 06 - 17 )
+공부 : dfs 공부 -> 재귀 & 스택 활용
  */
 
 public class Main {
 
-    static char[][] candy; // candy를 담을 2차원 배열
-    static int max; // 최대 사탕 수를 저장할 변수
+    static boolean[] visited = new boolean[6]; // 방문처리를 표현할 배열
+    static int[][] graph = new int[6][6]; // 그래프의 연결을 표현할 2차원 배열
+    static Stack<Integer> stack = new Stack<>(); // dfs에 쓰일 스택 자료구조
 
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        addLine(graph,0,1);
+        addLine(graph,0,2);
+        addLine(graph,0,3);
+        addLine(graph,0,4);
+        addLine(graph,2,5);
 
-        int n = Integer.parseInt(br.readLine());
-
-        max = 0;
-        candy = new char[n][n];
-        for(int i=0;i<n;i++) {
-            candy[i] = br.readLine().toCharArray();
-        }
-        char temp=' ';
-
-        for(int i=0;i<n;i++) { // 가로 확인
-            for(int j=0;j<n-1;j++) {
-                if(candy[i][j] != candy[i][j+1]) { // 다음 변수와 다르다면
-                    temp= candy[i][j];
-                    candy[i][j] = candy[i][j+1];
-                    candy[i][j+1] = temp; // 다음 변수와 위치 교환
-                    check(); // 교환한 상태로 최대 사탕 수 계산해서 저장
-                    temp = candy[i][j];
-                    candy[i][j] = candy[i][j+1];
-                    candy[i][j+1] = temp; // 위치를 교환한 변수끼리 다시 교체
-                }
-            }
-        }
-        for(int i=0;i<n;i++) { // 세로확인
-            for(int j=0;j<n-1;j++) {
-                if(candy[j][i]!=candy[j+1][i]) { // 연속된 다음 변수와 다르다면
-                    temp = candy[j][i];
-                    candy[j][i] = candy[j+1][i];
-                    candy[j+1][i] = temp; // 위치 교환
-                    check();
-                    temp = candy[j][i];
-                    candy[j][i] = candy[j+1][i];
-                    candy[j+1][i] = temp; // 다시 원래 2차원 배열로 복구
-                }
-            }
-        }
-        System.out.println(max);
+        /*
+        dfsByRecursion(0);
+        dfsByStack(0);
+         */
     }
 
-    static public void check(){
-        int num = 1;
-        for(int i=0;i<candy.length;i++) { // 가로체크
-            num = 1;
-            for(int j=0;j<candy[i].length-1;j++) {
-                if(candy[i][j]==candy[i][j+1]) {
-                    num++;
-                    if(max < num) {
-                        max = num;
-                    }
-                }
-                else {
-                    num = 1;
+    private static void dfsByRecursion(int start){
+        visited[start] = true; // 해당 정점을 방문처리하고
+
+        System.out.print(start + " ");
+
+        for(int i=start;i<6;i++){
+            if(!visited[i] && graph[start][i] == 1){ // 연결된 정점을 방문하지 않았으면
+                dfsByRecursion(i);
+            }
+        }
+    } // dfs를 재귀로 구현
+
+    private static void dfsByStack(int start) {
+
+        stack.push(start);
+        visited[start] = true;
+
+        while(!stack.isEmpty()){
+            int v = stack.pop();
+
+            System.out.print(v + " ");
+
+            for(int i=start;i<6;i++){
+                if(!visited[i] && graph[start][i] == 1){ // 연결된 정점을 방문하지 않았으면
+                    dfsByStack(i);
                 }
             }
         }
-        for(int i=0;i<candy.length;i++) { // 세로체크
-            num = 1;
-            for(int j=0;j<candy[i].length-1;j++) {
-                if(candy[j][i]==candy[j+1][i]) {
-                    num++;
-                    if(max < num) {
-                        max = num;
-                    }
-                }
-                else {
-                    num = 1;
-                }
-            }
-        }
+
+    } // dfs를 스택으로 구현
+
+    private static void addLine(int[][] graph, int a, int b) {
+        graph[a][b] = 1;
+        graph[b][a] = 1;
     }
 }

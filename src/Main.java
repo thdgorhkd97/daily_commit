@@ -6,103 +6,85 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 /*
-작성자 : 송해광 ( 2022 - 06 - 21 )
-문제 : java baekjoon 1012
-문제접근 : 2차원배열의 크기가 주어지고 배추의 위치가 쭉 주어지면 연결된 배추 영역마다
-        1마리의 지렁이를 놔둔다고 가정했을 때 몇 마리의 벌레가 필요할까?
-        bfs로 2차원 배열을 돌면서 visited[i][j]가 false고 field[i][j] == 1이면
-        bfs로 넣고 인접한 배추가 있다면 해당 위치의 방문처리를 한다.
+작성자 : 송해광 ( 2022 - 06 - 22 )
+문제 : java baekjoon 7562
+문제접근 : N x N 크기의 맵에서 체스의 나이트가 이동해서 타겟위치까지 최소 몇 번을 움직여서 이동할 수 있는지 최소횟수를 구한다.
  */
 
 class algorithm {
 
-    static List<Integer> list = new ArrayList<>();
-    static int worm = 0; // 배추밭에 필요한 벌레의 수를 저장할 변수
-    static int[] dx = {-1,1,0,0}; // 상하좌우
-    static int[] dy = {0,0,-1,1}; // 상하좌우
+    static int dx[] = {-1,-2,-2,-1,1,2,2,1}; // 체스에서 나이트의 이동 (행)의 변화
+    static int dy[] = {-2,-1,1,2,2,1,-1,-2}; // 체스에서 나이트의 이동 (열)의 변화
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int T = Integer.parseInt(br.readLine()); // 전체 테스트케이스의 수
+        int T = Integer.parseInt(br.readLine());
 
-        for(int i=0;i<T;i++){ // 테스트케이스 수만큼 for문 돌기
+        for(int i=0;i<T;i++){
+            int length = Integer.parseInt(br.readLine());
+
+            int[][] map = new int[length][length]; // 체스판의 크기
+            boolean[][] visited = new boolean[length][length]; // 방문처리를 저장할 변수
+            int[][] move = new int[length][length]; // 움직인 횟수를 저장하는 배열
+
             StringTokenizer stk = new StringTokenizer(br.readLine()," ");
 
-            int M = Integer.parseInt(stk.nextToken()); // 배추밭 배열의 행의 크기
-            int N = Integer.parseInt(stk.nextToken()); // 배추밭 배열의 열의 크기
-            int K = Integer.parseInt(stk.nextToken()); // 배추의 개수
+            int nowX = Integer.parseInt(stk.nextToken()); // 현재 있는 위치의 행
+            int nowY = Integer.parseInt(stk.nextToken()); // 현재 있는 위치의 열
 
-            int[][] field = new int[M][N]; // 주어진 크기만큼 배추밭의 2차원 배열 선언
+            stk = new StringTokenizer(br.readLine()," ");
 
-            for(int j=0;j<K;j++){ // 배추의 개수만큼 for문을 돌며 입력받아 저장
-                stk = new StringTokenizer(br.readLine()," ");
-                int row = Integer.parseInt(stk.nextToken());
-                int column = Integer.parseInt(stk.nextToken());
+            int targetX = Integer.parseInt(stk.nextToken()); // 이동할 행
+            int targetY = Integer.parseInt(stk.nextToken()); // 이동할 열
 
-                field[row][column] = 1; // 배추밭에 배추의 위치를 1로 저장(field[row][column] = 1이면 배추가 있다)
-            }
+            bfs(map,nowX,nowY,targetX,targetY,visited,move);
 
-            boolean[][] visited = new boolean[M][N]; // 방문처리 할 배추밭과 같은 크기의 boolean 배열
-
-            worm = 0; // 벌레의 수 초기화
-
-            for(int j=0;j<M;j++){
-                for(int k=0;k<N;k++){
-                    if(!visited[j][k] && field[j][k] == 1) { // 방문하지 않았고 배추가 존재하는 위치면
-                        bfs(j,k,visited,field); // 해당 위치와 연결된 다른 배추들을 체크하기 위해 bfs
-                        worm++; // bfs를 호출할 때마다 벌레 1마리가 추가로 필요하다
-                    }
-                }
-            } // 크기만큼 돌면서 bfs를 호출할 때마다 worm+1
-
-            list.add(worm);
+            System.out.println(move[targetX][targetY]);
 
         }
-
-        for(int i=0;i<list.size();i++){
-            System.out.println(list.get(i));
-        }
-
-
-
-
 
     }
-    private static void bfs(int row,int column,boolean[][] visited,int[][] field){
 
+    private static void bfs(int[][] map,int nowX,int nowY,int targetX, int targetY,boolean[][] visited,int[][] move){
         Queue<int[]> que = new LinkedList<>();
-        int[] add = new int[2];
-        add[0] = row;
-        add[1] = column;
-        que.add(add);
-        visited[row][column] = true;
+        queAdd(que,nowX,nowY); // 큐에 배열로 넣기
+        visited[nowX][nowY] = true; // 해당 좌표에 방문 처리
+        move[nowX][nowY] = 0; // 처음 위치는 0번 이동 후 도달 가능(처음은 0으로 세팅)
 
         while(!que.isEmpty()){
-            int[] v = que.poll();
+            int v[] = que.poll();
 
-            int nextX = 0;
-            int nextY = 0;
-
+            int nextX = 0; // 다음에 이동할 위치의 행
+            int nextY = 0; // 다음에 이동할 위치의 열
             for(int i=0;i<dx.length;i++){
                 nextX = v[0] + dx[i];
                 nextY = v[1] + dy[i];
 
-                if(nextX < 0 || nextY < 0 || nextX >= visited.length || nextY >= visited[0].length){
+                if(nextX < 0 || nextY < 0 || nextX >= map.length || nextY >= map.length){
                     continue;
-                }
+                } // map을 벗어나면 그대로 진행
                 else{
-                    if(field[nextX][nextY] == 1 && !visited[nextX][nextY]){
-                        visited[nextX][nextY] = true;
-                        int[] queAdd = new int[2];
-                        queAdd[0] = nextX;
-                        queAdd[1] = nextY;
-                        que.add(queAdd);
+                    if(!visited[nextX][nextY]) { // 해당위치를 처음 방문하는 거면
+                        move[nextX][nextY] = move[v[0]][v[1]] + 1; // 이전 위치에 도달한 이동 횟수에 + 1
+                        queAdd(que, nextX, nextY); // 다음 이동위치를 큐에 저장
+                        visited[nextX][nextY] = true; // 방문처리
+                        if (nextX == targetX && nextY == targetY) { // 이동한 곳이 타겟위치와 같으면 종료
+                            return;
+                        }
                     }
                 }
             }
-
         }
+
     }
+
+    private static void queAdd(Queue<int[]> que,int first,int second){
+        int[] add = new int[2];
+        add[0] = first;
+        add[1] = second;
+        que.add(add);
+    }
+
 }

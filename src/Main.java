@@ -1,62 +1,51 @@
-package src; // daily 폴더를 source root로 인식시켰기 때문에
+package src;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
+import static java.lang.Character.isDigit;
+
 /*
-작성자 : 송해광 ( 2022 - 06 - 28 )
-문제 : JAVA programmers level 2 - 다리를 지나는 트럭
-문제접근 : 다리를 큐로 보는 건 생각했는데 다리가 지탱할 수 있는 무게를 초과하면 어떻게 할 지를
-         전혀 몰랐는데 알아보니 0을 큐에 넣어서 원래 있던 다리를 앞으로 미뤄주면 해결되는 거였다
+작성자 : 송해광 ( 2022 - 06 - 29 )
+문제 : java baekjoon 1620 나는야 포켓몬 마스터 이다솜
+문제접근 : hashmap으로 문자열과 정수를 저장하는 건 알겠는데 반대로 하는 걸 어떻게 해야 할까 하다가
+        HASHMAP에서 value로 key를 찾는 게 아니라 그냥 String[] 에서 index로 저장된 배열의
+        string을 꺼내려 했다.
  */
 
-public class Main {
+class algorithm {
 
     public static void main(String[] args) throws IOException {
 
-        int bridge_length = 2;
-        int weight = 10;
-        int[] truck_weights = {7,4,5,6};
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int answer = 0;
+        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
 
-        Queue<Integer> que = new LinkedList<>(); // 다리
-        int sum = 0; // 무게
+        int N = Integer.parseInt(stk.nextToken()); // 도감에 수록된 포켓몬 개수
+        int M = Integer.parseInt(stk.nextToken()); // 맞춰야 하는 문제의 개수
 
-        // queue 7 0 4 5 0 6 -> 0 6
-        // sum   7 0 4 9 5 0 6 -> 6
-        // time  1 2 3 4 5 6 -> 6
+        HashMap<String,Integer> pocketmonMap = new HashMap<String, Integer>();
+        String[] pocketmonArray = new String[N+1];
 
-        for(int truck : truck_weights){
-
-            while(true){
-                if(que.isEmpty()){ // 큐가 비어있다 = 다리가 비어있다
-                    que.add(truck);
-                    sum += truck;
-                    answer++;
-                    break;
-                }
-                else if(que.size() == bridge_length){ // 만약 다리가 꽉 차있다면
-                    sum -= que.poll();
-                }
-                else{
-                    if(sum + truck <= weight){ // 다리에 더 올라갈 수 있으면
-                        que.add(truck);
-                        sum += truck;
-                        answer++;
-                        break;
-                    }
-                    else{ // 다리에 더 올릴 수없다-> 지금 있는 트럭만 앞으로 보내자
-                        que.add(0);
-                        answer++;
-                    }
-                }
-            }
-
+        for(int i=0;i<N;i++){
+            String pocketmonName = br.readLine();
+            pocketmonMap.put(pocketmonName,i+1);
+            pocketmonArray[i+1] = pocketmonName;
         }
 
-        // 트럭을 올리는 게 기준이기 때문에 건너야함
-//        return answer + bridge_length;
+        for(int i=0;i<M;i++){
+            String wantToKnow = br.readLine();
+            if(isDigit(wantToKnow.charAt(0))){ // 수가 주어지면
+                System.out.println(pocketmonArray[Integer.valueOf(wantToKnow)]);
+            }
+            else{ // 문자열이 주어지면
+                if(pocketmonMap.containsKey(wantToKnow)){
+                    System.out.println(pocketmonMap.get(wantToKnow));
+                }
+            }
+        }
 
     }
 }

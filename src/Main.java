@@ -6,49 +6,44 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 /*
-작성자 : 송해광 ( 2022 - 06 - 30 )
-문제 : java programmers level 2 - 땅따먹기
-문제접근 : 바로 아래줄로 내려올 수 없기때문에 한 줄씩 내려올 때마다 다른 열과의 합 중 최대값을 저장해나간다
-        ex) 0열이면 한 줄 위의 1,2,3 열과의 합 중 최대를 저장한다.
+작성자 : 송해광 ( 2022 - 07 - 01 )
+문제 : java baekjoon 1764 듣보잡
+문제접근 : 듣지 못한 사람과 보지 못한 사람 중 겹치는 부분에 대해 체크한다.
  */
 
-class algorithm {
+class Main {
 
     public static void main(String[] args) throws IOException {
 
-        int[][] land = {{1,2,3,5},{5,6,7,8},{4,3,2,1}};
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int[][] dp = new int[land.length][4]; // 열은 반드시 4로 고정
+        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
 
-        for(int i=0;i<4;i++){
-            dp[0][i] = land[0][i]; // 0행 -> 첫 줄은 똑같이
+        int N = Integer.parseInt(stk.nextToken());
+        int M = Integer.parseInt(stk.nextToken());
+
+        HashSet<String> notHear = new HashSet<>(); // 듣지 못한 사람을 담을 목록
+
+        for(int i=0;i<N;i++){
+            notHear.add(br.readLine()); // 듣지 못한 사람
         }
 
-        for(int i=1;i<land.length;i++){
-            for(int j=0;j<4;j++){
-                if(j==0){
-                    dp[i][0] = Math.max(land[i][j] + dp[i-1][1],Math.max(land[i][j] + dp[i-1][2],land[i][j] + dp[i-1][3]));
-                }else if(j==3){
-                    dp[i][j] = Math.max(land[i][j] + dp[i-1][0],Math.max(land[i][j] + dp[i-1][1],land[i][j] + dp[i-1][2]));
-                }
-                else if(j==1){
-                    dp[i][j] = Math.max(land[i][j] + dp[i-1][0],Math.max(land[i][j] + dp[i-1][2],land[i][j] + dp[i-1][3]));
-                }
-                else{
-                    dp[i][j] = Math.max(land[i][j] + dp[i-1][0],Math.max(land[i][j] + dp[i-1][1],land[i][j] + dp[i-1][3]));
-                }
+        List<String> answer = new ArrayList<>(); // 듣지도 보지도 못한 사람을 담을 리스트
+        int numOfNotHearSee = 0; // 듣지도 보지도 못한 사람의 수
+        for(int i=0;i<M;i++){
+            String notSee = br.readLine(); // 보지 못한 사람을 입력받고
+            if(!notHear.add(notSee)){ // 보지 못한 사람이 듣지 못한 사람에 있으면
+                numOfNotHearSee++; // 듣보잡의 수를 추가하고
+                answer.add(notSee); // 듣보잡 사람 목록으로 추가
             }
-        } // dp로 해당 열을 제외한 위 열과의 합 중 최대를 구한다.
+        }
 
-        int answer = 0;
-        int num = dp[land.length-1][0];
-        for(int i=0;i<4;i++){
-            if(num <= dp[land.length-1][i]){
-                num = dp[land.length-1][i];
-            }
-        } // 맨 마지막 행 중 최대값이 답이 된다.
+        Collections.sort(answer); // 사전 순으로 출력을 위한 정렬
 
-        answer = num;
-        System.out.println(answer);
+        System.out.println(numOfNotHearSee);
+        for(int i=0;i<numOfNotHearSee;i++){
+            System.out.println(answer.get(i));
+        }
+
     }
 }

@@ -6,9 +6,9 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 /*
-작성자 : 송해광 ( 2022 - 07 - 01 )
-문제 : java baekjoon 1764 듣보잡
-문제접근 : 듣지 못한 사람과 보지 못한 사람 중 겹치는 부분에 대해 체크한다.
+작성자 : 송해광 ( 2022 - 07 - 02 )
+문제 : java baekjoon 11478 서로 다른 부분 문자열의 개수
+문제접근 : 입력된 string의 부분 문자열 중에서 서로 다른 문자열의 개수를 구하는 문제
  */
 
 class Main {
@@ -17,33 +17,37 @@ class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+        String str = br.readLine();
 
-        int N = Integer.parseInt(stk.nextToken());
-        int M = Integer.parseInt(stk.nextToken());
+        Set<String> subString = new HashSet<>();
 
-        HashSet<String> notHear = new HashSet<>(); // 듣지 못한 사람을 담을 목록
+        for(int i=0;i<str.length();i++){
+            String sub = "";
 
-        for(int i=0;i<N;i++){
-            notHear.add(br.readLine()); // 듣지 못한 사람
-        }
-
-        List<String> answer = new ArrayList<>(); // 듣지도 보지도 못한 사람을 담을 리스트
-        int numOfNotHearSee = 0; // 듣지도 보지도 못한 사람의 수
-        for(int i=0;i<M;i++){
-            String notSee = br.readLine(); // 보지 못한 사람을 입력받고
-            if(!notHear.add(notSee)){ // 보지 못한 사람이 듣지 못한 사람에 있으면
-                numOfNotHearSee++; // 듣보잡의 수를 추가하고
-                answer.add(notSee); // 듣보잡 사람 목록으로 추가
+            for(int j=i;j< str.length();j++){
+                sub += str.substring(j,j+1);
+                subString.add(sub);
             }
         }
 
-        Collections.sort(answer); // 사전 순으로 출력을 위한 정렬
+        /*
+        int length = 1;
+        while(length <= str.length()-1){
+            for(int i=0;i<=str.length()-length;i++){
+                StringBuffer sb = new StringBuffer();
 
-        System.out.println(numOfNotHearSee);
-        for(int i=0;i<numOfNotHearSee;i++){
-            System.out.println(answer.get(i));
+                for(int j=i;j<i+length;j++){
+                    sb.append(str.charAt(j));
+                }
+
+                subString.add(sb.toString());
+            }
+            length++;
         }
+        subString.add(str);
+         */
+
+        System.out.println(subString.size());
 
     }
 }

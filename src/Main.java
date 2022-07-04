@@ -6,58 +6,66 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 /*
-작성자 : 송해광 ( 2022 - 07 - 03 )
-문제 : java baekjoon 1699 제곱수의 합
-문제접근 : 몇 개의 제곱수로 주어진 수를 표현할 수 있는가?
+작성자 : 송해광 ( 2022 - 07 - 04 )
+문제 : java baekjoon 1269 대칭차집합
+문제접근 : A와 B 배열 원소 중 서로에게 없는 원소 ( A-B, B-A ) 의 개수 합을 구한다.
  */
 
-class Main {
-
-    static int answer = 0; // 더해지는 제곱수의 개수 ( 정답 )
-    static int N = 0; // 주어진 수
+class algorithm {
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        N = Integer.parseInt(br.readLine()); // N < 100,000
+        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
 
-        int[] square = new int[317]; // 316의 제곱 < 100000 < 317의 제곱
+        int Alength = Integer.parseInt(stk.nextToken());
+        int Blength = Integer.parseInt(stk.nextToken());
 
-        square[0] = 1;
-        square[1] = 1;
-        for(int i=1;i<square.length-1;i++){
-            square[i+1] = (int) Math.pow(i+1,2); // square 배열은 제곱수를 저장한 배열
+        int[] A = new int[Alength]; // A 배열의 원소를 담을 배열
+        int[] B = new int[Blength]; // B 배열의 원소를 담을 배열
+
+        HashMap<Integer,Integer> Amap = new HashMap<>();
+        HashMap<Integer,Integer> Bmap = new HashMap<>();
+
+        stk = new StringTokenizer(br.readLine()," ");
+        for(int i=0;i<Alength;i++){
+            int aIndex = Integer.parseInt(stk.nextToken());
+            A[i] = aIndex;
+            Amap.put(aIndex,1); // A에 해당하는 원소
         }
 
-        while(N != 0) { // N이 0이 될때까지 진행
-            BinarySearch(N, square); // 시간 효율성을 위해 이분탐색으로 가장 가깝게 작은 제곱수를 구한다
-            answer++; // 횟수 + 1
+        stk = new StringTokenizer(br.readLine()," ");
+        for(int i=0;i<Blength;i++){
+            int bIndex = Integer.parseInt(stk.nextToken());
+            B[i] = bIndex;
+            Bmap.put(bIndex,1); // B에 해당하는 원소
         }
 
-        System.out.println(answer);
 
-    }
+        int BminusA = 0;
 
-    private static void BinarySearch(int n, int[] square) {
-        int left = 1;
-        int right = square.length-1;
-        while(Math.abs(left - right) != 1){ // 이분탐색
-
-            int mid = (left + right) / 2;
-            if(square[mid] < n){
-                left = mid+1;
+        for(Integer aIndex : A){ // A 배열의 원소 각각을 확인
+            if(Bmap.containsKey(aIndex)){ // A 배열의 원소가 B에 포함되는가
+                BminusA++;
             }
-            else if(square[mid] > n){
-                right = mid -1;
+            else{
+                continue;
             }
-            else{ // square[mid] == n
-                N -= square[mid];
-                return ;
-            }
-
         }
 
-        N -= square[Math.min(left,right)];
+        int AminusB = 0;
+
+        for(Integer bIndex : B) {
+
+            if (Amap.containsKey(bIndex)) {
+                AminusB++;
+            } else {
+                continue;
+            }
+        }
+
+        System.out.println(B.length - BminusA + A.length - AminusB);
+
     }
 }

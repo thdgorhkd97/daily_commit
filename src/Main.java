@@ -3,61 +3,53 @@ package src;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.Buffer;
 import java.util.*;
 
 /*
-작성자 : 송해광 ( 2022 - 07 - 03 )
-문제 : java baekjoon 1699 제곱수의 합
-문제접근 : 몇 개의 제곱수로 주어진 수를 표현할 수 있는가?
+작성자 : 송해광 ( 2022 - 07 - 05 )
+문제 : java baekjoon 14501 퇴사
+문제접근 : dp로 저장하면서 최대값을 정한다.
  */
 
-class Main {
-
-    static int answer = 0; // 더해지는 제곱수의 개수 ( 정답 )
-    static int N = 0; // 주어진 수
+class algorithm {
 
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        N = Integer.parseInt(br.readLine()); // N < 100,000
+        int n = Integer.parseInt(br.readLine());
 
-        int[] square = new int[317]; // 316의 제곱 < 100000 < 317의 제곱
+        int[] t = new int[n];
+        int[] p = new int[n];
 
-        square[0] = 1;
-        square[1] = 1;
-        for(int i=1;i<square.length-1;i++){
-            square[i+1] = (int) Math.pow(i+1,2); // square 배열은 제곱수를 저장한 배열
+        StringTokenizer stk;
+        for (int i=0; i<n; i++) {
+            stk = new StringTokenizer(br.readLine());
+
+            t[i] = Integer.parseInt(stk.nextToken());
+            p[i] = Integer.parseInt(stk.nextToken());
         }
 
-        while(N != 0) { // N이 0이 될때까지 진행
-            BinarySearch(N, square); // 시간 효율성을 위해 이분탐색으로 가장 가깝게 작은 제곱수를 구한다
-            answer++; // 횟수 + 1
-        }
+        //dp : N일에 얻을 수 있는 최대 수익
+        int[] dp = new int[n+1];
 
-        System.out.println(answer);
+        //점화식
+        //현재 날짜에서 소요 시간과 비용을 더해 dp에 저장한다.
+        //이후, 중복될 때 최대값을 넣는다.
+        //dp[i + t[i]] = max(dp[i + t[i]], dp[i] + p[i]);
+
+        for (int i=0; i<n; i++) {
+            if (i + t[i] <= n) {
+                //날짜가 범위를 넘어가지 않는 경우
+                dp[i + t[i]] = Math.max(dp[i + t[i]], dp[i] + p[i]);
+            }
+            //현재 경우의 수가 0일 수 있기 때문에 이전의 최대값을 넣어줌.
+            //해당 날짜에 일할 수 없다면, 이전까지 일한 최대 수당을 넣어주어야 한다.
+            dp[i+1] = Math.max(dp[i+1], dp[i]);
+        }
+        System.out.println(dp[n]);
 
     }
 
-    private static void BinarySearch(int n, int[] square) {
-        int left = 1;
-        int right = square.length-1;
-        while(Math.abs(left - right) != 1){ // 이분탐색
-
-            int mid = (left + right) / 2;
-            if(square[mid] < n){
-                left = mid+1;
-            }
-            else if(square[mid] > n){
-                right = mid -1;
-            }
-            else{ // square[mid] == n
-                N -= square[mid];
-                return ;
-            }
-
-        }
-
-        N -= square[Math.min(left,right)];
-    }
 }

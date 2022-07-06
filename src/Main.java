@@ -3,53 +3,76 @@ package src;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.Buffer;
 import java.util.*;
 
 /*
-작성자 : 송해광 ( 2022 - 07 - 05 )
-문제 : java baekjoon 14501 퇴사
-문제접근 : dp로 저장하면서 최대값을 정한다.
+작성자 : 송해광 ( 2022 - 07 - 06 )
+문제 : java baekjoon 16948 데스 나이트
+문제접근 : 데스나이트의 이동가능한 규약에 따라서 이동함에 따라 해당 위치에 몇 번 이동후 도착할 수 있는가
  */
 
 class algorithm {
 
-    public static void main(String[] args) throws IOException {
+    static int[] dx = {-2,-2,0,0,2,2}; // 데스 나이트의 이동 가능 경로 <행>
+    static int[] dy = {-1,1,-2,2,-1,1}; // 데스 나이트의 이동 가능 경로 <열>
+    static boolean[][] visited; // 방문 여부를 저장할 2차원 배열
+    static int[][] move; // 각 지점까지 도달하기 위한 이동 횟수를 저장하는 2차원 배열
 
+    public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int n = Integer.parseInt(br.readLine());
+        int N = Integer.parseInt(br.readLine());
 
-        int[] t = new int[n];
-        int[] p = new int[n];
+        int[][] chess = new int[N][N]; // 2차원 배열 ( 체스판의 크기)
 
-        StringTokenizer stk;
-        for (int i=0; i<n; i++) {
-            stk = new StringTokenizer(br.readLine());
+        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
 
-            t[i] = Integer.parseInt(stk.nextToken());
-            p[i] = Integer.parseInt(stk.nextToken());
-        }
+        int r1 = Integer.parseInt(stk.nextToken()); // 시작점의 행
+        int c1 = Integer.parseInt(stk.nextToken()); // 시작점의 열
+        int r2 = Integer.parseInt(stk.nextToken()); // 도착지점의 행
+        int c2 = Integer.parseInt(stk.nextToken()); // 도착지점의 열
 
-        //dp : N일에 얻을 수 있는 최대 수익
-        int[] dp = new int[n+1];
+        visited = new boolean[N][N];
+        move = new int[N][N];
 
-        //점화식
-        //현재 날짜에서 소요 시간과 비용을 더해 dp에 저장한다.
-        //이후, 중복될 때 최대값을 넣는다.
-        //dp[i + t[i]] = max(dp[i + t[i]], dp[i] + p[i]);
+        bfs(r1,c1,r2,c2);
 
-        for (int i=0; i<n; i++) {
-            if (i + t[i] <= n) {
-                //날짜가 범위를 넘어가지 않는 경우
-                dp[i + t[i]] = Math.max(dp[i + t[i]], dp[i] + p[i]);
-            }
-            //현재 경우의 수가 0일 수 있기 때문에 이전의 최대값을 넣어줌.
-            //해당 날짜에 일할 수 없다면, 이전까지 일한 최대 수당을 넣어주어야 한다.
-            dp[i+1] = Math.max(dp[i+1], dp[i]);
-        }
-        System.out.println(dp[n]);
+        if(move[r2][c2] == 0) System.out.println("-1");
+        else System.out.println(move[r2][c2]);
 
     }
+    private static void bfs(int r1,int c1,int r2,int c2){
+        Queue<int[]> que = new LinkedList<>();
+        int[] add= new int[2];
+        add[0] = r1;
+        add[1] = c1;
+        que.add(add);
+        visited[r1][c1] = true; // 출발지점을 방문처리
+        move[r1][c1] = 0; // 출발지점의 이동횟수는 0
 
+        while(!que.isEmpty()){
+            int[] v= que.poll();
+
+            for(int i=0;i<dx.length;i++){
+                int nextX = v[0] + dx[i]; // 다음 이동가능한 행
+                int nextY = v[1] + dy[i]; // 다음 이동가능한 열
+
+                if(nextX < 0 || nextY < 0 || nextY>=move.length || nextX>=move.length){
+                    continue;
+                } // 다음 이동경로가 체스판을 벗어나면 무시하고 진행
+                else{
+                    if(!visited[nextX][nextY]){ // 다음 이동 칸을 방문한 적 없다면
+                        move[nextX][nextY] = move[v[0]][v[1]] + 1; // 현재 위치에서 +1 (이동횟수)
+                        visited[nextX][nextY] = true; // 방문처리
+                        int[] addque = new int[2];
+                        addque[0] = nextX;
+                        addque[1] = nextY;
+                        que.add(addque); // 다음 이동위치를 큐에 넣어 다시 반복
+                    }
+                }
+            }
+        }
+
+
+    }
 }

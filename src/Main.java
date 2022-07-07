@@ -6,73 +6,141 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 /*
-작성자 : 송해광 ( 2022 - 07 - 06 )
-문제 : java baekjoon 16948 데스 나이트
-문제접근 : 데스나이트의 이동가능한 규약에 따라서 이동함에 따라 해당 위치에 몇 번 이동후 도착할 수 있는가
+작성자 : 송해광 ( 2022 - 07 - 07 )
+문제 : java algorithm study ( programmers level 2 - 수식 최대화 + 모음사전 )
+문제접근 : 모음사전 문제는 쉽게 해결했는데 수식 최대화 문제가 40분을 넘게 했는데도 접근조차 못한것같다...
+        접근 방법, 문제 구현 등 확실히 고쳐야 하는 방법이라 생각한다. 처음부터 다시 해봐야 할 것이다
  */
 
 class algorithm {
 
-    static int[] dx = {-2,-2,0,0,2,2}; // 데스 나이트의 이동 가능 경로 <행>
-    static int[] dy = {-1,1,-2,2,-1,1}; // 데스 나이트의 이동 가능 경로 <열>
-    static boolean[][] visited; // 방문 여부를 저장할 2차원 배열
-    static int[][] move; // 각 지점까지 도달하기 위한 이동 횟수를 저장하는 2차원 배열
+    static int answer = Integer.MIN_VALUE;
 
     public static void main(String[] args) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int N = Integer.parseInt(br.readLine());
+        String expressions = "100-200*300-500+20";
 
-        int[][] chess = new int[N][N]; // 2차원 배열 ( 체스판의 크기)
 
-        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+        char[][] operator = {
+                {'*','+','-'},{'*','-','+'},
+                {'-','+','*'},{'-','*','+'},
+                {'+','*','-'},{'+','-','*'}};
 
-        int r1 = Integer.parseInt(stk.nextToken()); // 시작점의 행
-        int c1 = Integer.parseInt(stk.nextToken()); // 시작점의 열
-        int r2 = Integer.parseInt(stk.nextToken()); // 도착지점의 행
-        int c2 = Integer.parseInt(stk.nextToken()); // 도착지점의 열
+        for(int i=0;i< operator.length;i++){
+            String expression = expressions;
+            for(int j=0;j< operator[i].length; j++){
 
-        visited = new boolean[N][N];
-        move = new int[N][N];
+                char ch = operator[i][j];
 
-        bfs(r1,c1,r2,c2);
+                for(int k=0;k<expression.length();k++){
+                    if(expression.charAt(k) == ch){
+                        int endPoint = 0;
+                        int startPoint = 0;
+                        for(int a = k+1; a<expression.length();a++){
+                            if(expression.charAt(a) == '-' || expression.charAt(a) == '*' ||expression.charAt(a) == '+'){
+                                endPoint = a;
+                                break;
+                            }
+                            else if(a==expression.length()-1){
+                                endPoint = a+1;
+                                break;
+                            }
+                        }
+                        for(int b = k-1; b>= 0; b--){
+                            if(expression.charAt(b) == '-' || expression.charAt(b) == '*' ||expression.charAt(b) == '+'){
+                                startPoint = b;
+                                break;
+                            }
+                            else if( b == 0){
+                                startPoint = -1;
+                                break;
+                            }
+                        }
 
-        if(move[r2][c2] == 0) System.out.println("-1");
-        else System.out.println(move[r2][c2]);
+                        int num = calculate(expression.substring(startPoint+1,endPoint));
 
-    }
-    private static void bfs(int r1,int c1,int r2,int c2){
-        Queue<int[]> que = new LinkedList<>();
-        int[] add= new int[2];
-        add[0] = r1;
-        add[1] = c1;
-        que.add(add);
-        visited[r1][c1] = true; // 출발지점을 방문처리
-        move[r1][c1] = 0; // 출발지점의 이동횟수는 0
-
-        while(!que.isEmpty()){
-            int[] v= que.poll();
-
-            for(int i=0;i<dx.length;i++){
-                int nextX = v[0] + dx[i]; // 다음 이동가능한 행
-                int nextY = v[1] + dy[i]; // 다음 이동가능한 열
-
-                if(nextX < 0 || nextY < 0 || nextY>=move.length || nextX>=move.length){
-                    continue;
-                } // 다음 이동경로가 체스판을 벗어나면 무시하고 진행
-                else{
-                    if(!visited[nextX][nextY]){ // 다음 이동 칸을 방문한 적 없다면
-                        move[nextX][nextY] = move[v[0]][v[1]] + 1; // 현재 위치에서 +1 (이동횟수)
-                        visited[nextX][nextY] = true; // 방문처리
-                        int[] addque = new int[2];
-                        addque[0] = nextX;
-                        addque[1] = nextY;
-                        que.add(addque); // 다음 이동위치를 큐에 넣어 다시 반복
                     }
                 }
+
             }
         }
 
 
+        /*
+        List<Integer> list = new ArrayList<>();
+        list.add(0);
+        for(int i=0;i<expression.length();i++){
+            if(expression.charAt(i) == '-' || expression.charAt(i) == '+' || expression.charAt(i) == '*') {
+                list.add(i+1);
+            }
+        }
+        list.add(expression.length()-1);
+
+        for(int i=0;i<list.size();i++){
+            System.out.println(list.get(i));
+        }
+
+        for(int i=0;i< operator.length; i++){
+            for(int j=0;j< operator[i].length; j++){
+
+                for(int k=1;k<list.size();k++){
+                    if(expression.charAt(list.get(k) -1) == operator[i][j]){
+                        System.out.println(operator[i][j]);
+                        calculate(expression.substring(list.get(k-1),list.get(k+1)-1));
+                    }
+                }
+                System.out.println();
+            }
+        }
+
+
+         */
+    }
+    private static int calculate(String str){
+        char oper = 'a';
+
+        for(int i=0;i<str.length();i++){
+            if(str.charAt(i) == '-' || str.charAt(i) == '*' || str.charAt(i) == '+'){
+                oper = str.charAt(i);
+                break;
+            }
+        }
+
+        String[] number = str.split("[-+*]");
+
+        int num1 = Integer.parseInt(number[0]);
+        int num2 = Integer.parseInt(number[1]);
+        int result = 0;
+        switch (oper){
+            case '-' : result = num1 - num2; break;
+            case '+' : result = num1 + num2; break;
+            case '*' : result = num1 * num2; break;
+        }
+
+        return result;
+
     }
 }
+
+/* 모음사전문제
+String word = "AAAE";
+
+        int answer = word.length();
+
+        HashMap<Character, Integer> map = new HashMap<>();
+        map.put('E',1);
+        map.put('I',2);
+        map.put('O',3);
+        map.put('U',4);
+        int[] nextMoum = {781,156,31,6,1};
+
+        for(int i=0;i<word.length();i++){
+            char ch = word.charAt(i);
+
+            if(ch != 'A'){
+                answer += nextMoum[i] * (map.get(ch));
+            }
+        }
+
+        System.out.println(answer);
+ */

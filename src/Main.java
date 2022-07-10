@@ -6,9 +6,9 @@ import java.io.InputStreamReader;
 import java.util.*;
 
 /*
-작성자 : 송해광 ( 2022 - 07 - 09 )
-문제 : java baekjoon 1834 나머지와 몫이 같은 수
-문제접근 : 처음에는 그저 for문을 돌리면 될 줄알았는데 그럼 무한히 반복되서 규칙을 찾기로 했다
+작성자 : 송해광 ( 2022 - 07 - 10 )
+문제 : java baekjoon 3273 두 수의 합
+문제접근 : 배열에서 2개 수의 합이 특정 수(x)가 되는 경우의 수를 구하라.
 */
 
 class Main {
@@ -17,35 +17,43 @@ class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int N = Integer.parseInt(br.readLine());
+        int n = Integer.parseInt(br.readLine());
 
-        long answer = 0;
-
-        // N answer
-        // 1 : X
-        // 2 : 3
-        // 3 : 4,8
-        // 4 : 5, 10, 15
-
-        for(long i=1;i<N;i++){
-            answer += (N+1) * i;
+        int[] arr = new int[n];
+        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+        for(int i=0;i<n;i++){
+            arr[i] = Integer.parseInt(stk.nextToken());
         }
-        System.out.println(answer);
-    }
-}
-        /* 원래 시도했던 방식 -> i의 범위가 정해진 거고 확인하는 거는 모든 자연수를 다 해야한다.
-        for(int i=1;i<=2000000;i++){
-            if(checkTrue(i,N)){
-                answer += i;
+
+        int x = Integer.parseInt(br.readLine());
+
+        int answer = 0;
+
+        /* 가장 일반적으로 생각할 수 있는 2중 for문을 활용한 해결법
+        for(int i=0;i<n-1;i++){
+            for(int j=i+1;j<n;j++){
+                if(arr[i] + arr[j] == x){
+                    answer++;
+                }
+            }
+        }
+         */
+
+        Arrays.sort(arr); // 투포인터로 접근하기 위해 정렬
+
+        for(int left = 0; left < n-1; left++){ // 배열의 끝 -1 까지만
+            for(int right = left+1; right<n; right++){ // 중복이 아니게 하나 다음부터
+                if(arr[left] + arr[right] == x){ // 해당 수와 같으면
+                    answer++;
+                }
+                else if(arr[left] + arr[right] > x) break;
+                // 정렬되어 있기때문에 arr[i] + arr[j]가 x를 넘으면 arr[k](k>j)와 더하는 건 무조건 x가 아니다
+                // 따라서 x를 넘는 순간 그 다음부터는 보지 않아도 괜찮다.
             }
         }
 
         System.out.println(answer);
+
+
     }
-    private static boolean checkTrue(int number,int N){
-        if(number / N == number % N){
-            return true;
-        }
-        else return false;
-    }
-}*/
+}

@@ -3,12 +3,12 @@ package src;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
 
 /*
-작성자 : 송해광 ( 2022 - 07 - 17 )
-문제 : java baekjoon 1032 명령 프롬프트
-문제접근 :  검색 결과가 먼저 주어졌을 때, 패턴으로 뭘 쳐야 그 결과가 나오는지를 출력하는 문제
+작성자 : 송해광 ( 2022 - 07 - 18 )
+문제 : java baekjoon 10953 A+B-6 && 1789 수들의 합
+문제접근 :  (수들의 합)검색 결과가 먼저 주어졌을 때, 패턴으로 뭘 쳐야 그 결과가 나오는지를 출력하는 문제
+          (A+B - 6) a,b 형태로 문자열이 주어지면 합을 구해서 출력하는 문제
  */
 
 class Main {
@@ -17,35 +17,28 @@ class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int N = Integer.parseInt(br.readLine());
+        /* 정수가 주어질 때 그 수를 더해서 만들 수 있는 최대 자연수의 개수
+        long S = Long.parseLong(br.readLine());
 
-        String[] fileName = new String[N]; // 입력받는 string들을 담을 배열
+        long answer = 0; // 더하는 자연수의 최대 개수를 구하기 위한 변수
 
-        for(int i=0;i<N;i++){
-            fileName[i] = br.readLine(); // string 입력
+        long number = 1; // 더하는 자연수
+        while(number <= S){ // 더하는 자연수를 빼나가다가 더하는 수가 S보다 작아지면 종료
+            answer++; // 더하는 자연수 개수 +1
+
+            S -= number; // S에서 더하는 수를 뺀다
+            number++; // 더하는 자연수를 1더해나간다(1,2,3... 자연수를)
         }
 
-        StringBuffer sb = new StringBuffer();
+        System.out.println(answer);
+         */
 
-        for(int i=0;i<fileName[0].length();i++){ // 첫번째 STRING을 for문으로 돌면서
-            char ch = fileName[0].charAt(i); // 첫번째 string의 하나하나
-            boolean flag = true;
-            for(int j=0;j<fileName.length;j++){ // 다른 string 들의 i번째 문자를 모두 확인
-                if(fileName[j].charAt(i) != ch){ // 그 중 다른 문자가 있다면 ?로 넣어야 한다.
-                    flag = false; // 해당 위치가 모두 같지 않다
-                    break;
-                }
-            }
+        int T = Integer.parseInt(br.readLine());
 
-            if(flag){ // 모든 string의 해당 위치 문자가 같으면
-                sb.append(ch); // 해당 문자를 넣고
-            } // 모든 string의 해당 위치가 모두 같지 않으면
-            else sb.append("?"); // 물음표를 넣는다.
-
+        for(int i=0;i<T;i++){
+            String str = br.readLine();
+            String[] number = str.split(","); // a,b형태로 수가 주어지기에
+            System.out.println(Integer.parseInt(number[0]) + Integer.parseInt(number[1]));
         }
-
-        System.out.println(sb.toString());
-
-
     }
 }

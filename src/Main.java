@@ -3,12 +3,14 @@ package src;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.Arrays;
+import java.util.StringTokenizer;
 
 /*
-작성자 : 송해광 ( 2022 - 07 - 17 )
-문제 : java baekjoon 1032 명령 프롬프트
-문제접근 :  검색 결과가 먼저 주어졌을 때, 패턴으로 뭘 쳐야 그 결과가 나오는지를 출력하는 문제
+작성자 : 송해광 ( 2022 - 07 - 20 )
+문제 : java baekjoon 1049 기타줄
+문제접근 : 끊어진 기타줄의 개수 N과 기타줄 브랜드 M개가 주어지고, 각각의 브랜드에서 파는 기타줄 6개가 들어있는 패키지의 가격,
+낱개로 살 때의 가격이 주어질 때, 적어도 N개를 사기 위해 필요한 돈의 수를 최소로 하는 프로그램을 작성
  */
 
 class Main {
@@ -17,35 +19,33 @@ class Main {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
-        int N = Integer.parseInt(br.readLine());
+        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
 
-        String[] fileName = new String[N]; // 입력받는 string들을 담을 배열
+        int N = Integer.parseInt(stk.nextToken());
+        int M = Integer.parseInt(stk.nextToken());
 
-        for(int i=0;i<N;i++){
-            fileName[i] = br.readLine(); // string 입력
+        int[] pack = new int[M];
+        int[] one = new int[M];
+
+        for(int i=0;i<M;i++){
+            stk = new StringTokenizer(br.readLine()," ");
+            int price_package = Integer.parseInt(stk.nextToken());
+            int price_one = Integer.parseInt(stk.nextToken());
+
+            pack[i] = price_package;
+            one[i] = price_one;
         }
 
-        StringBuffer sb = new StringBuffer();
+        int answer = 0;
 
-        for(int i=0;i<fileName[0].length();i++){ // 첫번째 STRING을 for문으로 돌면서
-            char ch = fileName[0].charAt(i); // 첫번째 string의 하나하나
-            boolean flag = true;
-            for(int j=0;j<fileName.length;j++){ // 다른 string 들의 i번째 문자를 모두 확인
-                if(fileName[j].charAt(i) != ch){ // 그 중 다른 문자가 있다면 ?로 넣어야 한다.
-                    flag = false; // 해당 위치가 모두 같지 않다
-                    break;
-                }
-            }
-
-            if(flag){ // 모든 string의 해당 위치 문자가 같으면
-                sb.append(ch); // 해당 문자를 넣고
-            } // 모든 string의 해당 위치가 모두 같지 않으면
-            else sb.append("?"); // 물음표를 넣는다.
-
+        Arrays.sort(pack);
+        Arrays.sort(one);
+        if (N < 6) {
+            answer += Math.min(pack[0], one[0] * N);
+        } else {
+            int calcHelp = Math.min(pack[0], one[0] * 6);
+            answer += calcHelp * (N / 6);
+            answer += Math.min(calcHelp, one[0] * (N % 6));
         }
-
-        System.out.println(sb.toString());
-
-
     }
 }

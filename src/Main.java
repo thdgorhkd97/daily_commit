@@ -8,10 +8,9 @@ import java.util.StringTokenizer;
 
 /*
 작성자 : 송해광 ( 2022 - 07 - 20 )
-문제 : java baekjoon 1049 기타줄
-문제접근 : 끊어진 기타줄의 개수 N과 기타줄 브랜드 M개가 주어지고, 각각의 브랜드에서 파는 기타줄 6개가 들어있는 패키지의 가격,
-낱개로 살 때의 가격이 주어질 때, 적어도 N개를 사기 위해 필요한 돈의 수를 최소로 하는 프로그램을 작성
- */
+문제 : java baekjoon 1051 숫자 정사각형
+문제접근 : 직사각형에서 꼭짓점에 쓰여 있는 수가 모두 같은 가장 큰 정사각형을 찾는 프로그램을 작성
+*/
 
 class Main {
 
@@ -24,28 +23,30 @@ class Main {
         int N = Integer.parseInt(stk.nextToken());
         int M = Integer.parseInt(stk.nextToken());
 
-        int[] pack = new int[M];
-        int[] one = new int[M];
-
-        for(int i=0;i<M;i++){
-            stk = new StringTokenizer(br.readLine()," ");
-            int price_package = Integer.parseInt(stk.nextToken());
-            int price_one = Integer.parseInt(stk.nextToken());
-
-            pack[i] = price_package;
-            one[i] = price_one;
+        char[][] rectangle = new char[N][M];
+        for(int i=0;i<N;i++){
+            rectangle[i] = br.readLine().toCharArray(); // 배열에 char로 넣고
         }
 
-        int answer = 0;
+        int min = Math.min(N,M); // N,M 중 작은 걸로
+        int maxArea = Integer.MIN_VALUE;
+        int area = 0;
 
-        Arrays.sort(pack);
-        Arrays.sort(one);
-        if (N < 6) {
-            answer += Math.min(pack[0], one[0] * N);
-        } else {
-            int calcHelp = Math.min(pack[0], one[0] * 6);
-            answer += calcHelp * (N / 6);
-            answer += Math.min(calcHelp, one[0] * (N % 6));
+        for(int i=0; i<N; i++) {
+            for(int j=0; j<M; j++) {
+                for(int k=0; k<min; k++) { // 아무리 커봤자 가로,세로 중 작은 값을 넘어설 순 없다
+                    if(i+k < N && j+k < M) {	// 배열 범위 이내
+
+                        // 4개의 꼭짓점이 정사각형이 되는 조건
+                        if(rectangle[i][j] == rectangle[i][j+k] && rectangle[i][j] == rectangle[i+k][j] && rectangle[i][j] == rectangle[i+k][j+k]) {
+                            area = (k+1) * (k+1); // k는 인덱스이므로 + 1
+                            maxArea = Math.max(maxArea, area);
+                        }
+                    }
+                }
+            }
         }
+
+        System.out.println(maxArea);
     }
 }

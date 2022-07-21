@@ -7,46 +7,33 @@ import java.util.Arrays;
 import java.util.StringTokenizer;
 
 /*
-작성자 : 송해광 ( 2022 - 07 - 20 )
-문제 : java baekjoon 1051 숫자 정사각형
-문제접근 : 직사각형에서 꼭짓점에 쓰여 있는 수가 모두 같은 가장 큰 정사각형을 찾는 프로그램을 작성
+작성자 : 송해광 ( 2022 - 07 - 21 )
+문제 : java programmers 타겟 넘버
+문제접근 : int형 배열이 주어지고 타겟넘버가 주어질 때 + - 를 조합해서 타겟넘버가 되는 경우의 수
 */
 
 class Main {
 
+    static int answer = 0;
+
     public static void main(String[] args) throws IOException {
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int[] numbers = {1,1,1,1,1};
+        int target = 3;
 
-        StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+        dfs(numbers,target,0,0);
+        System.out.println(answer);
+    }
 
-        int N = Integer.parseInt(stk.nextToken());
-        int M = Integer.parseInt(stk.nextToken());
-
-        char[][] rectangle = new char[N][M];
-        for(int i=0;i<N;i++){
-            rectangle[i] = br.readLine().toCharArray(); // 배열에 char로 넣고
-        }
-
-        int min = Math.min(N,M); // N,M 중 작은 걸로
-        int maxArea = Integer.MIN_VALUE;
-        int area = 0;
-
-        for(int i=0; i<N; i++) {
-            for(int j=0; j<M; j++) {
-                for(int k=0; k<min; k++) { // 아무리 커봤자 가로,세로 중 작은 값을 넘어설 순 없다
-                    if(i+k < N && j+k < M) {	// 배열 범위 이내
-
-                        // 4개의 꼭짓점이 정사각형이 되는 조건
-                        if(rectangle[i][j] == rectangle[i][j+k] && rectangle[i][j] == rectangle[i+k][j] && rectangle[i][j] == rectangle[i+k][j+k]) {
-                            area = (k+1) * (k+1); // k는 인덱스이므로 + 1
-                            maxArea = Math.max(maxArea, area);
-                        }
-                    }
-                }
+    static void dfs(int[] numbers, int target,int sum,int index){
+        if(numbers.length == index){ // index가 같다는 건 모든 수에 대해 부호를 정했다는 뜻
+            if(sum == target){ // 부호를 정한 모든 수의 계산이 target과 같으면
+                answer++;
             }
+            return ;
         }
 
-        System.out.println(maxArea);
+        dfs(numbers,target,sum + numbers[index],index+1); // 해당 인덱스의 수를 + 로
+        dfs(numbers,target,sum - numbers[index],index+1); // 해당 인덱스의 수를 - 로
     }
 }

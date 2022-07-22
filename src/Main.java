@@ -26,13 +26,13 @@ class Main {
 
         int N = Integer.parseInt(br.readLine()); // 컴퓨터의 수
 
-        visited = new boolean[N+1];
-        graph = new int[N+1][N+1];
+        visited = new boolean[N + 1];
+        graph = new int[N + 1][N + 1];
 
         int M = Integer.parseInt(br.readLine()); // 연결되어 있는 컴퓨터 쌍의 수
 
-        for(int i=0;i<M;i++){
-            StringTokenizer stk = new StringTokenizer(br.readLine()," ");
+        for (int i = 0; i < M; i++) {
+            StringTokenizer stk = new StringTokenizer(br.readLine(), " ");
 
             int one = Integer.parseInt(stk.nextToken());
             int two = Integer.parseInt(stk.nextToken());
@@ -42,27 +42,26 @@ class Main {
 
         bfs(1); // 1번과 연결된 컴퓨터의 수 구하기
 
-        System.out.println(answer-1);
+        System.out.println(answer - 1);
     }
 
-    private static void bfs(int start){
+    private static void bfs(int start) {
         Queue<Integer> que = new LinkedList<>();
         que.add(start);
         visited[start] = true;
 
-        while(!que.isEmpty()){
+        while (!que.isEmpty()) {
             int v = que.poll();
             System.out.println(v);
             answer++;
 
 
-            for(int i=1;i< graph.length;i++){
-                if(graph[v][i] == 1 && !visited[i]){
+            for (int i = 1; i < graph.length; i++) {
+                if (graph[v][i] == 1 && !visited[i]) {
                     que.add(i);
                     visited[i] = true;
                 }
             }
         }
-
     }
 }

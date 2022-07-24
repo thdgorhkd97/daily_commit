@@ -9,7 +9,7 @@ import java.util.Queue;
 import java.util.StringTokenizer;
 
 /*
-작성자 : 송해광 ( 2022 - 07 - 23 )
+작성자 : 송해광 ( 2022 - 07 - 24 )
 문제 : java baekjoon 1743 음식물 피하기
 문제접근 : 2차원 배열에서 음식물위치가 주어지면 가장 큰 덩어리의 크기를 구하기
 */
@@ -21,6 +21,7 @@ class Main {
     static int answer = Integer.MIN_VALUE;
     static int[] dx = {-1,1,0,0}; // 상하좌우
     static int[] dy = {0,0,-1,1}; // 상하좌우
+    static int cnt = 0;
 
     public static void main(String[] args) throws IOException {
 
@@ -42,19 +43,21 @@ class Main {
             int c = Integer.parseInt(stk.nextToken()); // 음식물이 떨어진 좌표의 열
 
             hallway[r][c] = 1;
-            hallway[c][r] = 1;
 
         }
 
-        for(int i=0;i<N;i++){
-            for(int j=0;j<M;j++){
+        for(int i=1;i<=N;i++){ // N+1 로 받았으니까범위 수정
+            for(int j=1;j<=M;j++){ // M+1로 받았기에 범위 수정
                 if(hallway[i][j]== 1 && !visited[i][j]){ // 음식물이 위치해있고 방문하지 않았다면
+                    cnt = 0;
                     bfs(i,j); // 해당 위치를 기준으로 BFS 시작
+
+                    answer = Math.max(answer,cnt);
                 }
             }
         }
 
-        System.out.println(answer-1);
+        System.out.println(answer);
 
 
     }
@@ -64,8 +67,7 @@ class Main {
         addque(row,column,que); // que에 row,column을 가지는 int[] 배열 넣기
         visited[row][column] = true;
 
-        int cnt = 1;
-
+        cnt++; // 처음 bfs로 들어오면 하나 추가
         while(!que.isEmpty()){
             int[] v = que.poll();
 
@@ -79,14 +81,13 @@ class Main {
                 else{
                     if(hallway[nextX][nextY] == 1 && !visited[nextX][nextY]){
                         addque(nextX,nextY,que);
+
                         visited[nextX][nextY] = true;
                         cnt++;
                     }
                 }
             }
         }
-
-        answer = Math.max(answer,cnt);
 
 
     }
